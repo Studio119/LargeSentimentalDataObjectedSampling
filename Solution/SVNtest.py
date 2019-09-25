@@ -18,7 +18,7 @@ file = open("../data/sentiment.json", mode='r')
 #     else:
 #         y.append(1)
 bos = json.loads(file.read())
-for i in range(0, len(bos)):
+for i in range(0, len(bos), 1):
     d = bos[i]
     X.append([d['lat'], d['lng']])
     if d['sentiment'] == '0.0':
@@ -34,7 +34,7 @@ file.close()
 # we create an instance of SVM and fit out data. We do not scale our
 # data since we want to plot the support vectors
 
-svc = svm.SVC(kernel='rbf', C=10, gamma=20, decision_function_shape='ovr').fit(X, y)
+svc = svm.SVC(kernel='linear', C=100, gamma='auto', decision_function_shape='ovr').fit(X, y)
 # create a mesh to plot in
 x_min, x_max = 0, 0
 y_min, y_max = 0, 0
@@ -67,5 +67,5 @@ plt.scatter([x[0] for x in X], [x[1] for x in X], c=y, cmap=plt.cm.Paired)
 plt.xlabel('x')
 plt.ylabel('y')
 plt.xlim(xx.min(), xx.max())
-plt.title('SVC with rbf kernel and C = 10')
+plt.title('SVC with linear kernel and C = 10')
 plt.show()
