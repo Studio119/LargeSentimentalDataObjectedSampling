@@ -35,7 +35,7 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
                     display: 'inline-block',
                     height: '100%',
                     width: '75.6%',
-                    marginLeft: '0.12%',
+                    marginLeft: '24.12%',
                     background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 2%, rgb(227, 227, 229) 94%, rgb(135, 137, 142))',
                     border: '1px solid black'
                 }}>

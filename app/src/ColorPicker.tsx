@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-27 19:41:41 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-09-28 03:11:26
+ * @Last Modified time: 2019-09-28 21:18:44
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -102,12 +102,13 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
                             </svg>
                         </div>
                     </div>
+                    <div id="ColorPickerFocusBox" style="position: absolute; z-index: 3000; width: 4px; height: 4px;
+                    border: 3px solid black; border-radius: 4px;" />
                 </div>`);
             ColorPicker.initialized = true;
             $('#containerascolorpickerstatic').hide();
             $('#containerascolorpickerstatic').on('mouseover', () => {
                 ColorPicker.mouseOverContainer = true;
-                $('#containerascolorpickerstatic').show();
             }).on('mouseleave', () => {
                 setTimeout(() => {
                     ColorPicker.mouseOverContainer = false;
@@ -153,9 +154,9 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
                 }
             });
             $('#ColorPickerrgb_tab').on("click", (event: JQuery.ClickEvent<HTMLElement, undefined, HTMLElement, HTMLElement>) => {
+                let x: number = event.offsetX / 280;
+                let y: number = event.offsetY / 60;
                 if (ColorPicker.ref) {
-                    let x: number = event.offsetX / 280;
-                    let y: number = event.offsetY / 60;
                     let r: number = ColorPicker.ref.state.r;
                     let g: number = ColorPicker.ref.state.g;
                     let b: number = ColorPicker.ref.state.b;
@@ -165,7 +166,7 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
                         case 0:
                             r = 255;
                             g = i;
-                            b = 0
+                            b = 0;
                             break;
                         case 1:
                             r = 255 - i;
@@ -207,6 +208,13 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
                         r: r, g: g, b: b
                     });
                 }
+                $('#ColorPickerFocusBox').css("left", event.offsetX - 3).css("top", event.offsetY - 3);
+                if (event.offsetY > 30) {
+                    $('#ColorPickerFocusBox').css("border", "3px solid white");
+                }
+                else {
+                    $('#ColorPickerFocusBox').css("border", "3px solid black");
+                }
             });
         }
         $(this.refs["icon"]).on('mouseover', (event: JQuery.MouseOverEvent<React.ReactInstance, undefined, React.ReactInstance, React.ReactInstance>) => {
@@ -219,6 +227,7 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
                 .show()
                 .css("left", event.clientX - event.offsetX - 260)
                 .css("top", event.clientY - event.offsetY + 16);
+            ColorPicker.loadFocusBox(this.state);
         });
         $(this.refs["iconsvg"]).on('mouseleave', () => {
             setTimeout(() => {
@@ -231,6 +240,73 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
         });
     }
 
+    protected static loadFocusBox(rgba: ColorPickerState): void {
+        let x: number = 10;
+        let y: number = 10;
+        if (rgba.r === 0) {
+            if (rgba.g >= rgba.b) {
+                x = 280 / 3 + (280 / 6) * (rgba.b / rgba.g) - 3;
+                y = 30 + (255 - rgba.g) * 30 / 255 - 3;
+            }
+            else {
+                x = 140 + (280 / 6) * (1 - rgba.g / rgba.b) - 3;
+                y = 30 + (255 - rgba.b) * 30 / 255 - 3;
+            }
+        }
+        else if (rgba.g === 0) {
+            x = 560 / 3;
+            if (rgba.b > rgba.r) {
+                x += (280 / 6) * (rgba.r / rgba.b) - 3;
+                y = 30 + (255 - rgba.b) * 30 / 255 - 3;
+            }
+            else {
+                x += (280 / 6) * (2 - rgba.b / rgba.r) - 3;
+                y = 30 + (255 - rgba.r) * 30 / 255 - 3;
+            }
+        }
+        else if (rgba.b === 0) {
+            if (rgba.r <= rgba.g) {
+                x = 280 / 6 + 280 * (1 - rgba.r / rgba.g) / 6 - 3;
+                y = 30 + (255 - rgba.g) * 30 / 255 - 3;
+            }
+            else {
+                x = 280 / 6 * rgba.g / rgba.r - 3;
+                y = 30 + (255 - rgba.r) * 30 / 255 - 3;
+            }
+        }
+        else {
+            if (rgba.b <= rgba.r && rgba.b <= rgba.g) {
+                y = 30 * (255 - rgba.b) / 255 - 3;
+                if (rgba.g === 255) {
+                    x = 280 / 6 + ((255 - rgba.r) * 30 / (y + 3)) * 280 / 255 / 6 - 3;
+                }
+                else {
+                    x = 280 / 6 - ((255 - rgba.g) * 30 / (y + 3)) * 280 / 255 / 6 - 3;
+                }
+            }
+            else if (rgba.r <= rgba.g && rgba.r <= rgba.b) {
+                y = 30 * (255 - rgba.r) / 255 - 3;
+                if (rgba.b === 255) {
+                    x = 140 + ((255 - rgba.g) * 30 / (y + 3)) * 280 / 255 / 6 - 3;
+                }
+                else {
+                    x = 140 - ((255 - rgba.b) * 30 / (y + 3)) * 280 / 255 / 6 - 3;
+                }
+            }
+            else {
+                y = 30 * (255 - rgba.g) / 255 - 3;
+                if (rgba.b === 255) {
+                    x = 280 * 5 / 6 - ((255 - rgba.r) * 30 / (y + 3)) * 280 / 255 / 6 - 3;
+                }
+                else {
+                    x = 280 * 5 / 6 + ((255 - rgba.b) * 30 / (y + 3)) * 280 / 255 / 6 - 3;
+                }
+            }
+        }
+        x = x >= 267 ? x - 271 : x;
+        $('#ColorPickerFocusBox').css("left", x).css("top", y).css("border", y > 30 ? "3px solid white" : "3px solid black");
+    }
+
     public getColor(): string {
         return `rgba(${this.state.r}, ${this.state.g}, ${this.state.b}, ${this.state.opacity})`;
     }
@@ -238,6 +314,16 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
     public bind(element: JQuery<HTMLElement>): void {
         element.css('fill', this.getColor()).css('color', this.getColor());
         this.observing.push(element);
+    }
+
+    public unbind(element: JQuery<HTMLElement>): void {
+        let update: Array<JQuery<HTMLElement>> = [];
+        this.observing.forEach((e: JQuery<HTMLElement>) => {
+            if (e !== element) {
+                update.push(e);
+            }
+        });
+        this.observing = update;
     }
 
     public componentDidUpdate(): void {
