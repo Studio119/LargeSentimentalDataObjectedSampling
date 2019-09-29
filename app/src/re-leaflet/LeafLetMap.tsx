@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-25 18:59:40 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-09-25 20:26:45
+ * @Last Modified time: 2019-09-29 20:02:46
  */
 
 import React, { Component } from "react";
@@ -61,7 +61,7 @@ class LeafLetMap extends Component<LeafLetMapProps, LeafLetMapState, {}> {
 
     public addPoint(lat: number, lng: number, options: L.CircleMarkerOptions | undefined,
             comment?: string | ((layer: L.Layer) => L.Content) | HTMLElement | L.Popup): void {
-        let point: L.Circle<any> = L.circle([lng, lat], 1, {
+        let point: L.Circle<any> = L.circle([lat, lng], 1, {
             color: 'red',
             fillColor: '#f03',
             ...options
