@@ -58,6 +58,18 @@ class LeafLetMap extends Component<LeafLetMapProps, LeafLetMapState, {}> {
     public layer(index: number): L.FeatureGroup<any> {
         return this.layers[index];
     }
+
+    public addPoint(lat: number, lng: number, options: L.CircleMarkerOptions | undefined,
+            comment?: string | ((layer: L.Layer) => L.Content) | HTMLElement | L.Popup): void {
+        let point: L.Circle<any> = L.circle([lng, lat], 1, {
+            color: 'red',
+            fillColor: '#f03',
+            ...options
+        }).addTo(this.map!);
+        if (comment) {
+            point.bindPopup(comment);
+        }
+    }
 }
 
 

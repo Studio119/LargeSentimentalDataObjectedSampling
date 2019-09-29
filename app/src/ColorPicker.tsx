@@ -23,7 +23,7 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
     private valueAfterDragging: number;
     private static mouseOverIcon: boolean;
     private static mouseOverContainer: boolean;
-    private observing: Array<JQuery<HTMLElement>>;
+    private observing: Array<{ element: JQuery<HTMLElement>, Attr: Array<string> }>;
 
     public constructor(props: ColorPickerState & { x: number; y: number }) {
         super(props);
@@ -311,15 +311,17 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
         return `rgba(${this.state.r}, ${this.state.g}, ${this.state.b}, ${this.state.opacity})`;
     }
 
-    public bind(element: JQuery<HTMLElement>): void {
-        element.css('fill', this.getColor()).css('color', this.getColor());
-        this.observing.push(element);
+    public bind(element: JQuery<HTMLElement>, ...attrName: Array<string>): void {
+        attrName.forEach((attr: string) => {
+            element.css(attr, this.getColor());
+        });
+        this.observing.push({ element: element, Attr: attrName });
     }
 
     public unbind(element: JQuery<HTMLElement>): void {
-        let update: Array<JQuery<HTMLElement>> = [];
-        this.observing.forEach((e: JQuery<HTMLElement>) => {
-            if (e !== element) {
+        let update: Array<{ element: JQuery<HTMLElement>, Attr: Array<string> }> = [];
+        this.observing.forEach((e: { element: JQuery<HTMLElement>, Attr: Array<string> }) => {
+            if (e.element !== element) {
                 update.push(e);
             }
         });
@@ -327,8 +329,10 @@ class ColorPicker extends Component<ColorPickerState & { x: number; y: number },
     }
 
     public componentDidUpdate(): void {
-        this.observing.forEach((element: JQuery<HTMLElement>) => {
-            element.css('fill', this.getColor()).css('color', this.getColor());
+        this.observing.forEach((e: { element: JQuery<HTMLElement>, Attr: Array<string> }) => {
+            e.Attr.forEach((attr: string) => {
+                e.element.css(attr, this.getColor());
+            });
         });
     }
 

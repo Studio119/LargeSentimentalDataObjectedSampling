@@ -5,6 +5,7 @@
  * @Last Modified time: 2019-09-25 20:28:40
  */
 import React, { Component } from 'react';
+import $ from 'jquery';
 import LeafLetMap from './re-leaflet/LeafLetMap';
 
 export interface MapViewProps {
@@ -51,7 +52,12 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
 
     public componentDidMount(): void {
         this.mounted = true;
+        
         this.setState({});
+    }
+
+    public componentDidUpdate(): void {
+
     }
 }
 

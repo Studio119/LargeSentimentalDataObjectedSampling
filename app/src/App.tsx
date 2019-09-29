@@ -22,7 +22,7 @@ const App: React.FC = () => {
           marginBottom: '2px'
         }}>
         <Settings id="MapSettings" />
-        <MapView id="MapView" center={ [38, -100] } zoom={ 5 } minZoom={ 5 } />
+        <MapView id="MapView" center={ [38, -100] } zoom={ 5 } minZoom={ 4 } />
       </div>
       <div className="Line"
         style={{
