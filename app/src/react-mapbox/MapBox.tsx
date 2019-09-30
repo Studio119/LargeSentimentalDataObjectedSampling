@@ -70,7 +70,7 @@ class MapBox extends Component<MapProps, {}, {}> {
                 source: "default",
                 paint: {
                     "circle-radius": 2,
-                    "circle-color": "#B42222"
+                    "circle-color": ['get', 'color']
                 }
             });
             this.layerData = { 'default': [] };
@@ -78,14 +78,42 @@ class MapBox extends Component<MapProps, {}, {}> {
         });
     }
 
-    public appendPoint(key: string, latlng: [number, number], source: string = 'default'): void {
+    public addSource(id: string, color: string): void {
         if (!this.status) {
-            setTimeout(() => this.appendPoint(key, latlng), 400);
+            setTimeout(() => this.addSource(id, color));
+            return;
+        }
+        this.map!.addSource(id, {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                features: []
+            }
+        });
+        this.map!.addLayer({
+            id: id,
+            type: "circle",
+            source: id,
+            paint: {
+                "circle-radius": 2,
+                "circle-color": ['get', 'color']
+            }
+        });
+        this.layerData[id] = [];
+        this.status = true;
+    }
+
+    public appendPoint(key: string, latlng: [number, number], color: string, source: string = 'default'): void {
+        if (!this.status) {
+            setTimeout(() => this.appendPoint(key, latlng, color, source), 400);
             return;
         }
         (this.layerData[source] as Array<Feature<Geometry, GeoJsonProperties>>).push({
             type: "Feature",
-            properties: { dbh: 5 },
+            properties: {
+                dbh: 5,
+                color: color
+            },
             geometry: {
                 type: "Point",
                 coordinates: [latlng[1], latlng[0]]

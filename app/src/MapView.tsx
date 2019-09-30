@@ -79,15 +79,15 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
     }
 
     public componentDidUpdate(): void {
+        // (this.refs["map"] as MapBox).addSource('a', 'green');
+        // (this.refs["map"] as MapBox).addSource('b', 'yellow');
+        // (this.refs["map"] as MapBox).addSource('c', 'red');
         let count: number = 0;
         this.state.data.forEach((d: {
             id: string, lng: number, lat: number, words: string,
-        day: string, city: string, sentiment: string}, index: number) => {
-            if (index % 100 >= 100) {
-                return;
-            }
+        day: string, city: string, sentiment: string}) => {
             if (d.lat >= 0 || d.lat < 0 || d.lng >= 0 || d.lng < 0) {
-                (this.refs["map"] as MapBox).appendPoint(d.id, [d.lat, d.lng]);
+                (this.refs["map"] as MapBox).appendPoint(d.id, [d.lat, d.lng], parseFloat(d.sentiment) < 0 ? 'red' : parseFloat(d.sentiment) > 0 ? 'green' : 'yellow');
                 count++;
             }
         });
