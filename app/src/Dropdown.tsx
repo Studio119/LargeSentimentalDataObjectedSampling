@@ -5,7 +5,7 @@
  * @Last Modified time: 2019-09-29 17:38:29
  */
 
-import React, { Component, ReactInstance } from 'react';
+import React, { Component } from 'react';
 import $ from 'jquery';
 
 export interface DropdownProps<T> {
@@ -43,6 +43,18 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                     fontWeight: 'bold',
                     letterSpacing: '0.1em'
                 }}
+                onMouseOver={
+                    () => {
+                        let button: JQuery<HTMLElement> = $((this.refs["button"] as any));
+                        button.css("background", "rgb(209, 98, 212)");
+                    }
+                }
+                onMouseOut={
+                    () => {
+                        let button: JQuery<HTMLElement> = $((this.refs["button"] as any));
+                        button.css("background", "rgb(218, 202, 229)");
+                    }
+                }
                 onClick={
                     () => {
                         let list: JQuery<HTMLElement> = $((this.refs["list"] as any));
@@ -85,6 +97,7 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                                         this.setState({
                                             value: index
                                         });
+                                        $((this.refs["list"] as any)).hide();
                                     }
                                 }
                                 onMouseEnter={
