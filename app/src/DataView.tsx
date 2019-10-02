@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-02 22:01:38
+ * @Last Modified time: 2019-10-03 00:34:28
  */
 import React, { Component } from 'react';
 
@@ -54,13 +54,13 @@ class DataView extends Component<DataViewProps, DataViewState, {}> {
                     marginRight: 'auto'
                 }} >
                     <tbody>
-                        <tr style={{ padding: '2px 6px' }} ><th style={{ marginRight: '6px' }} >数据总量</th><td>{ DataView.format(this.state.total, false) }</td></tr>
-                        <tr style={{ padding: '2px 6px' }} ><th style={{ marginRight: '6px' }} >积极情感</th><td>{ DataView.format(this.state.active, false) }</td></tr>
-                        <tr style={{ padding: '2px 6px' }} ><th style={{ marginRight: '6px' }} >消极情感</th><td>{ DataView.format(this.state.positive, false) }</td></tr>
-                        <tr style={{ padding: '2px 6px' }} ><th style={{ marginRight: '6px' }} >中性情感</th><td>{ DataView.format(this.state.neutre, false) }</td></tr>
-                        <tr style={{ padding: '2px 6px' }} ><th style={{ marginRight: '6px' }} >积极情感均值</th><td>{ DataView.format(this.state.Aver_active, true) }</td></tr>
-                        <tr style={{ padding: '2px 6px' }} ><th style={{ marginRight: '6px' }} >消极情感均值</th><td>{ DataView.format(this.state.Aver_positive, true) }</td></tr>
-                        <tr style={{ padding: '2px 6px' }} ><th style={{ marginRight: '6px' }} >中性情感均值</th><td>{ DataView.format(this.state.Aver_neutre, true) }</td></tr>
+                        <tr style={{ padding: '2px 6px' }} ><th style={{ paddingRight: '6px' }} >数据总量</th><td>{ DataView.format(this.state.total, false) }</td></tr>
+                        <tr style={{ padding: '2px 6px' }} ><th style={{ paddingRight: '6px' }} >积极情感</th><td>{ DataView.format(this.state.active, false) }</td></tr>
+                        <tr style={{ padding: '2px 6px' }} ><th style={{ paddingRight: '6px' }} >消极情感</th><td>{ DataView.format(this.state.positive, false) }</td></tr>
+                        <tr style={{ padding: '2px 6px' }} ><th style={{ paddingRight: '6px' }} >中性情感</th><td>{ DataView.format(this.state.neutre, false) }</td></tr>
+                        <tr style={{ padding: '2px 6px' }} ><th style={{ paddingRight: '6px' }} >积极情感均值</th><td>{ DataView.format(this.state.Aver_active, true) }</td></tr>
+                        <tr style={{ padding: '2px 6px' }} ><th style={{ paddingRight: '6px' }} >消极情感均值</th><td>{ DataView.format(this.state.Aver_positive, true) }</td></tr>
+                        <tr style={{ padding: '2px 6px' }} ><th style={{ paddingRight: '6px' }} >中性情感均值</th><td>{ DataView.format(this.state.Aver_neutre, true) }</td></tr>
                     </tbody>
                 </table>
             </div>

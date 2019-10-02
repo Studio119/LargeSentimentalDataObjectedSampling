@@ -18,7 +18,7 @@ class App extends Component<{}, {}, {}> {
     return (
       <div className="App">
         <DataCenter ref="DataCenter"/>
-        <ItemStrip id="ItemStrip" />
+        <ItemStrip id="ItemStrip" importSource={ this.loadSource } />
         <DataView id="MapSettings" ref="DataView" />
         <Settings id="ActiveSettings" />
         <MapView id="MapView" ref="map" center={ [-100, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 5 } />
@@ -39,7 +39,7 @@ class App extends Component<{}, {}, {}> {
             height: '306px',
             width: '1111px'
           }}>
-          <ContrastView id="ContrastView" />
+          <ContrastView id="ContrastView" displayLevels={ 3 } />
           <div
             style={{
                 display: 'inline-block',
@@ -56,37 +56,44 @@ class App extends Component<{}, {}, {}> {
   }
 
   public componentDidMount(): void {
-    (this.refs["DataCenter"] as DataCenter).openCSV('/data/93.csv', (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
-      let dataset: Array<{
-        id: string, lng: number, lat: number, words: string,
-        day: string, city: string, sentiment: string}> = [];
-      let active: number = 0;
-      let positive: number = 0;
-      let neutre: number = 0;
-      let A_active: number = 0;
-      let A_positive: number = 0;
-      let A_neutre: number = 0;
-      data.forEach((d: { id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }) => {
-        if (parseFloat(d.sentiment) > 0) {
-          active++;
-          A_active += parseFloat(d.sentiment);
-        }
-        else if (parseFloat(d.sentiment) < 0) {
-          positive++;
-          A_positive += parseFloat(d.sentiment);
-        }
-        else {
-          neutre++;
-          A_neutre += parseFloat(d.sentiment);
-        }
-        dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng) });
+    this.loadSource = (url: string) => {
+      (this.refs["DataCenter"] as DataCenter).openCSV(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
+        let dataset: Array<{
+          id: string, lng: number, lat: number, words: string,
+          day: string, city: string, sentiment: string}> = [];
+        let active: number = 0;
+        let positive: number = 0;
+        let neutre: number = 0;
+        let A_active: number = 0;
+        let A_positive: number = 0;
+        let A_neutre: number = 0;
+        data.forEach((d: { id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }) => {
+          if (parseFloat(d.sentiment) > 0) {
+            active++;
+            A_active += parseFloat(d.sentiment);
+          }
+          else if (parseFloat(d.sentiment) < 0) {
+            positive++;
+            A_positive += parseFloat(d.sentiment);
+          }
+          else {
+            neutre++;
+            A_neutre += parseFloat(d.sentiment);
+          }
+          dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng) });
+        });
+        (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
+        (this.refs["map"] as MapView).setState({
+          data: dataset
+        });
       });
-      (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
-      (this.refs["map"] as MapView).setState({
-        data: dataset
-      });
-    });
+    }
   }
+
+  private loadSource: (url: string) => void
+    = (url: string) => {
+      setTimeout(() => this.loadSource(url), 1000);
+    };
 }
 
 

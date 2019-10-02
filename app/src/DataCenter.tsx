@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-02 15:53:12 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-02 21:44:55
+ * @Last Modified time: 2019-10-03 00:24:46
  */
 
 import React, { Component } from 'react';
@@ -53,7 +53,7 @@ class DataCenter extends Component<DataCenterProps, DataCenterState, {}> {
                 top: 0,
                 zIndex: 10000
             }}>
-                <div
+                <div key="title"
                 style={{
                     paddingTop: '8px',
                     borderBottom: '1px solid black',
@@ -63,53 +63,89 @@ class DataCenter extends Component<DataCenterProps, DataCenterState, {}> {
                 }}>
                     <header>TASK QUEUE</header>
                 </div>
-                <table
-                style={{
-                    width: '100%'
-                }}>
-                    <tbody>
-                        <tr key={ `taskheader` }
-                        style={{
-                            width: '100%',
-                            height: '36px'
-                        }}>
-                            <td key={ `taskheader_label1`} style={{ width: '40%' }} >file path</td>
-                            <td key={ `taskheader_label2`} style={{ width: '30%' }} >state</td>
-                            <td key={ `taskheader_label3`} style={{ width: '30%' }} >size</td>
-                        </tr>
-                        {
-                            this.state.tasks.length === 0
-                                ?
-                            <tr key={ `task_null` }
+                <div key="head">
+                    <table
+                    style={{
+                        width: '100%',
+                        padding: '0px 52px 0px 10px'
+                    }}>
+                        <tbody>
+                            <tr key={ `taskheader` }
                             style={{
-                                width: '100%'
+                                width: '100%',
+                                height: '36px'
                             }}>
-                                <td key={ `task_null_text1`} style={{ width: '40%' }} >Nothing in the queue</td>
-                                <td key={ `task_null_text2`} style={{ width: '30%' }} >...</td>
-                                <td key={ `task_null_text3`} style={{ width: '30%' }} >...</td>
+                                <td key={ `taskheader_label1`} style={{ width: '36%' }} >file path</td>
+                                <td key={ `taskheader_label2`} style={{ width: '20%' }} >state</td>
+                                <td key={ `taskheader_label3`} style={{ width: '24%' }} >size</td>
+                                <td key={ `taskheader_label4`} style={{ width: '10%' }} >print</td>
+                                <td key={ `taskheader_label5`} style={{ width: '10%' }} >cancel</td>
                             </tr>
-                                :
-                            this.state.tasks.map((task: { url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }, index: number) => {
-                                return (
-                                    <tr key={ `task${ index }` }
-                                    style={{
-                                        width: '100%'
-                                    }}>
-                                        <td key={ `task${ index }_text1`} style={{ width: '40%' }} >{ task.url }</td>
-                                        <td key={ `task${ index }_text2`}
+                        </tbody>
+                    </table>
+                </div>
+                <div key="list"
+                style={{
+                    minHeight: '80px',
+                    maxHeight: '200px',
+                    overflowY: 'scroll'
+                }}>
+                    <table
+                    style={{
+                        width: '100%',
+                        padding: '0px 30px 0px 10px'
+                    }}>
+                        <tbody>
+                            {
+                                this.state.tasks.length === 0
+                                    ?
+                                <tr key={ `task_null` }
+                                style={{
+                                    width: '100%'
+                                }}>
+                                    <td key={ `task_null_text1`} style={{ width: '36%' }} >Nothing in the queue</td>
+                                    <td key={ `task_null_text2`} style={{ width: '20%' }} >...</td>
+                                    <td key={ `task_null_text3`} style={{ width: '24%' }} >...</td>
+                                    <td key={ `task_null_button1`} style={{ width: '10%' }} />
+                                    <td key={ `task_null_button2`} style={{ width: '10%' }} />
+                                </tr>
+                                    :
+                                this.state.tasks.map((task: { url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }, index: number) => {
+                                    return (
+                                        <tr key={ `task${ index }` }
                                         style={{
-                                            width: '30%',
-                                            color: task.state === 'failed' ? 'rgb(215,0,34)' : task.state === 'successed' ? 'rgb(78,187,124)' : task.state === 'reading' ? 'rgb(195,96,45)' : 'rgb(86,156,178)'
-                                        }} >
-                                            { task.state }
-                                        </td>
-                                        <td key={ `task${ index }_text3`} style={{ width: '30%' }} >{ task.size }</td>
-                                    </tr>
-                                );
-                            })
-                        }   
-                    </tbody>
-                </table>
+                                            width: '100%',
+                                            paddingBottom: '4px'
+                                        }}>
+                                            <td key={ `task${ index }_text1`} style={{ width: '36%' }} >{ task.url }</td>
+                                            <td key={ `task${ index }_text2`}
+                                            style={{
+                                                width: '20%',
+                                                color: task.state === 'failed' ? 'rgb(215,0,34)' : task.state === 'successed' ? 'rgb(78,187,124)' : task.state === 'reading' ? 'rgb(195,96,45)' : 'rgb(86,156,178)'
+                                            }} >
+                                                { task.state }
+                                            </td>
+                                            <td key={ `task${ index }_text3`} style={{ width: '24%' }} >{ DataCenter.format(task.size) }</td>
+                                            <td key={ `task${ index }_button1`} style={{ width: '10%' }} >
+                                                <button onClick={() => {
+                                                    for (let i: number = this.didRead.length - 1; i >= 0; i--) {
+                                                        if (this.didRead[i].url === task.url) {
+                                                            console.log({ ...this.didRead[i], size: task.size });
+                                                            break;
+                                                        }
+                                                    }
+                                                } } >print</button>
+                                            </td>
+                                            <td key={ `task${ index }_button2`} style={{ width: '10%' }} >
+                                                <button onClick={() => this.cancel(index) } >cancel</button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            }   
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     }
@@ -133,6 +169,44 @@ class DataCenter extends Component<DataCenterProps, DataCenterState, {}> {
         .keyup(() => {
             this.debounce = false;
         });
+        setInterval(() => {
+            this.setState({});
+        }, 1000);
+    }
+
+    private static format(num: number): string {
+        let part: string = num.toString();
+        let temp: string = "";
+        while (part.length > 3) {
+            temp = part.substr(part.length - 3, part.length) + "," + temp;
+            part = part.substr(0, part.length - 3);
+        }
+        temp = part + "," + temp;
+        return temp.substr(0, temp.length - 1) + " B";
+    }
+
+    private cancel(index: number): void {
+        let url: string = "";
+        let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = [];
+        this.state.tasks.forEach((task: { url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }, i: number) => {
+            if (i !== index) {
+                tasks.push(task);
+            }
+            else {
+                url = task.url;
+            }
+        });
+        this.setState({tasks});
+        if (url.length === 0) {
+            return;
+        }
+        let queue: Array<FileInfo> = [];
+        this.didRead.forEach((file: FileInfo) => {
+            if (file.url !== url) {
+                queue.push(file);
+            }
+        });
+        this.didRead = queue;
     }
 
     public openCSV(url: string, success?: (jsondata: any) => void | undefined | null,
@@ -152,7 +226,6 @@ class DataCenter extends Component<DataCenterProps, DataCenterState, {}> {
         });
         $.get(url, (file: string) => {
             if (file.startsWith("<!DOCTYPE html>")) {
-                console.error(`Can't find file "${ url }"`);
                 let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = this.state.tasks;
                 for (let i: number = tasks.length - 1; i >= 0; i--) {
                     if (tasks[i].url === url) {
@@ -163,6 +236,7 @@ class DataCenter extends Component<DataCenterProps, DataCenterState, {}> {
                 this.setState({
                     tasks: tasks
                 });
+                console.error(`Can't find file "${ url }"`);
                 return;
             }
             let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = this.state.tasks;
@@ -252,6 +326,20 @@ class DataCenter extends Component<DataCenterProps, DataCenterState, {}> {
             tasks: tasks
         });
         $.get(url, (file: string) => {
+            if (file.startsWith("<!DOCTYPE html>")) {
+                let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = this.state.tasks;
+                for (let i: number = tasks.length - 1; i >= 0; i--) {
+                    if (tasks[i].url === url) {
+                        tasks[i].state = 'failed';
+                        break;
+                    }
+                }
+                this.setState({
+                    tasks: tasks
+                });
+                console.error(`Can't find file "${ url }"`);
+                return;
+            }
             let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = this.state.tasks;
             for (let i: number = tasks.length - 1; i >= 0; i--) {
                 if (tasks[i].url === url) {

@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-29 15:24:57 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-09-29 17:38:29
+ * @Last Modified time: 2019-10-03 00:48:02
  */
 
 import React, { Component } from 'react';
@@ -13,6 +13,7 @@ export interface DropdownProps<T> {
     height: number;
     optionList: Array<T>;
     defaultIndex?: number;
+    onChange?: (option: T) => null | void | undefined;
 }
 
 export interface DropdownState<T> {
@@ -97,6 +98,9 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                                         this.setState({
                                             value: index
                                         });
+                                        if (this.props.onChange) {
+                                            this.props.onChange(this.state.optionList[index]);
+                                        }
                                         $((this.refs["list"] as any)).hide();
                                     }
                                 }

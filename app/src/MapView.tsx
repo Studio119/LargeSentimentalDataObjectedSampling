@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-02 21:30:24
+ * @Last Modified time: 2019-10-03 00:43:21
  */
 import React, { Component } from 'react';
 import MapBox from './react-mapbox/MapBox';
@@ -18,9 +18,7 @@ export interface MapViewProps {
 }
 
 export interface MapViewState {
-    data: Array<{
-        id: string, lng: number, lat: number, words: string,
-        day: string, city: string, sentiment: string}>;
+    data: Array<{ id: string, lng: number, lat: number, words: string, day: string, city: string, sentiment: string }>;
 }
 
 class MapView extends Component<MapViewProps, MapViewState, {}> {
@@ -66,9 +64,9 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
         this.state.data.forEach((d: {
             id: string, lng: number, lat: number, words: string,
         day: string, city: string, sentiment: string}, index: number) => {
-            if (index % 100 !== 0) {
-                return;
-            }
+            // if (index % 100 !== 0) {
+            //     return;
+            // }
             if (d.lat >= 0 || d.lat < 0 || d.lng >= 0 || d.lng < 0) {
                 (this.refs["map"] as MapBox).appendPoint(d.id, [d.lat, d.lng], parseFloat(d.sentiment) < 0 ? 'red' : parseFloat(d.sentiment) > 0 ? 'green' : 'yellow');
                 count++;
