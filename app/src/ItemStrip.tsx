@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-03 00:51:51
+ * @Last Modified time: 2019-10-04 00:40:09
  */
 import React, { Component } from 'react';
 import ValueBar from './ValueBar';
@@ -11,7 +11,7 @@ import Dropdown from './Dropdown';
 
 export interface ItemStripProps {
     id: string,
-    importSource: (url: string) => void;
+    importSource: (url: string, json: string) => void;
 }
 
 export interface ItemStripState {
@@ -61,16 +61,15 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             }
             (this.refs[`cp${index}`] as ColorPicker).bind(element, ...attrName);
         };
-        this.props.importSource('/data/93.csv');
+        this.load('Tweet');
     }
 
     private load(source: string): void {
-        console.log(source);
         if (source === 'Tweet') {
-            this.props.importSource('/data/93.csv');
+            this.props.importSource('/data/93.csv', '/data/Tree.json');
         }
         else if (source === 'yelp') {
-            this.props.importSource('/data/NOSUCHFILE.csv');
+            this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json');
         }
     }
 }

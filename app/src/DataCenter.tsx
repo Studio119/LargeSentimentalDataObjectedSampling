@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-02 15:53:12 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-03 00:24:46
+ * @Last Modified time: 2019-10-04 00:52:32
  */
 
 import React, { Component } from 'react';
@@ -17,10 +17,10 @@ export interface DataCenterState {
 
 export class FileInfo {
     public readonly url: string;
-    public readonly type: 'csv';
+    public readonly type: 'csv' | 'json';
     public readonly data: any;
 
-    public constructor(url: string, type: 'csv', data: any) {
+    public constructor(url: string, type: 'csv' | 'json', data: any) {
         this.url = url;
         this.type = type;
         this.data = data;
@@ -403,6 +403,90 @@ class DataCenter extends Component<DataCenterProps, DataCenterState, {}> {
             }
             else {
                 console.warn(`Loaded file '${ url }' is not valid csv file! `);
+            }
+        });
+    }
+
+    public openJSON(url: string, success?: (jsondata: any) => void | undefined | null): void {
+        for (let i: number = this.didRead.length - 1; i >= 0; i--) {
+            if (this.didRead[i].url === url) {
+                if (success) {
+                    success(this.didRead[i].data);
+                }
+                return;
+            }
+        }
+        let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = this.state.tasks;
+        tasks.push({ url: url, state: 'reading', size: 0 });
+        this.setState({
+            tasks: tasks
+        });
+        $.getJSON(url, (file: any) => {
+            let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = this.state.tasks;
+            for (let i: number = tasks.length - 1; i >= 0; i--) {
+                if (tasks[i].url === url) {
+                    tasks[i].state = 'parsing';
+                    break;
+                }
+            }
+            this.setState({
+                tasks: tasks
+            });
+            tasks = this.state.tasks;
+            for (let i: number = tasks.length - 1; i >= 0; i--) {
+                if (tasks[i].url === url) {
+                    tasks[i].state = 'successed';
+                    break;
+                }
+            }
+            this.didRead.push(new FileInfo(url, 'json', file));
+            this.setState({
+                tasks: tasks
+            });
+            if (success) {
+                success(file);
+            }
+        });
+    }
+
+    public openJSON_nostoring(url: string, success?: (jsondata: any) => void | undefined | null): void {
+        for (let i: number = this.didRead.length - 1; i >= 0; i--) {
+            if (this.didRead[i].url === url) {
+                if (success) {
+                    success(this.didRead[i].data);
+                }
+                return;
+            }
+        }
+        let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = this.state.tasks;
+        tasks.push({ url: url, state: 'reading', size: 0 });
+        this.setState({
+            tasks: tasks
+        });
+        $.getJSON(url, (file: any) => {
+            let tasks: Array<{ url: string, state: 'reading' | 'parsing' | 'successed' | 'failed', size: number }> = this.state.tasks;
+            for (let i: number = tasks.length - 1; i >= 0; i--) {
+                if (tasks[i].url === url) {
+                    tasks[i].state = 'parsing';
+                    tasks[i].size = file.toString().length;
+                    break;
+                }
+            }
+            this.setState({
+                tasks: tasks
+            });
+            tasks = this.state.tasks;
+            for (let i: number = tasks.length - 1; i >= 0; i--) {
+                if (tasks[i].url === url) {
+                    tasks[i].state = 'successed';
+                    break;
+                }
+            }
+            this.setState({
+                tasks: tasks
+            });
+            if (success) {
+                success(file);
             }
         });
     }

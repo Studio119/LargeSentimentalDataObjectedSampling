@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-03 01:36:24
+ * @Last Modified time: 2019-10-04 01:06:43
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -30,151 +30,18 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
 
     public constructor(props: ContrastViewProps) {
         super(props);
-        // this.state = {
-        //     attr: {
-        //         x: 0,
-        //         y: 0,
-        //         width: 523,
-        //         height: 306
-        //     },
-        //     level: 0,
-        //     path: [ 'root' ],
-        //     parent: null,
-        //     leftChild: null,
-        //     rightChild: null
-        // };
         this.state = {
             attr: {
                 x: 0,
                 y: 0,
-                width: 475,
+                width: 523,
                 height: 306
             },
             level: 0,
             path: [ 'root' ],
             parent: null,
-            leftChild: {
-                attr: {
-                    x: 0,
-                    y: 0,
-                    width: 203,
-                    height: 306
-                },
-                level: 1,
-                path: [ 'root', 'left' ],
-                parent: null,
-                leftChild: {
-                    attr: {
-                        x: 0,
-                        y: 0,
-                        width: 203,
-                        height: 150
-                    },
-                    level: 2,
-                    path: [ 'root', 'left', 'left' ],
-                    parent: null,
-                    leftChild: null,
-                    rightChild: null
-                },
-                rightChild: {
-                    attr: {
-                        x: 0,
-                        y: 150,
-                        width: 203,
-                        height: 157
-                    },
-                    level: 2,
-                    path: [ 'root', 'left', 'right' ],
-                    parent: null,
-                    leftChild: null,
-                    rightChild: null
-                }
-            },
-            rightChild: {
-                attr: {
-                    x: 203,
-                    y: 0,
-                    width: 270,
-                    height: 306
-                },
-                level: 1,
-                path: [ 'root', 'right' ],
-                parent: null,
-                leftChild: {
-                    attr: {
-                        x: 203,
-                        y: 180,
-                        width: 270,
-                        height: 126
-                    },
-                    level: 2,
-                    path: [ 'root', 'right', 'left' ],
-                    parent: null,
-                    leftChild: {
-                        attr: {
-                            x: 203,
-                            y: 180,
-                            width: 270,
-                            height: 46
-                        },
-                        level: 3,
-                        path: [ 'root', 'right', 'left', 'left' ],
-                        parent: null,
-                        leftChild: null,
-                        rightChild: null
-                    },
-                    rightChild: {
-                        attr: {
-                            x: 203,
-                            y: 226,
-                            width: 270,
-                            height: 80
-                        },
-                        level: 3,
-                        path: [ 'root', 'right', 'left', 'right' ],
-                        parent: null,
-                        leftChild: null,
-                        rightChild: null
-                    }
-                },
-                rightChild: {
-                    attr: {
-                        x: 203,
-                        y: 0,
-                        width: 270,
-                        height: 180
-                    },
-                    level: 2,
-                    path: [ 'root', 'right', 'right' ],
-                    parent: null,
-                    leftChild: {
-                        attr: {
-                            x: 203,
-                            y: 0,
-                            width: 130,
-                            height: 180
-                        },
-                        level: 3,
-                        path: [ 'root', 'right', 'right', 'left' ],
-                        parent: null,
-                        leftChild: null,
-                        rightChild: null
-                    },
-                    rightChild: {
-                        attr: {
-                            x: 333,
-                            y: 0,
-                            width: 140,
-                            height: 180
-                        },
-                        level: 3,
-                        path: [ 'root', 'right', 'right', 'right' ],
-                        parent: null,
-                        leftChild: null,
-                        rightChild: null
-                    }
-                }
-            }
+            leftChild: null,
+            rightChild: null
         };
         this.base = this.state;
         this.baseLevel = 0;
@@ -259,6 +126,12 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
         }
 
         return attr;
+    }
+
+    public import(root: RectNode): void {
+        this.setState(root);
+        this.base = this.state;
+        this.baseLevel = 0;
     }
 }
 

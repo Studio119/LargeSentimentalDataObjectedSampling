@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-02 21:43:18
+ * @Last Modified time: 2019-10-04 01:04:58
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -10,8 +10,15 @@ import ItemStrip from './ItemStrip';
 import MapView from './MapView';
 import DataView from './DataView';
 import Settings from './Settings';
-import ContrastView from './ContrastView';
+import ContrastView, { RectNode } from './ContrastView';
 import DataCenter from './DataCenter';
+
+
+export interface TreeNode {
+  data: [number, number, number, number];
+  left?: TreeNode;
+  right?: TreeNode;
+}
 
 class App extends Component<{}, {}, {}> {
   public render(): JSX.Element {
@@ -39,7 +46,7 @@ class App extends Component<{}, {}, {}> {
             height: '306px',
             width: '1111px'
           }}>
-          <ContrastView id="ContrastView" displayLevels={ 3 } />
+          <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 3 } />
           <div
             style={{
                 display: 'inline-block',
@@ -56,7 +63,7 @@ class App extends Component<{}, {}, {}> {
   }
 
   public componentDidMount(): void {
-    this.loadSource = (url: string) => {
+    this.loadSource = (url: string, json: string) => {
       (this.refs["DataCenter"] as DataCenter).openCSV(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
@@ -87,12 +94,35 @@ class App extends Component<{}, {}, {}> {
           data: dataset
         });
       });
+      (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
+        let dataset: RectNode = this.loadTree(data, null, 'left');
+        (this.refs["RectTree"] as ContrastView).import(dataset);
+      });
     }
   }
 
-  private loadSource: (url: string) => void
-    = (url: string) => {
-      setTimeout(() => this.loadSource(url), 1000);
+  private loadTree(data: TreeNode, parent: RectNode | null, side: 'left' | 'right'): RectNode {
+    let node: RectNode = {
+      attr: { x: data.data[0], y: data.data[1], width: data.data[2] - data.data[0], height: data.data[3] - data.data[1] },
+      level: 0,
+      path: parent ? [ ...parent.path, side ] : [ 'root' ],
+      parent: parent,
+      leftChild: null,
+      rightChild: null
+    };
+    if (data.left) {
+      node.leftChild = this.loadTree(data.left, node, 'left');
+    }
+    if (data.right) {
+      node.rightChild = this.loadTree(data.right, node, 'right');
+    }
+
+    return node;
+  }
+
+  private loadSource: (url: string, json: string) => void
+    = (url: string, json: string) => {
+      setTimeout(() => this.loadSource(url, json), 1000);
     };
 }
 
