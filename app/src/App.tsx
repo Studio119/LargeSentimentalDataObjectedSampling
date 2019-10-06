@@ -6,6 +6,7 @@
  */
 import React, { Component } from 'react';
 import './App.css';
+import $ from 'jquery';
 import ItemStrip from './ItemStrip';
 import MapView from './MapView';
 import DataView from './DataView';
@@ -51,7 +52,7 @@ class App extends Component<{}, {}, {}> {
             style={{
                 display: 'inline-block',
                 height: '100%',
-                width: '629px',
+                width: '509px',
                 marginLeft: '0.12%',
                 background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 2%, rgb(227, 227, 229) 94%, rgb(135, 137, 142))',
                 border: '1px solid black'
@@ -90,9 +91,9 @@ class App extends Component<{}, {}, {}> {
           dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng) });
         });
         (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
-        (this.refs["map"] as MapView).setState({
-          data: dataset
-        });
+        // (this.refs["map"] as MapView).setState({
+        //   data: dataset
+        // });
       });
       (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
         let dataset: RectNode = this.loadTree(data, null, 'left');
@@ -103,12 +104,18 @@ class App extends Component<{}, {}, {}> {
 
   private loadTree(data: TreeNode, parent: RectNode | null, side: 'left' | 'right'): RectNode {
     let node: RectNode = {
-      attr: { x: data.data[0], y: data.data[1], width: data.data[2] - data.data[0], height: data.data[3] - data.data[1] },
-      level: 0,
+      attr: {
+        x: data.data[0] / 1000 * 475,
+        y: data.data[1] / 600 * 306,
+        width: (data.data[2] - data.data[0]) / 1000 * 475,
+        height: (data.data[3] - data.data[1]) / 600 * 306
+      },
+      level: parent === null ? 0 : parent.level + 1,
       path: parent ? [ ...parent.path, side ] : [ 'root' ],
       parent: parent,
       leftChild: null,
-      rightChild: null
+      rightChild: null,
+      ref: $("NULL")
     };
     if (data.left) {
       node.leftChild = this.loadTree(data.left, node, 'left');

@@ -55,6 +55,8 @@ export interface ValueBarProps {
     label?: string;
     showValue?: boolean;
     valueFormatter?: (value: number) => (string | number);
+    onValueChange?: (value: number) => null | void | undefined;
+    style?: React.CSSProperties;
 }
 
 export interface ValueBarState {
@@ -195,7 +197,7 @@ class ValueBar extends Component<ValueBarProps, ValueBarState, {}> {
     public render(): JSX.Element {
         return (
             <div className="ValueBar" style={{ display: 'inline-block', alignItems: 'center', transform: 'translateY(50%)',
-            padding: "0px 10px 0px 6px" }} ref="container" >
+            padding: "0px 10px 0px 6px", ...this.props.style }} ref="container" >
                 {
                     this.props.label
                         ? <p key="label" style={
@@ -320,6 +322,12 @@ class ValueBar extends Component<ValueBarProps, ValueBarState, {}> {
             this.callbackHandler.update({ value: this.valueAfterDragging });
             this.debounceHandler = 0;
         });
+    }
+
+    public componentDidUpdate(): void {
+        if (this.props.onValueChange) {
+            this.props.onValueChange(this.state.value);
+        }
     }
 
     public val(value?: number): number | void {
