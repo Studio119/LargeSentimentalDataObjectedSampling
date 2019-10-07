@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-02 19:11:04
+ * @Last Modified time: 2019-10-07 21:10:51
  */
 import React, { Component } from 'react';
 
@@ -66,9 +66,9 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                     }}>
                         <tbody>
                             {
-                                this.state.topics.map((item: { topic: string, count: number }) => {
+                                this.state.topics.map((item: { topic: string, count: number }, index: number) => {
                                     return (
-                                        <tr style={{ padding: '2px 6px' }} >
+                                        <tr key={ index } style={{ padding: '2px 6px' }} >
                                             <td style={{ paddingRight: '6px', width: '70%' }} >{ item.topic }</td>
                                             <td style={{ width: '30%' }} >{ Settings.format(item.count) }</td>
                                         </tr>                                    

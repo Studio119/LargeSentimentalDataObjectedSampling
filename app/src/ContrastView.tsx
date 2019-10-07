@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-07 19:18:48
+ * @Last Modified time: 2019-10-07 20:57:13
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -76,7 +76,6 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     display: 'inline-block',
                     height: '100%',
                     width: '595px',
-                    paddingTop: '1px',
                     background: 'white',
                     border: '1px solid black'
                 }} >

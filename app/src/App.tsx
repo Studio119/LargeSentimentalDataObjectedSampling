@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-04 01:04:58
+ * @Last Modified time: 2019-10-07 21:09:32
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -13,6 +13,7 @@ import DataView from './DataView';
 import Settings from './Settings';
 import ContrastView, { RectNode } from './ContrastView';
 import DataCenter from './DataCenter';
+import TreeMap from './TreeMap';
 
 
 export interface TreeNode {
@@ -48,16 +49,7 @@ class App extends Component<{}, {}, {}> {
             width: '1111px'
           }}>
           <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 3 } />
-          <div
-            style={{
-                display: 'inline-block',
-                height: '100%',
-                width: '509px',
-                marginLeft: '0.12%',
-                background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 2%, rgb(227, 227, 229) 94%, rgb(135, 137, 142))',
-                border: '1px solid black'
-            }}>
-          </div>
+          <TreeMap id="TreeMap" ref="TreeMap" />
         </div>
       </div>
     );
@@ -98,6 +90,7 @@ class App extends Component<{}, {}, {}> {
       (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
         let dataset: RectNode = this.loadTree(data, null, 'left');
         (this.refs["RectTree"] as ContrastView).import(dataset);
+        (this.refs["TreeMap"] as TreeMap).import(dataset);
       });
       (this.refs["DataCenter"] as DataCenter).openJSON(topic, (data: Array<{ topic: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
