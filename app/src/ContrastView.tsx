@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-04 01:06:43
+ * @Last Modified time: 2019-10-07 19:18:48
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -141,12 +141,17 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     }
                 }
                 onMouseUp={
-                    () => {
+                    (event) => {
                         if (this.selectBox[0].css("display") === "none") {
                             return;
                         }
+                        let width: number = event.clientX - 3 - parseInt(this.selectBox[0].attr("width")!);
+                        let height: number = event.clientY - 557 - parseInt(this.selectBox[0].attr("height")!);
                         for (let i: number = 0; i < 8; i++) {
                             this.selectBox[i].css("display", "none");
+                        }
+                        if (width <= 47.5 || height <= 30.6) {
+                            return;
                         }
                         this.stretch(this.state);
                         this.trans = {
@@ -162,6 +167,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     display: 'inline-block',
                     height: '307px',
                     width: '120px',
+                    padding: '20px 0px',
                     background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 2%, rgb(227, 227, 229) 94%, rgb(135, 137, 142))'
                 }} >
                     <ValueBar label={ "Depth: " } width={ 120 } height={ 20 }
@@ -178,6 +184,21 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                             this.svg!.append(this.selectBox);
                         }
                     } />
+                    <br />
+                    <button type="button" name="relayout"
+                    style={{
+                        margin: '10px 0px'
+                    }}
+                    onClick={
+                        () => {
+                            this.offset = { x1: 0, x2: 475, y1: 0, y2: 306 };
+                            this.trans = { x1: 0, x2: 475, y1: 0, y2: 306 };
+                            this.stretch(this.state);
+                        }
+                    } >
+                        Reset
+                    </button>
+                    <br />
                 </div>
             </div>
         );
@@ -236,10 +257,20 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                 return attr;
             }
         }
-        node.ref.attr("x", (attr.x - this.offset.x1) * (this.trans.x2 - this.trans.x1) / (this.offset.x2 - this.offset.x1))
-                .attr("y", (attr.y - this.offset.y1) * (this.trans.y2 - this.trans.y1) / (this.offset.y2 - this.offset.y1))
-                .attr("width", attr.width * (this.trans.x2 - this.trans.x1) / (this.offset.x2 - this.offset.x1))
-                .attr("height", attr.height * (this.trans.y2 - this.trans.y1) / (this.offset.y2 - this.offset.y1));
+        let _x: number = parseInt(node.ref.attr("x")!);
+        let _y: number = parseInt(node.ref.attr("y")!);
+        let _width: number = parseInt(node.ref.attr("width")!);
+        let _height: number = parseInt(node.ref.attr("height")!);
+        let offset: { x1: number, x2: number, y1: number, y2: number } = this.offset;
+        let trans: { x1: number, x2: number, y1: number, y2: number } = this.trans;
+        for (let i: number = 100; i <= 400; i += 20) {
+            setTimeout(() => {
+                node.ref.attr("x", _x * (400 - i) / 400 + i / 400 * ((attr.x - offset.x1) * (trans.x2 - trans.x1) / (offset.x2 - offset.x1)))
+                        .attr("y", _y * (400 - i) / 400 + i / 400 * ((attr.y - offset.y1) * (trans.y2 - trans.y1) / (offset.y2 - offset.y1)))
+                        .attr("width", _width * (400 - i) / 400 + i / 400 * (attr.width * (trans.x2 - trans.x1) / (offset.x2 - offset.x1)))
+                        .attr("height", _height * (400 - i) / 400 + i / 400 * (attr.height * (trans.y2 - trans.y1) / (offset.y2 - offset.y1)));
+            }, i);
+        }
 
         return attr;
     }
@@ -298,20 +329,32 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                 rect.on("mouseover", () => {
                     if (node.parent) {
                         if (node.parent.leftChild) {
-                            $(node.parent.leftChild.ref).css("fill-opacity", "0.6");
+                            $(node.parent.leftChild.ref)
+                                .css("fill-opacity", "0.6")
+                                .css("stroke", "rgb(208,160,48)")
+                                .css("stroke-width", "2.4px");
                         }
                         if (node.parent.rightChild) {
-                            $(node.parent.rightChild.ref).css("fill-opacity", "0.6");
+                            $(node.parent.rightChild.ref)
+                                .css("fill-opacity", "0.6")
+                                .css("stroke", "rgb(208,160,48)")
+                                .css("stroke-width", "2.4px");
                         }
                     }
                 });
                 rect.on("mouseout", () => {
                     if (node.parent) {
                         if (node.parent.leftChild) {
-                            $(node.parent.leftChild.ref).css("fill-opacity", "1.0");
+                            $(node.parent.leftChild.ref)
+                                .css("fill-opacity", "1.0")
+                                .css("stroke", "black")
+                                .css("stroke-width", "1px");
                         }
                         if (node.parent.rightChild) {
-                            $(node.parent.rightChild.ref).css("fill-opacity", "1.0");
+                            $(node.parent.rightChild.ref)
+                                .css("fill-opacity", "1.0")
+                                .css("stroke", "black")
+                                .css("stroke-width", "1px");
                         }
                     }
                 });

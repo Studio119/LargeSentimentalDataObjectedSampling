@@ -28,7 +28,7 @@ class App extends Component<{}, {}, {}> {
         <DataCenter ref="DataCenter"/>
         <ItemStrip id="ItemStrip" importSource={ this.loadSource } />
         <DataView id="MapSettings" ref="DataView" />
-        <Settings id="ActiveSettings" />
+        <Settings id="ActiveSettings" ref="topics" />
         <MapView id="MapView" ref="map" center={ [-100, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 5 } />
         <div className="Chart"
           style={{
@@ -64,7 +64,7 @@ class App extends Component<{}, {}, {}> {
   }
 
   public componentDidMount(): void {
-    this.loadSource = (url: string, json: string) => {
+    this.loadSource = (url: string, json: string, topic: string) => {
       (this.refs["DataCenter"] as DataCenter).openCSV(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
@@ -91,13 +91,16 @@ class App extends Component<{}, {}, {}> {
           dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng) });
         });
         (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
-        // (this.refs["map"] as MapView).setState({
-        //   data: dataset
-        // });
+        (this.refs["map"] as MapView).setState({
+          data: dataset
+        });
       });
       (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
         let dataset: RectNode = this.loadTree(data, null, 'left');
         (this.refs["RectTree"] as ContrastView).import(dataset);
+      });
+      (this.refs["DataCenter"] as DataCenter).openJSON(topic, (data: Array<{ topic: string, count: number }>) => {
+        (this.refs["topics"] as Settings).import(data);
       });
     }
   }
@@ -127,9 +130,9 @@ class App extends Component<{}, {}, {}> {
     return node;
   }
 
-  private loadSource: (url: string, json: string) => void
-    = (url: string, json: string) => {
-      setTimeout(() => this.loadSource(url, json), 1000);
+  private loadSource: (url: string, json: string, topic: string) => void
+    = (url: string, json: string, topic: string) => {
+      setTimeout(() => this.loadSource(url, json, topic), 1000);
     };
 }
 
