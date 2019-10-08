@@ -160,10 +160,16 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                             y2: (306 - this.offset.y1) * (this.trans.y2 - this.trans.y1) / (this.offset.y2 - this.offset.y1)
                         };
                     }
-                } />
+                }
+                style={{
+                    position: 'relative',
+                    left: '-60px'
+                }} />
                 <div id={ this.props.id + "-Bar" }
                 style={{
-                    display: 'inline-block',
+                    position: 'relative',
+                    top: '-311px',
+                    left: '475px',
                     height: '307px',
                     width: '120px',
                     padding: '20px 0px',
@@ -320,7 +326,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                 `<rect x="${ attr.x }" y="${ attr.y }" width="${ attr.width }" height="${ attr.height }" `
                 + `id="${ node.path.join("-") }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
                 + `style="stroke: black; `
-                    + `fill: rgb(${ Math.random() * 80 + 40 }, ${ Math.random() * 80 + 40 }, ${ Math.random() * 80 + 40 }); `
+                    + `fill: rgb(${ Math.random() * 80 + 100 }, ${ Math.random() * 80 + 100 }, ${ Math.random() * 80 + 100 }); `
                     + `display: none" />`
             ).documentElement);
             if ((!left && !right) || node.level === this.baseLevel + this.displayLevels) {

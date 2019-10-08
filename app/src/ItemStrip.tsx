@@ -11,7 +11,7 @@ import Dropdown from './Dropdown';
 
 export interface ItemStripProps {
     id: string,
-    importSource: (url: string, json: string, topic: string) => void;
+    importSource: (url: string, json: string, topic: string, dis: string, sum: string) => void;
 }
 
 export interface ItemStripState {
@@ -66,10 +66,10 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
 
     private load(source: string): void {
         if (source === 'Tweet') {
-            this.props.importSource('/data/93.csv', '/data/Tree.json', '/data/93-topics.json');
+            this.props.importSource('/data/93.csv', '/data/rectangle_tree-0.15-0.01-20-new.json', '/data/93-topics.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json');
         }
         else if (source === 'yelp') {
-            this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json');
+            this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');
         }
     }
 }

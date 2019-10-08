@@ -14,6 +14,7 @@ import Settings from './Settings';
 import ContrastView, { RectNode } from './ContrastView';
 import DataCenter from './DataCenter';
 import TreeMap from './TreeMap';
+import PolylineChart from './PolylineChart';
 
 
 export interface TreeNode {
@@ -37,18 +38,39 @@ class App extends Component<{}, {}, {}> {
             width: '422px',
             top: '67px',
             left: '1112px',
-            height: '796px',
+            height: '486px',
             background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 1.3%, rgb(227, 227, 229) 97.7%, rgb(135, 137, 142))',
             border: '1px solid black'
+          }}>
+          <PolylineChart width={ 400 } height={ 230 } ref="dis"
+          padding={{
+            top: 4,
+            right: 30,
+            bottom: 4,
+            left: 30
+          }}
+          style={{
+            margin: '2px'
           }} />
+          <PolylineChart width={ 400 } height={ 230 } ref="ref"
+          padding={{
+            top: 4,
+            right: 30,
+            bottom: 4,
+            left: 30
+          }}
+          style={{
+            margin: '2px'
+          }} />
+        </div>
         <div className="Line"
           style={{
             position: 'absolute',
             top: '556px',
             height: '306px',
-            width: '1111px'
+            width: '595px'
           }}>
-          <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 3 } />
+          <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } />
           <TreeMap id="TreeMap" ref="TreeMap" />
         </div>
       </div>
@@ -56,7 +78,7 @@ class App extends Component<{}, {}, {}> {
   }
 
   public componentDidMount(): void {
-    this.loadSource = (url: string, json: string, topic: string) => {
+    this.loadSource = (url: string, json: string, topic: string, dis: string, sum: string) => {
       (this.refs["DataCenter"] as DataCenter).openCSV(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
@@ -95,6 +117,16 @@ class App extends Component<{}, {}, {}> {
       (this.refs["DataCenter"] as DataCenter).openJSON(topic, (data: Array<{ topic: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
       });
+      (this.refs["DataCenter"] as DataCenter).openJSON(dis, (data: Array<[[number, number], [number, number]]>) => {
+        (this.refs["dis"] as PolylineChart).import(data);
+      });
+      (this.refs["DataCenter"] as DataCenter).openJSON(sum, (data: Array<[[number, number, number], [number, number, number]]>) => {
+        let pick: Array<[[number, number], [number, number]]> = [];
+        data.forEach((d: [[number, number, number], [number, number, number]]) => {
+          pick.push([[d[0][0], - d[0][1]], [d[1][0], - d[1][1]]]);
+        });
+        (this.refs["ref"] as PolylineChart).import(pick);
+      });
     }
   }
 
@@ -123,9 +155,9 @@ class App extends Component<{}, {}, {}> {
     return node;
   }
 
-  private loadSource: (url: string, json: string, topic: string) => void
-    = (url: string, json: string, topic: string) => {
-      setTimeout(() => this.loadSource(url, json, topic), 1000);
+  private loadSource: (url: string, json: string, topic: string, dis: string, sum: string) => void
+    = (url: string, json: string, topic: string, dis: string, sum: string) => {
+      setTimeout(() => this.loadSource(url, json, topic, dis, sum), 1000);
     };
 }
 

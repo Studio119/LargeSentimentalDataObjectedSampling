@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-07 22:22:29
+ * @Last Modified time: 2019-10-08 10:14:34
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -47,11 +47,14 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
             <div
             style={{
                 display: 'inline-block',
-                height: '100%',
-                width: '509px',
-                border: '1px solid black'
+                height: '102%',
+                width: '936px',
+                border: '1px solid black',
+                position: 'absolute',
+                top: '0px',
+                left: '598px'
             }}>
-                <svg width="100%" height="100%" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`} />
+                <svg width="100%" height="102%" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`} />
             </div>
         );
     }
@@ -79,11 +82,11 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
             for (let index: number = 0; index < Math.pow(2, level); index++) {
                 let circle: JQuery<HTMLElement> = $($.parseXML(
                     `<circle r="2" `
-                    + `cx="${ this.padding.left + (index + 0.5) * (509 - this.padding.left - this.padding.right) / Math.pow(2, level) }" `
+                    + `cx="${ this.padding.left + (index + 0.5) * (936 - this.padding.left - this.padding.right) / Math.pow(2, level) }" `
                     + `cy="${ this.padding.top + (level + 0.5) * (306 - this.padding.top - this.padding.bottom) / this.layers.length }" `
                     + `id="${ `virtualAddr/${ level }-${ index }` }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
                     + `style="stroke: black; `
-                        + `fill: rgb(${ Math.random() * 80 + 100 }, ${ Math.random() * 80 + 100 }, ${ Math.random() * 80 + 100 });`
+                        + `fill: rgb(58,201,176);`
                         + `" />`
                 ).documentElement);
                 virtualCircles.push(circle);
@@ -102,37 +105,79 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
             }
         }
         lines.forEach((d: { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> }, index: number) => {
-            let line: JQuery<HTMLElement> = $($.parseXML(
-                `<line `
-                + `id="${ `branch_${ index }` }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
-                + `x1="${ d.parent.attr("cx") }" y1="${ d.parent.attr("cy") }" `
-                + `x2="${ d.child.attr("cx") }" y2="${ d.child.attr("cy") }" `
-                + `style="stroke: black; " />`
-            ).documentElement);
+            // let line: JQuery<HTMLElement> = $($.parseXML(
+            //     `<line `
+            //     + `id="${ `branch_${ index }` }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
+            //     + `x1="${ d.parent.attr("cx") }" y1="${ d.parent.attr("cy") }" `
+            //     + `x2="${ d.child.attr("cx") }" y2="${ d.child.attr("cy") }" `
+            //     + `style="stroke: black; " />`
+            // ).documentElement);
+            let line: JQuery<HTMLElement> = parseFloat(d.parent.attr("cx")!) > parseFloat(d.child.attr("cx")!) // left child
+                ? $($.parseXML(
+                    `<path `
+                    + `id="${ `branch_${ index }` }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
+                    + `d="M${ d.parent.attr("cx") },${ d.parent.attr("cy") } `
+                        + `A${ (parseFloat(d.parent.attr("cx")!) - parseFloat(d.child.attr("cx")!)) * 1.2 },`
+                            + `${ (parseFloat(d.child.attr("cy")!) - parseFloat(d.parent.attr("cy")!)) * 2 },`
+                            + `0,`
+                            + `0,`
+                            + `1,`
+                            + `${ d.child.attr("cx") },`
+                            + `${ d.child.attr("cy") }" `
+                    + `style="stroke: black; fill: none; " />`).documentElement)
+                : $($.parseXML(
+                    `<path `
+                    + `id="${ `branch_${ index }` }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
+                    + `d="M${ d.parent.attr("cx") },${ d.parent.attr("cy") } `
+                        + `A${ (parseFloat(d.child.attr("cx")!) - parseFloat(d.parent.attr("cx")!)) * 1.2 },`
+                            + `${ (parseFloat(d.child.attr("cy")!) - parseFloat(d.parent.attr("cy")!)) * 2 },`
+                            + `0,`
+                            + `0,`
+                            + `0,`
+                            + `${ d.child.attr("cx") },`
+                            + `${ d.child.attr("cy") }" `
+                    + `style="stroke: black; fill: none; " />`).documentElement);
             this.svg!.append(line);
         });
         circles.forEach((d: { node: TreeNode, element: JQuery<HTMLElement>, level: number, index: number }) => {
             this.svg!.append(d.element);
             let virtualX: number = parseFloat(d.element.attr("cx")!);
-            let realX: number = this.padding.left + (d.index + 0.5) * (509 - this.padding.left - this.padding.right) / this.layers[d.level].length;
-            // let cx: number = realX * d.level / this.layers.length + virtualX * (1 - d.level / this.layers.length);
-            let cx: number = realX * d.level / this.layers.length / 2 + virtualX * (0.5 + 0.5 - d.level / this.layers.length / 2);
-            // let cx: number = realX * d.level / this.layers.length / 4 + virtualX * (0.75 + 0.25 - d.level / this.layers.length / 4);
-            for (let i: number = 100; i <= 400; i += 20) {
+            let realX: number = this.padding.left + (d.index + 0.5) * (936 - this.padding.left - this.padding.right) / this.layers[d.level].length;
+            let cx: number = realX * (0.5 - d.level / this.layers.length / 2) + virtualX * (0.5 + d.level / this.layers.length / 2);
+            for (let i: number = 100; i <= 420; i += 40) {
                 setTimeout(() => {
                     d.element.attr("cx", virtualX * (400 - i) / 400 + i / 400 * cx);
                 }, i);
             }
         });
         lines.forEach((d: { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> }, index: number) => {
-            for (let i: number = 100; i <= 400; i += 20) {
+            for (let i: number = 100; i <= 500; i += 80) {
                 setTimeout(() => {
-                    $(`#branch_${ index }`).attr("x1", () => {
-                            return $(d.parent).attr("cx")!;
-                        })
-                        .attr("x2", () => {
-                            return $(d.child).attr("cx")!;
-                        });
+                    // $(`#branch_${ index }`).attr("x1", () => {
+                    //         return $(d.parent).attr("cx")!;
+                    //     })
+                    //     .attr("x2", () => {
+                    //         return $(d.child).attr("cx")!;
+                    //     });
+                    $(`#branch_${ index }`).attr("d", () => {
+                        return parseFloat(d.parent.attr("cx")!) > parseFloat(d.child.attr("cx")!) // left child
+                            ? `M${ d.parent.attr("cx") },${ d.parent.attr("cy") } `
+                                + `A${ (parseFloat(d.parent.attr("cx")!) - parseFloat(d.child.attr("cx")!)) * 1.2 },`
+                                    + `${ (parseFloat(d.child.attr("cy")!) - parseFloat(d.parent.attr("cy")!)) * 2 },`
+                                    + `0,`
+                                    + `0,`
+                                    + `0,`
+                                    + `${ d.child.attr("cx") },`
+                                    + `${ d.child.attr("cy") }`
+                            : `M${ d.parent.attr("cx") },${ d.parent.attr("cy") } `
+                                + `A${ (parseFloat(d.child.attr("cx")!) - parseFloat(d.parent.attr("cx")!)) * 1.2 },`
+                                    + `${ (parseFloat(d.child.attr("cy")!) - parseFloat(d.parent.attr("cy")!)) * 2 },`
+                                    + `0,`
+                                    + `0,`
+                                    + `1,`
+                                    + `${ d.child.attr("cx") },`
+                                    + `${ d.child.attr("cy") }`;
+                    });
                 }, i + 20);
             }
         });
