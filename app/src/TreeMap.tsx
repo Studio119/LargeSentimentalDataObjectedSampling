@@ -26,6 +26,7 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
     private svg: JQuery<HTMLElement> | null;
     private layers: Array< Array<TreeNode> >;
     private padding: { top: number, right: number, bottom: number, left: number };
+    private r: number;
 
     public constructor(props: TreeMapProps) {
         super(props);
@@ -40,6 +41,7 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         };
         this.layers = [];
         this.padding = { top: 10, right: 10, bottom: 10, left: 10 };
+        this.r = 2.4;
     }
 
     public render(): JSX.Element {
@@ -81,7 +83,7 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         for (let level: number = 0; level < this.layers.length; level++) {
             for (let index: number = 0; index < Math.pow(2, level); index++) {
                 let circle: JQuery<HTMLElement> = $($.parseXML(
-                    `<circle r="2" `
+                    `<circle r="${ this.r }" `
                     + `cx="${ this.padding.left + (index + 0.5) * (936 - this.padding.left - this.padding.right) / Math.pow(2, level) }" `
                     + `cy="${ this.padding.top + (level + 0.5) * (306 - this.padding.top - this.padding.bottom) / this.layers.length }" `
                     + `id="${ `virtualAddr/${ level }-${ index }` }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
@@ -139,26 +141,52 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
                     + `style="stroke: black; fill: none; " />`).documentElement);
             this.svg!.append(line);
         });
+        let toAdjust: Array< JQuery<HTMLElement> > = [];
+        let last: number = 0;
         circles.forEach((d: { node: TreeNode, element: JQuery<HTMLElement>, level: number, index: number }) => {
             this.svg!.append(d.element);
             let virtualX: number = parseFloat(d.element.attr("cx")!);
-            let realX: number = this.padding.left + (d.index + 0.5) * (936 - this.padding.left - this.padding.right) / this.layers[d.level].length;
-            let cx: number = realX * (0.5 - d.level / this.layers.length / 2) + virtualX * (0.5 + d.level / this.layers.length / 2);
-            for (let i: number = 100; i <= 420; i += 40) {
-                setTimeout(() => {
-                    d.element.attr("cx", virtualX * (400 - i) / 400 + i / 400 * cx);
-                }, i);
+            // let realX: number = this.padding.left + (d.index + 0.5) * (936 - this.padding.left - this.padding.right) / this.layers[d.level].length;
+            // let cx: number = realX * (0.5 - d.level / this.layers.length / 2) + virtualX * (0.5 + d.level / this.layers.length / 2);
+            // for (let i: number = 100; i <= 420; i += 40) {
+            //     setTimeout(() => {
+            //         d.element.attr("cx", virtualX * (400 - i) / 400 + i / 400 * cx);
+            //     }, i);
+            // }
+            if (d.index > 0) {
+                if (virtualX - last <= this.r * 3) {
+                    toAdjust.push(d.element);
+                }
+                else if (toAdjust.length > 1) {
+                    let centerX: number = toAdjust.length % 2 === 0
+                        ? (parseFloat(toAdjust[toAdjust.length / 2 - 1].attr("cx")!) + parseFloat(toAdjust[toAdjust.length / 2].attr("cx")!)) / 2
+                        : parseFloat(toAdjust[(toAdjust.length - 1) / 2].attr("cx")!);
+                    toAdjust.forEach((e: JQuery<HTMLElement>, index: number) => {
+                        let fitX: number = centerX + (index - toAdjust.length / 2) * 3 * this.r;
+                        for (let i: number = 0; i <= 400; i += 40) {
+                            setTimeout(() => {
+                                e.attr("cx", virtualX * (400 - i) / 400 + i / 400 * fitX);
+                            }, i);
+                            this.adjustBranches(lines);
+                        }
+                    });
+                    toAdjust = [ d.element ];
+                }
+                else {
+                    toAdjust = [ d.element ];
+                }
             }
+            else {
+                toAdjust = [ d.element ];
+            }
+            last = virtualX;
         });
+    }
+
+    private adjustBranches(lines: Array<{ parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> }>): void {
         lines.forEach((d: { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> }, index: number) => {
             for (let i: number = 100; i <= 500; i += 80) {
                 setTimeout(() => {
-                    // $(`#branch_${ index }`).attr("x1", () => {
-                    //         return $(d.parent).attr("cx")!;
-                    //     })
-                    //     .attr("x2", () => {
-                    //         return $(d.child).attr("cx")!;
-                    //     });
                     $(`#branch_${ index }`).attr("d", () => {
                         return parseFloat(d.parent.attr("cx")!) > parseFloat(d.child.attr("cx")!) // left child
                             ? `M${ d.parent.attr("cx") },${ d.parent.attr("cy") } `
