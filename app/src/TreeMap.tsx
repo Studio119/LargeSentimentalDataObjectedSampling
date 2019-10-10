@@ -204,7 +204,9 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         box.forEach((e: JQuery<HTMLElement>, index: number) => {
             setTimeout(() => {
                 let cx: number = parseFloat(e.attr("cx")!);
-                e.attr("cx", (cx - this.padding.left) * zoomRate + this.padding.left).css("fill-opacity", 1);
+                e.attr("cx", (cx - this.padding.left) * zoomRate + this.padding.left)
+                    .attr("r", this.r * Math.sqrt(zoomRate))
+                    .css("fill-opacity", 1);
                 this.updateBranches(lines);
             }, index * 10);
         });

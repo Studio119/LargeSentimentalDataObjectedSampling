@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-07 21:09:32
+ * @Last Modified time: 2019-10-10 14:13:25
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -15,6 +15,8 @@ import ContrastView, { RectNode } from './ContrastView';
 import DataCenter from './DataCenter';
 import TreeMap from './TreeMap';
 import PolylineChart from './PolylineChart';
+import Dropdown from './Dropdown';
+import BBS from './BBS';
 
 
 export interface TreeNode {
@@ -33,35 +35,61 @@ class App extends Component<{}, {}, {}> {
         <Settings id="ActiveSettings" ref="topics" />
         <MapView id="MapView" ref="map" center={ [-100, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 5 } />
         <div className="Chart"
-          style={{
-            position: 'absolute',
-            width: '422px',
-            top: '67px',
-            left: '1112px',
-            height: '486px',
-            background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 1.3%, rgb(227, 227, 229) 97.7%, rgb(135, 137, 142))',
-            border: '1px solid black'
-          }}>
-          <PolylineChart width={ 400 } height={ 230 } ref="dis"
+        style={{
+          position: 'absolute',
+          width: '422px',
+          top: '67px',
+          left: '1112px',
+          height: '148px',
+          background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 7%, rgb(227, 227, 229) 91%, rgb(135, 137, 142))',
+          border: '1px solid black'
+        }} >
+          <Dropdown<string> width = { 200 } height = { 28 } optionList = { ["积极/消极情感标签数", "积极/消极情感总值"] }
+          onChange={
+            (option: string) => {
+              if (option === "积极/消极情感标签数") {
+                $("#p_dis").show();
+                $("#p_sum").hide();
+              }
+              else {
+                $("#p_dis").hide();
+                $("#p_sum").show();
+              }
+            }
+          } />
+          <PolylineChart id="p_dis" width={ 400 } height={ 100 } ref="dis"
           padding={{
-            top: 4,
+            top: 10,
             right: 30,
-            bottom: 4,
+            bottom: 10,
             left: 30
           }}
           style={{
-            margin: '2px'
+            margin: '6px'
           }} />
-          <PolylineChart width={ 400 } height={ 230 } ref="ref"
+          <PolylineChart id="p_sum" width={ 400 } height={ 100 } ref="sum"
           padding={{
-            top: 4,
+            top: 10,
             right: 30,
-            bottom: 4,
+            bottom: 10,
             left: 30
           }}
           style={{
-            margin: '2px'
+            margin: '6px',
+            display: 'none'
           }} />
+        </div>
+        <div
+        style={{
+          position: 'absolute',
+          width: '422px',
+          top: '218px',
+          left: '1112px',
+          height: '335px',
+          background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 3.4%, rgb(227, 227, 229) 91.5%, rgb(135, 137, 142))',
+          border: '1px solid black'
+        }} >
+          <BBS width={ 422 } height={ 335 } ref="bbs" />
         </div>
         <div className="Line"
           style={{
@@ -105,6 +133,15 @@ class App extends Component<{}, {}, {}> {
           dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng) });
         });
         (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
+        let list: Array<{ text: string; city: string; sentiment: number; }> = [];
+        for (let i: number = 0; i < 20; i++) {
+          list.push({
+            text: data[i].words,
+            city: data[i].city,
+            sentiment: parseFloat(data[i].sentiment)
+          });
+        }
+        (this.refs["bbs"] as BBS).import(list);
         (this.refs["map"] as MapView).setState({
           data: dataset
         });
@@ -125,7 +162,7 @@ class App extends Component<{}, {}, {}> {
         data.forEach((d: [[number, number, number], [number, number, number]]) => {
           pick.push([[d[0][0], - d[0][1]], [d[1][0], - d[1][1]]]);
         });
-        (this.refs["ref"] as PolylineChart).import(pick);
+        (this.refs["sum"] as PolylineChart).import(pick);
       });
     }
   }

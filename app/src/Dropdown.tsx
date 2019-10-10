@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-29 15:24:57 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-03 00:48:02
+ * @Last Modified time: 2019-10-10 12:43:54
  */
 
 import React, { Component } from 'react';
@@ -133,7 +133,7 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
 
     public componentDidMount(): void {
         let button: React.ReactInstance = this.refs["button"];
-        $(this.refs["list"]).css("left", $(button).offset()!.left)
+        $(this.refs["list"]).css("left", $(button).offset()!.left - $($(button).offsetParent() as any).offset()!.left)
             .css("top", (button as any)["offsetTop"] + (button as any)["offsetHeight"]);
     }
 }

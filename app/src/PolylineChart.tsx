@@ -2,11 +2,12 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-07 20:57:13
+ * @Last Modified time: 2019-10-10 13:11:18
  */
 import React, { Component } from 'react';
 
 export interface PolylineChartProps {
+    id: string;
     width: number;
     height: number;
     padding?: { top: number, right: number, bottom: number, left: number };
@@ -30,7 +31,7 @@ class PolylineChart extends Component<PolylineChartProps, PolylineChartState, an
 
     public render(): JSX.Element {
         return (
-            <svg className="PolylineChartSVG" xmlns="http://www.w3.org/2000/svg"
+            <svg className="PolylineChartSVG" xmlns="http://www.w3.org/2000/svg" id={ this.props.id }
                 width={ this.props.width } height={ this.props.height }
                 style={{
                     background: 'white',
