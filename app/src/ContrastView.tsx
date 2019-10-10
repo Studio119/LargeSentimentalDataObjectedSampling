@@ -21,6 +21,7 @@ export interface RectNode {
     leftChild: RectNode | null;
     rightChild: RectNode | null;
     ref: JQuery<HTMLElement>;
+    sentiment?: number;
 }
 
 export interface ContrastViewState extends RectNode {}
@@ -322,11 +323,19 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
             }
         }
         if (this.svg) {
+            let sentiment: number = node.sentiment ? node.sentiment : Math.random() / Math.random();
+            let rgb: string = 'yellow';
+            if (sentiment >= 1) {
+                rgb = `rgb(${ 194 + 61 * (1 - 1 / sentiment) * 0.7 },${ 8 + 247 * (1 - 1 / sentiment) * 0.7 },${ 107 + 148 * (1 - 1 / sentiment) * 0.7 })`;
+            }
+            else {
+                rgb = `rgb(${ 22 + 233 * (1 - sentiment) * 0.7 },${ 83 + 172 * (1 - sentiment) * 0.7 },${ 202 + 53 * (1 - sentiment) * 0.7 })`;
+            }
             let rect: JQuery<HTMLElement> = $($.parseXML(
                 `<rect x="${ attr.x }" y="${ attr.y }" width="${ attr.width }" height="${ attr.height }" `
                 + `id="${ node.path.join("-") }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
                 + `style="stroke: black; `
-                    + `fill: rgb(${ Math.random() * 80 + 100 }, ${ Math.random() * 80 + 100 }, ${ Math.random() * 80 + 100 }); `
+                    + `fill: ${ rgb }; `
                     + `display: none" />`
             ).documentElement);
             if ((!left && !right) || node.level === this.baseLevel + this.displayLevels) {

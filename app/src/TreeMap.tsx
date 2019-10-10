@@ -9,6 +9,7 @@ import $ from 'jquery';
 
 export interface TreeMapProps {
     id: string;
+    style?: React.CSSProperties;
 }
 
 export interface TreeNode {
@@ -60,7 +61,10 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
                 top: '0px',
                 left: '598px'
             }}>
-                <svg width="100%" height="102%" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`} />
+                <svg width="100%" height="102%" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
+                style={{
+                    ...this.props.style
+                }} />
             </div>
         );
     }

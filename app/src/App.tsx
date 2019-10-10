@@ -65,7 +65,8 @@ class App extends Component<{}, {}, {}> {
             left: 30
           }}
           style={{
-            margin: '6px'
+            margin: '6px',
+            background: 'none'
           }} />
           <PolylineChart id="p_sum" width={ 400 } height={ 100 } ref="sum"
           padding={{
@@ -76,7 +77,8 @@ class App extends Component<{}, {}, {}> {
           }}
           style={{
             margin: '6px',
-            display: 'none'
+            display: 'none',
+            background: 'none'
           }} />
         </div>
         <div
@@ -99,7 +101,10 @@ class App extends Component<{}, {}, {}> {
             width: '595px'
           }}>
           <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } />
-          <TreeMap id="TreeMap" ref="TreeMap" />
+          <TreeMap id="TreeMap" ref="TreeMap"
+          style={{
+            background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 3.4%, rgb(227, 227, 229) 91.5%, rgb(135, 137, 142))'
+          }} />
         </div>
       </div>
     );
