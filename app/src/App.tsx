@@ -41,39 +41,52 @@ class App extends Component<{}, {}, {}> {
           top: '67px',
           left: '1112px',
           height: '148px',
-          background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 7%, rgb(227, 227, 229) 91%, rgb(135, 137, 142))',
-          border: '1px solid black'
+          background: 'white',
+          border: '1px solid rgb(149,188,239)'
         }} >
-          <Dropdown<string> width = { 200 } height = { 28 } optionList = { ["积极/消极情感标签数", "积极/消极情感总值"] }
-          onChange={
-            (option: string) => {
-              if (option === "积极/消极情感标签数") {
-                $("#p_dis").show();
-                $("#p_sum").hide();
+          <div
+          style={{
+              height: '44px',
+              width: '100%',
+              borderBottom: '1px solid rgb(149,188,239)',
+              background: 'rgb(120,151,213)',
+              color: 'white',
+              textAlign: 'left',
+              paddingLeft: '16px',
+              letterSpacing: '2px'
+          }}>
+            采样结果评估
+            <Dropdown<string> width = { 200 } height = { 28 } optionList = { ["积极/消极情感标签数", "积极/消极情感总值"] }
+            onChange={
+              (option: string) => {
+                if (option === "积极/消极情感标签数") {
+                  $("#p_dis").show();
+                  $("#p_sum").hide();
+                }
+                else {
+                  $("#p_dis").hide();
+                  $("#p_sum").show();
+                }
               }
-              else {
-                $("#p_dis").hide();
-                $("#p_sum").show();
-              }
-            }
-          } />
-          <PolylineChart id="p_dis" width={ 400 } height={ 100 } ref="dis"
+            } />
+          </div>
+          <PolylineChart id="p_dis" width={ 400 } height={ 96 } ref="dis"
           padding={{
-            top: 10,
-            right: 30,
-            bottom: 10,
-            left: 30
+            top: 6,
+            right: 24,
+            bottom: 6,
+            left: 24
           }}
           style={{
             margin: '6px',
             background: 'none'
           }} />
-          <PolylineChart id="p_sum" width={ 400 } height={ 100 } ref="sum"
+          <PolylineChart id="p_sum" width={ 400 } height={ 96 } ref="sum"
           padding={{
-            top: 10,
-            right: 30,
-            bottom: 10,
-            left: 30
+            top: 6,
+            right: 24,
+            bottom: 6,
+            left: 24
           }}
           style={{
             margin: '6px',
@@ -88,8 +101,8 @@ class App extends Component<{}, {}, {}> {
           top: '218px',
           left: '1112px',
           height: '335px',
-          background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 3.4%, rgb(227, 227, 229) 91.5%, rgb(135, 137, 142))',
-          border: '1px solid black'
+          background: 'white',
+          border: '1px solid rgb(149,188,239)'
         }} >
           <BBS width={ 422 } height={ 335 } ref="bbs" />
         </div>
@@ -103,7 +116,15 @@ class App extends Component<{}, {}, {}> {
           <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } />
           <TreeMap id="TreeMap" ref="TreeMap"
           style={{
-            background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 3.4%, rgb(227, 227, 229) 91.5%, rgb(135, 137, 142))'
+            background: 'white'
+          }}
+          circleStyle={{
+            stroke: 'rgb(134,44,59)',
+            strokeWidth: '0.6px',
+            fill: 'rgb(230,28,65)'
+          }}
+          pathStyle={{
+            stroke: 'rgb(71,23,120)'
           }} />
         </div>
       </div>
@@ -147,9 +168,9 @@ class App extends Component<{}, {}, {}> {
           });
         }
         (this.refs["bbs"] as BBS).import(list);
-        (this.refs["map"] as MapView).setState({
-          data: dataset
-        });
+        // (this.refs["map"] as MapView).setState({
+        //   data: dataset
+        // });
       });
       (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
         let dataset: RectNode = this.loadTree(data, null, 'left');

@@ -78,7 +78,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     height: '100%',
                     width: '595px',
                     background: 'white',
-                    border: '1px solid black'
+                    border: '1px solid rgb(149,188,239)'
                 }} >
                 <svg width="475px" height="100%" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
                 onMouseDown={
@@ -173,9 +173,35 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     left: '475px',
                     height: '307px',
                     width: '120px',
-                    padding: '20px 0px',
-                    background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 2%, rgb(227, 227, 229) 94%, rgb(135, 137, 142))'
+                    background: 'white'
                 }} >
+                    <div
+                    style={{
+                        width: '104px',
+                        height: '110px',
+                        background: 'rgb(120,151,213)',
+                        color: 'white',
+                        textAlign: 'left',
+                        letterSpacing: '2px',
+                        padding: '10px 0px 10px 16px'
+                    }} >
+                        区域划分
+                        <hr
+                        style={{
+                            marginLeft: '-6px',
+                            color: 'white',
+                            width: '100px'
+                        }} />
+                        <span
+                        style={{
+                            fontSize: 'small',
+                            letterSpacing: '0.7px',
+                            paddingRight: '10px'
+                        }} >
+                            调节下方控件以更改最大划分层数显示
+                        </span>
+                    </div>
+                    <br />
                     <ValueBar label={ "Depth: " } width={ 120 } height={ 20 }
                     min={ 1 } max={ 15 } step={ 1 } defaultValue={ 3 }
                     style={{
@@ -204,7 +230,6 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     } >
                         Reset
                     </button>
-                    <br />
                 </div>
             </div>
         );

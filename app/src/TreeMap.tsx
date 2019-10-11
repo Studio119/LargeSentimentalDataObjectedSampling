@@ -7,31 +7,40 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
 
-export interface TreeMapProps {
+export interface StyleReflection<T = any> {
+    fill?: string | ((data: T) => string);
+    stroke?: string | ((data: T) => string);
+    strokeWidth?: string | ((data: T) => string);
+}
+
+export interface TreeMapProps<T = any> {
     id: string;
     style?: React.CSSProperties;
+    circleStyle?: StyleReflection<T>;
+    pathStyle?: React.CSSProperties;
 }
 
-export interface TreeNode {
+export interface TreeNode<T = any> {
     level: number;
     path: Array< 'root' | 'left' | 'right' >;
-    parent: TreeNode | null;
-    leftChild: TreeNode | null;
-    rightChild: TreeNode | null;
+    parent: TreeNode<T> | null;
+    leftChild: TreeNode<T> | null;
+    rightChild: TreeNode<T> | null;
     ref: JQuery<HTMLElement>;
+    data?: T;
 }
 
-export interface TreeMapState extends TreeNode {}
+export interface TreeMapState<T = any> extends TreeNode<T> {}
 
-class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
+class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     private svg: JQuery<HTMLElement> | null;
-    private layers: Array< Array<TreeNode> >;
+    private layers: Array< Array<TreeNode<T>> >;
     private width: number;
     private height: number;
     private padding: { top: number, right: number, bottom: number, left: number };
     private r: number;
 
-    public constructor(props: TreeMapProps) {
+    public constructor(props: TreeMapProps<T>) {
         super(props);
         this.svg = null;
         this.state = {
@@ -44,9 +53,9 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         };
         this.layers = [];
         this.width = 936;
-        this.height = 306;
-        this.padding = { top: 10, right: 10, bottom: 10, left: 10 };
-        this.r = 2.4;
+        this.height = 282;
+        this.padding = { top: 10, right: 20, bottom: 10, left: 20 };
+        this.r = 3;
     }
 
     public render(): JSX.Element {
@@ -56,12 +65,25 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
                 display: 'inline-block',
                 height: '102%',
                 width: '936px',
-                border: '1px solid black',
+                border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
                 top: '0px',
                 left: '598px'
             }}>
-                <svg width="100%" height="102%" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
+                <div
+                style={{
+                    height: '24px',
+                    width: '100%',
+                    borderBottom: '1px solid rgb(149,188,239)',
+                    background: 'rgb(120,151,213)',
+                    color: 'white',
+                    textAlign: 'left',
+                    paddingLeft: '16px',
+                    letterSpacing: '2px'
+                }}>
+                    K-D树的剪枝
+                </div>
+                <svg width="100%" height="294px" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
                 style={{
                     ...this.props.style
                 }} />
@@ -78,7 +100,7 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         this.draw(this.state);
     }
 
-    private draw(node: TreeNode): void {
+    private draw(node: TreeNode<T>): void {
         this.svg!.html("");
         this.layers = [];
         if (!this.svg) {
@@ -86,7 +108,7 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         }
         this.walk(node);
         let virtualCircles: Array< JQuery<HTMLElement> > = [];
-        let circles: Array< Array< { node: TreeNode, element: JQuery<HTMLElement>, level: number, index: number } > > = [];
+        let circles: Array< Array< { node: TreeNode<T>, element: JQuery<HTMLElement>, level: number, index: number } > > = [];
         let lines: Array< { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> } > = [];
         for (let level: number = 0; level < this.layers.length; level++) {
             for (let index: number = 0; index < Math.pow(2, level); index++) {
@@ -142,22 +164,56 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
                             + `${ d.child.attr("cy") }" `
                     + `style="stroke: black; fill: none; " />`).documentElement);
             this.svg!.append(line);
+            if (this.props.pathStyle) {
+                for (const key in this.props.pathStyle) {
+                    if (this.props.pathStyle.hasOwnProperty(key)) {
+                        const value = (this.props.pathStyle as any)[key];
+                        line.css(key, value);
+                    }
+                }
+            }
         });
         this.updateCircles(circles, lines, true);
     }
 
-    private updateCircles(circles: Array<Array<{ node: TreeNode, element: JQuery<HTMLElement>, level: number, index: number }>>, lines: Array<{ parent: JQuery<HTMLElement>; child: JQuery<HTMLElement>}>, repeat: boolean): void {
-        let moving: Array<{ node: TreeNode; element: JQuery<HTMLElement>; level: number; index: number; }> = [];
+    private updateCircles(circles: Array<Array<{ node: TreeNode<T>, element: JQuery<HTMLElement>, level: number, index: number }>>, lines: Array<{ parent: JQuery<HTMLElement>; child: JQuery<HTMLElement>}>, repeat: boolean): void {
+        let moving: Array<{ node: TreeNode<T>; element: JQuery<HTMLElement>; level: number; index: number; }> = [];
         for (let level: number = circles.length - 1; level >= 0; level--) {
-            circles[level].forEach((d: { node: TreeNode; element: JQuery<HTMLElement>; level: number; index: number; }) => {
+            circles[level].forEach((d: { node: TreeNode<T>; element: JQuery<HTMLElement>; level: number; index: number; }) => {
                 moving.push(d);
                 d.element.css("fill-opacity", 0.3);
+                if (this.props.circleStyle) {
+                    if (this.props.circleStyle.fill) {
+                        if (typeof this.props.circleStyle.fill === 'string') {
+                            d.element.css("fill", (this.props.circleStyle.fill as string));
+                        }
+                        else if (d.node.data) {
+                            d.element.css("fill", (this.props.circleStyle.fill as ((data: T) => string))(d.node.data));
+                        }
+                    }
+                    if (this.props.circleStyle.stroke) {
+                        if (typeof this.props.circleStyle.stroke === 'string') {
+                            d.element.css("stroke", (this.props.circleStyle.stroke as string));
+                        }
+                        else if (d.node.data) {
+                            d.element.css("stroke", (this.props.circleStyle.stroke as ((data: T) => string))(d.node.data));
+                        }
+                    }
+                    if (this.props.circleStyle.strokeWidth) {
+                        if (typeof this.props.circleStyle.strokeWidth === 'string') {
+                            d.element.css("stroke-width", (this.props.circleStyle.strokeWidth as string));
+                        }
+                        else if (d.node.data) {
+                            d.element.css("stroke-width", (this.props.circleStyle.strokeWidth as ((data: T) => string))(d.node.data));
+                        }
+                    }
+                }
                 if (repeat) {
                     this.svg!.append(d.element);
                 }
             });
         }
-        moving.sort((a: { node: TreeNode; element: JQuery<HTMLElement>; level: number; index: number; }, b: { node: TreeNode; element: JQuery<HTMLElement>; level: number; index: number; }) => {
+        moving.sort((a: { node: TreeNode<T>; element: JQuery<HTMLElement>; level: number; index: number; }, b: { node: TreeNode<T>; element: JQuery<HTMLElement>; level: number; index: number; }) => {
             return parseFloat(a.element.attr("cx")!) - parseFloat(b.element.attr("cx")!);
         });
         let lastX: Array<number> = [];
@@ -172,7 +228,8 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
                     if (offset - lastX[level] <= this.r * 3) {
                         for (let t: number = i; t < moving.length; t++) {
                             let originX: number = parseFloat(moving[t].element.attr("cx")!);
-                            moving[t].element.attr("cx", originX + this.r * 3 - offset + lastX[level]);
+                            let offsetNew: number = this.r * 3 - offset + lastX[level];
+                            moving[t].element.attr("cx", originX + offsetNew);
                         }
                         this.updateBranches(lines);
                     }
@@ -192,11 +249,11 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         }
     }
 
-    private adjustBorder(circles: Array<Array<{ node: TreeNode, element: JQuery<HTMLElement>, level: number, index: number }>>, lines: Array<{ parent: JQuery<HTMLElement>; child: JQuery<HTMLElement>}>): void {
+    private adjustBorder(circles: Array<Array<{ node: TreeNode<T>, element: JQuery<HTMLElement>, level: number, index: number }>>, lines: Array<{ parent: JQuery<HTMLElement>; child: JQuery<HTMLElement>}>): void {
         let max: number = 0;
         let box: Array<JQuery<HTMLElement>> = [];
         for (let level: number = circles.length - 1; level >= 0; level--) {
-            circles[level].forEach((d: { node: TreeNode; element: JQuery<HTMLElement>; level: number; index: number; }) => {
+            circles[level].forEach((d: { node: TreeNode<T>; element: JQuery<HTMLElement>; level: number; index: number; }) => {
                 let cx: number = parseFloat(d.element.attr("cx")!);
                 if (cx > max) {
                     max = cx;
@@ -260,7 +317,7 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         return pos;
     }
 
-    private walk(node: TreeNode): void {
+    private walk(node: TreeNode<T>): void {
         if (this.layers.length < node.level + 1) {
             this.layers.push([]);
         }
@@ -273,7 +330,7 @@ class TreeMap extends Component<TreeMapProps, TreeMapState, {}> {
         }
     }
 
-    public import(root: TreeNode): void {
+    public import(root: TreeNode<T>): void {
         this.setState(root);
     }
 }

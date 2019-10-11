@@ -42,13 +42,13 @@ class PolylineChart extends Component<PolylineChartProps, PolylineChartState, an
                 y1={ this.padding.top + (this.props.height - this.padding.top - this.padding.bottom) / 2 }
                 y2={ this.padding.top + (this.props.height - this.padding.top - this.padding.bottom) / 2 }
                 style={{
-                    stroke: 'black'
+                    stroke: 'rgb(216,161,21)'
                 }} />
                 <line key="y-scale" xmlns="http://www.w3.org/2000/svg" version="1.0"
                 x1={ this.padding.left } x2={ this.padding.left }
                 y1={ this.padding.top } y2={ this.props.height - this.padding.bottom }
                 style={{
-                    stroke: 'black'
+                    stroke: 'rgb(216,161,21)'
                 }} />
                 {
                     this.state.data.length === 0

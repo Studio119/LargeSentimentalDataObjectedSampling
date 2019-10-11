@@ -30,50 +30,63 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
             style={{
                 width: this.props.width,
                 height: this.props.height,
-                border: '1px solid black',
+                border: '1px solid rgb(149,188,239)',
                 overflowX: 'hidden',
                 overflowY: 'scroll'
             }}>
-                <table
-                    style={{
-                        width: '100%',
-                        padding: '0px'
-                    }}>
-                        <ul
-                        style={{
-                            margin: '0px'
-                        }}>
-                            {
-                                this.state.list.map((b: { text: string; city: string; sentiment: number; }, index: number) => {
-                                    return (
-                                        <li key={ `row${ index }` }
-                                        style={{
-                                            width: '96%',
-                                            marginRight: '4%',
-                                            borderBottom: '1px solid black',
-                                            borderTop: '1px solid black',
-                                        }}>
-                                            <p key={ `text${ index }` } ref={ `bbs_text${ index }` }
-                                            style={{
-                                                textAlign: 'left',
-                                                border: '1px solid black',
-                                                borderRadius: '6px',
-                                                padding: '8px',
-                                                background: 'white',
-                                                marginBottom: '4px'
-                                            }}>{ b.text }</p>
-                                            <p key={ `city${ index }` }
-                                            style={{
-                                                textAlign: 'right',
-                                                color: '#444',
-                                                marginTop: '4px'
-                                            }}>shared in <u>{ b.city }</u></p>
-                                        </li>
-                                    )
-                                })
-                            }
-                        </ul>
-                    </table>
+                <div
+                style={{
+                    height: '24px',
+                    width: '100%',
+                    borderBottom: '1px solid rgb(149,188,239)',
+                    background: 'rgb(120,151,213)',
+                    color: 'white',
+                    textAlign: 'left',
+                    paddingLeft: '16px',
+                    letterSpacing: '2px'
+                }}>
+                    推文列表
+                </div>
+                <ul
+                style={{
+                    margin: '0px',
+                    listStyle: 'none'
+                }}>
+                    {
+                        this.state.list.map((b: { text: string; city: string; sentiment: number; }, index: number) => {
+                            return (
+                                <li key={ `row${ index }` }
+                                style={{
+                                    width: '98%',
+                                    marginRight: '4%',
+                                    marginLeft: '-4%',
+                                    borderBottom: '1px solid rgb(149,188,239)',
+                                    borderTop: '1px solid rgb(149,188,239)',
+                                }}>
+                                    <p key={ `text${ index }` } ref={ `bbs_text${ index }` }
+                                    style={{
+                                        textAlign: 'left',
+                                        border: '1px solid rgb(149,188,239)',
+                                        borderRadius: '10px 10px 0px 10px',
+                                        padding: '8px 14px',
+                                        background: 'rgb(234,242,252)',
+                                        marginBottom: '4px'
+                                    }}>
+                                        { b.text }
+                                    </p>
+                                    <p key={ `city${ index }` }
+                                    style={{
+                                        textAlign: 'right',
+                                        color: '#668',
+                                        marginTop: '4px'
+                                    }}>
+                                        shared in <u>{ b.city }</u>
+                                    </p>
+                                </li>
+                            )
+                        })
+                    }
+                </ul>
             </div>
         );
     }

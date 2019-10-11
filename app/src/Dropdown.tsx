@@ -37,23 +37,22 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                 style={{
                     width: this.props.width,
                     height: this.props.height,
-                    background: 'rgb(218, 202, 229)',
-                    border: '4px solid rgb(150, 0, 170)',
+                    background: 'rgb(199, 214, 240)',
+                    border: '3px solid rgb(96, 121, 170)',
                     margin: `auto 10px`,
                     transform: 'translateY(25%)',
-                    fontWeight: 'bold',
                     letterSpacing: '0.1em'
                 }}
                 onMouseOver={
                     () => {
                         let button: JQuery<HTMLElement> = $((this.refs["button"] as any));
-                        button.css("background", "rgb(209, 98, 212)");
+                        button.css("background", "rgb(234,242,252)");
                     }
                 }
                 onMouseOut={
                     () => {
                         let button: JQuery<HTMLElement> = $((this.refs["button"] as any));
-                        button.css("background", "rgb(218, 202, 229)");
+                        button.css("background", "rgb(199, 214, 240)");
                     }
                 }
                 onClick={
@@ -70,7 +69,7 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                     { this.state.optionList[this.state.value] }
                 </button>
                 <ul key="list" ref="list" style={{ position: 'absolute', zIndex: 2000, margin: '8px 0px 0px',
-                width: this.props.width, background: 'rgb(218, 202, 229)',
+                width: this.props.width, background: 'rgb(234,242,252)',
                 padding: '2px 0px 6px', display: 'none' }} >
                     {
                         this.state.optionList.map((value: T, index: number) => {
@@ -82,10 +81,8 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                                     WebkitUserSelect: 'none',
                                     MozUserSelect: 'none',
                                     userSelect: 'none',
-                                    background: `rgb(`
-                                        + `${ 183 + 53 * index / this.state.optionList.length }, `
-                                        + `${ 101 + 127 * index / this.state.optionList.length }, `
-                                        + `${ 199 + 45 * index / this.state.optionList.length })`
+                                    background: index % 2 === 0 ? 'rgb(219, 227, 236)' : 'rgb(149,188,239)',
+                                    fontSize: 'smaller'
                                 }}
                                 onDragStart={
                                     () => void 0
@@ -107,8 +104,8 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                                 onMouseEnter={
                                     () => {
                                         $(this.refs[`li_${index}`])
-                                            .css("border-left", "5px solid rgb(120, 0, 136)")
-                                            .css("border-right", "5px solid rgb(120, 0, 136)")
+                                            .css("border-left", "4px solid rgb(96, 121, 170)")
+                                            .css("border-right", "4px solid rgb(96, 121, 170)")
                                             .css("list-style", "inside");
                                     }
                                 }
