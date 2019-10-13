@@ -33,24 +33,45 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
     public render(): JSX.Element {
         return (
             <div id={ this.props.id }
+            style={{
+                position: 'absolute',
+                left: '321px',
+                top: '67px',
+                height: '486px',
+                width: '788px',
+                background: 'white',
+                border: '1px solid rgb(149,188,239)'
+            }}>
+                <div
                 style={{
-                    position: 'absolute',
-                    left: '18.22%',
-                    top: '67px',
-                    height: '486px',
-                    width: '829px',
-                    background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 2%, rgb(227, 227, 229) 94%, rgb(135, 137, 142))',
-                    border: '1px solid black'
-                }}>
-                {
-                    this.mounted
-                        ? <MapBox
-                            accessToken={ "pk.eyJ1IjoiaWNoZW4tYW50b2luZSIsImEiOiJjanp0OWE4OTcwMWpzM2hwZm55bzI3YW04In0.n1R77KvU56MZXAuHVez9hw" }
-                            styleURL={"mapbox://styles/ichen-antoine/ck1504bas09eu1cs1op2eqsnu"}
-                            containerID={ this.props.id } center={ this.props.center } zoom={ this.props.zoom }
-                            minZoom={ this.props.minZoom } maxZoom={ this.props.maxZoom } ref="map" />
-                        : <></>
-                }
+                    height: '22px',
+                    width: '772px',
+                    borderBottom: '1px solid rgb(149,188,239)',
+                    background: 'rgb(120,151,213)',
+                    color: 'white',
+                    textAlign: 'left',
+                    paddingLeft: '16px',
+                    paddingTop: '2px',
+                    letterSpacing: '2px',
+                    fontSize: 'larger'
+                }} >
+                    Map View
+                </div>
+                <div
+                style={{
+                    height: '462px',
+                    width: '773px'
+                }} >
+                    {
+                        this.mounted
+                            ? <MapBox
+                                accessToken={ "pk.eyJ1IjoiaWNoZW4tYW50b2luZSIsImEiOiJjanp0OWE4OTcwMWpzM2hwZm55bzI3YW04In0.n1R77KvU56MZXAuHVez9hw" }
+                                styleURL={"mapbox://styles/ichen-antoine/ck1504bas09eu1cs1op2eqsnu"}
+                                containerID={ this.props.id } center={ this.props.center } zoom={ this.props.zoom }
+                                minZoom={ this.props.minZoom } maxZoom={ this.props.maxZoom } ref="map" />
+                            : <></>
+                    }
+                </div>
             </div>
         )
     }

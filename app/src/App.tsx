@@ -23,6 +23,7 @@ export interface TreeNode {
   data: [number, number, number, number];
   left?: TreeNode;
   right?: TreeNode;
+  sentiment?: number;
 }
 
 class App extends Component<{}, {}, {}> {
@@ -46,7 +47,7 @@ class App extends Component<{}, {}, {}> {
         }} >
           <div
           style={{
-              height: '44px',
+              height: '24px',
               width: '100%',
               borderBottom: '1px solid rgb(149,188,239)',
               background: 'rgb(120,151,213)',
@@ -55,11 +56,12 @@ class App extends Component<{}, {}, {}> {
               paddingLeft: '16px',
               letterSpacing: '2px'
           }}>
-            采样结果评估
-            <Dropdown<string> width = { 200 } height = { 28 } optionList = { ["积极/消极情感标签数", "积极/消极情感总值"] }
+            Sampling Result Evaluation
+            <br />
+            <Dropdown<string> width = { 260 } height = { 28 } optionList = { ["Active / Positive: Labels", "Active / Positive: Value"] }
             onChange={
               (option: string) => {
-                if (option === "积极/消极情感标签数") {
+                if (option === "Active / Positive: Labels") {
                   $("#p_dis").show();
                   $("#p_sum").hide();
                 }
@@ -70,7 +72,7 @@ class App extends Component<{}, {}, {}> {
               }
             } />
           </div>
-          <PolylineChart id="p_dis" width={ 400 } height={ 96 } ref="dis"
+          <PolylineChart id="p_dis" width={ 400 } height={ 80 } ref="dis"
           padding={{
             top: 6,
             right: 24,
@@ -78,10 +80,10 @@ class App extends Component<{}, {}, {}> {
             left: 24
           }}
           style={{
-            margin: '6px',
+            margin: '38px 6px 6px 6px',
             background: 'none'
           }} />
-          <PolylineChart id="p_sum" width={ 400 } height={ 96 } ref="sum"
+          <PolylineChart id="p_sum" width={ 400 } height={ 80 } ref="sum"
           padding={{
             top: 6,
             right: 24,
@@ -89,7 +91,7 @@ class App extends Component<{}, {}, {}> {
             left: 24
           }}
           style={{
-            margin: '6px',
+            margin: '38px 6px 6px 6px',
             display: 'none',
             background: 'none'
           }} />
@@ -101,8 +103,7 @@ class App extends Component<{}, {}, {}> {
           top: '218px',
           left: '1112px',
           height: '335px',
-          background: 'white',
-          border: '1px solid rgb(149,188,239)'
+          background: 'white'
         }} >
           <BBS width={ 422 } height={ 335 } ref="bbs" />
         </div>
@@ -168,9 +169,9 @@ class App extends Component<{}, {}, {}> {
           });
         }
         (this.refs["bbs"] as BBS).import(list);
-        // (this.refs["map"] as MapView).setState({
-        //   data: dataset
-        // });
+        (this.refs["map"] as MapView).setState({
+          data: dataset
+        });
       });
       (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
         let dataset: RectNode = this.loadTree(data, null, 'left');
@@ -206,6 +207,7 @@ class App extends Component<{}, {}, {}> {
       parent: parent,
       leftChild: null,
       rightChild: null,
+      sentiment: data.sentiment,
       ref: $("NULL")
     };
     if (data.left) {

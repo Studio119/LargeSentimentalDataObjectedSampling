@@ -178,14 +178,15 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     <div
                     style={{
                         width: '104px',
-                        height: '110px',
+                        // height: '110px',
                         background: 'rgb(120,151,213)',
                         color: 'white',
                         textAlign: 'left',
                         letterSpacing: '2px',
-                        padding: '10px 0px 10px 16px'
+                        padding: '10px 0px 10px 12px',
+                        marginBottom: '-18px'
                     }} >
-                        区域划分
+                        Geographic Division
                         <hr
                         style={{
                             marginLeft: '-6px',
@@ -198,7 +199,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                             letterSpacing: '0.7px',
                             paddingRight: '10px'
                         }} >
-                            调节下方控件以更改最大划分层数显示
+                            Drag the value bar below to adjust the maximum depth of division level
                         </span>
                     </div>
                     <br />
@@ -348,13 +349,13 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
             }
         }
         if (this.svg) {
-            let sentiment: number = node.sentiment ? node.sentiment : Math.random() / Math.random();
+            let sentiment: number = node.sentiment ? node.sentiment : -1;
             let rgb: string = 'yellow';
             if (sentiment >= 1) {
-                rgb = `rgb(${ 194 + 61 * (1 - 1 / sentiment) * 0.7 },${ 8 + 247 * (1 - 1 / sentiment) * 0.7 },${ 107 + 148 * (1 - 1 / sentiment) * 0.7 })`;
+                rgb = `rgb(${ 194 + 61 * 1 / sentiment * 0.7 },${ 8 + 247 * 1 / sentiment * 0.7 },${ 107 + 148 * 1 / sentiment * 0.7 })`;
             }
-            else {
-                rgb = `rgb(${ 22 + 233 * (1 - sentiment) * 0.7 },${ 83 + 172 * (1 - sentiment) * 0.7 },${ 202 + 53 * (1 - sentiment) * 0.7 })`;
+            else if (sentiment !== -1) {
+                rgb = `rgb(${ 22 + 233 * sentiment * 0.7 },${ 83 + 172 * sentiment * 0.7 },${ 202 + 53 * sentiment * 0.7 })`;
             }
             let rect: JQuery<HTMLElement> = $($.parseXML(
                 `<rect x="${ attr.x }" y="${ attr.y }" width="${ attr.width }" height="${ attr.height }" `

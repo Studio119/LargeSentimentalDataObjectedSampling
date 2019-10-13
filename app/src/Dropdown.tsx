@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-29 15:24:57 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-10 12:43:54
+ * @Last Modified time: 2019-10-12 14:34:00
  */
 
 import React, { Component } from 'react';
@@ -81,6 +81,7 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                                     WebkitUserSelect: 'none',
                                     MozUserSelect: 'none',
                                     userSelect: 'none',
+                                    color: 'black',
                                     background: index % 2 === 0 ? 'rgb(219, 227, 236)' : 'rgb(149,188,239)',
                                     fontSize: 'smaller'
                                 }}

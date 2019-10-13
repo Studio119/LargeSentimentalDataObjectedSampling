@@ -29,14 +29,15 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             <>
                 <div id={ this.props.id } key="container"
                     style={{
-                        height: '58px',
-                        paddingTop: '6px',
-                        background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 10%, rgb(192, 193, 196) 80%, rgb(147, 149, 154) 90%, #282c34)'
+                        height: '53px',
+                        paddingTop: '10px',
+                        background: 'rgb(234, 242, 252)',
+                        border: '1px solid rgb(149,188,239)'
                     }}>
                     <label style={{ position: 'relative', top: 8, fontSize: '18px' }}>dataset</label>
                     <Dropdown<string> width={ 100 } height={ 30 } optionList={ ['Tweet', 'yelp'] } onChange={ (option: string) => { this.load(option); } } />
 
-                    <ValueBar label={ "采样率" } width={ 160 } height={ 20 } min={ 0 } max={ 1 } defaultValue={ 0.4 } />
+                    <ValueBar label={ "Sampling Rate" } width={ 160 } height={ 20 } min={ 0 } max={ 1 } defaultValue={ 0.4 } />
                     <ValueBar label={ "α =" } width={ 120 } height={ 20 } min={ 0 } max={ 100 } step={ 5 } defaultValue={ 100 } />
                     <ValueBar label={ "β =" } width={ 120 } height={ 20 } min={ 0 } max={ 100 } defaultValue={ 100 } />
                     <ValueBar label={ "γ =" } width={ 120 } height={ 20 } min={ 0 } max={ 100 } defaultValue={ 100 } />
@@ -45,11 +46,6 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                     <ColorPicker ref={ "cp1" } x={ 1410 } y={ 6 } r={255} g={0} b={0} opacity={1} />
                     <ColorPicker ref={ "cp2" } x={ 1460 } y={ 6 } r={255} g={255} b={0} opacity={1} />
                 </div>
-                <div key="border"
-                    style={{
-                        height: '2px',
-                        background: 'linear-gradient(to right, blue, green 20%, yellow 50%, purple 80%, red)'
-                    }} />
             </>
         );
     }
@@ -66,7 +62,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
 
     private load(source: string): void {
         if (source === 'Tweet') {
-            this.props.importSource('/data/93.csv', '/data/rectangle_tree-0.15-0.01-20-new.json', '/data/93-topics.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json');
+            this.props.importSource('/data/93.csv', '/data/rectangle_sentiment_tree_-0.15-0.01-20-new.json', '/data/93-topics.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json');
         }
         else if (source === 'yelp') {
             this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');

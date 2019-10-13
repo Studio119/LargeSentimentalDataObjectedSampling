@@ -25,27 +25,40 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
     public render(): JSX.Element {
         return (
             <div id={ this.props.id }
+            style={{
+                display: 'inline-block',
+                height: '242px',
+                width: '318px',
+                background: 'white',
+                border: '1px solid rgb(149,188,239)',
+                position: 'absolute',
+                top: '311px',
+                left: 0
+            }}>
+                <div
                 style={{
-                    display: 'inline-block',
-                    height: '242px',
-                    width: '18%',
-                    background: 'linear-gradient(to bottom, rgb(150, 152, 157), #ffffff 2%, rgb(227, 227, 229) 94%, rgb(135, 137, 142))',
-                    border: '1px solid black',
-                    position: 'absolute',
-                    top: '311px',
-                    left: 0
-                }}>
+                    height: '24px',
+                    width: '308px',
+                    borderBottom: '1px solid rgb(149,188,239)',
+                    background: 'rgb(120,151,213)',
+                    color: 'white',
+                    textAlign: 'left',
+                    paddingLeft: '16px',
+                    letterSpacing: '2px'
+                }} >
+                    Hotspots
+                </div>
                 <div key="head">
                     <table
                     style={{
                         width: '100%',
-                        padding: '8px 15px 0px 10px'
+                        padding: '2px 46px 0px 9px'
                     }}>
                         <tbody>
                             <tr key={ `listheader` }
                             style={{
                                 width: '100%',
-                                height: '36px'
+                                height: '26px'
                             }}>
                                 <td key={ `listheader_label1`} style={{ width: '76%' }} >topic</td>
                                 <td key={ `listheader_label2`} style={{ width: '24%' }} >count</td>
@@ -55,7 +68,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                 </div>
                 <div key="list"
                 style={{
-                    height: '194px',
+                    height: '180px',
                     overflowY: 'scroll',
                     overflowX: 'hidden'
                 }}>
@@ -95,7 +108,9 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
 
     public import(topics: Array<{ topic: string, count: number }>): void {
         this.setState({
-            topics: topics
+            topics: topics.sort((a: { topic: string; count: number; }, b: { topic: string; count: number; }) => {
+                return b.count - a.count;
+            })
         });
     }
 }

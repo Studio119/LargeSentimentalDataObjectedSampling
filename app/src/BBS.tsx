@@ -45,7 +45,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                     paddingLeft: '16px',
                     letterSpacing: '2px'
                 }}>
-                    推文列表
+                    Tweets List
                 </div>
                 <ul
                 style={{

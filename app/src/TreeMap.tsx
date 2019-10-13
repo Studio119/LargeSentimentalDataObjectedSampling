@@ -81,7 +81,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                     paddingLeft: '16px',
                     letterSpacing: '2px'
                 }}>
-                    K-D树的剪枝
+                    Pruning of K-D Tree
                 </div>
                 <svg width="100%" height="294px" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
                 style={{
