@@ -42,7 +42,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                 x: 0,
                 y: 0,
                 width: 475,
-                height: 306
+                height: 270
             },
             level: 0,
             path: [ 'root' ],
@@ -58,7 +58,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
         this.selectBox = [];
         for (let i: number = 0; i < 8; i++) {
             let layer: JQuery<HTMLElement> = $($.parseXML(
-                `<rect x="0" y="0" width="475" height="306" `
+                `<rect x="0" y="0" width="475" height="270" `
                 + `id="RectTreeMapSelector_Layer${ i }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
                 + `style="stroke: black; stroke-width: 2; `
                     + `fill: #333333aa; `
@@ -67,131 +67,42 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
             this.selectBox.push(layer);
         }
         this.offset = { x1: 0, x2: 0, y1: 0, y2: 0 };
-        this.trans = { x1: 0, x2: 475, y1: 0, y2: 306 };
+        this.trans = { x1: 0, x2: 475, y1: 0, y2: 270 };
     }
 
     public render(): JSX.Element {
         return (
             <div id={ this.props.id }
                 style={{
-                    display: 'inline-block',
-                    height: '100%',
-                    width: '595px',
+                    height: '410px',
+                    width: '421px',
                     background: 'white',
-                    border: '1px solid rgb(149,188,239)'
+                    border: '1px solid rgb(149,188,239)',
+                    position: 'absolute',
+                    left: '1114px',
+                    top: '59px'
                 }} >
-                <svg width="475px" height="100%" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
-                onMouseDown={
-                    (event) => {
-                        this.offset.x1 = event.clientX - 3;
-                        this.offset.y1 = event.clientY - 557;
-                        this.selectBox[0].attr("x", 0).attr("y", 0).css("display", "unset")
-                                .attr("width", event.clientX - 3).attr("height", event.clientY - 557);
-                        this.selectBox[1].attr("x", event.clientX - 3).attr("y", 0).css("display", "unset")
-                                .attr("width", 0).attr("height", event.clientY - 557);
-                        this.selectBox[2].attr("x", event.clientX - 3).attr("y", 0).css("display", "unset")
-                                .attr("width", 478 - event.clientX).attr("height", event.clientY - 557);
-                        this.selectBox[3].attr("x", event.clientX - 3).attr("y", event.clientY - 557).css("display", "unset")
-                                .attr("width", 478 - event.clientX).attr("height", 0);
-                        this.selectBox[4].attr("x", event.clientX - 3).attr("y", event.clientY - 557).css("display", "unset")
-                                .attr("width", 478 - event.clientX).attr("height", 863 - event.clientY);
-                        this.selectBox[5].attr("x", event.clientX - 3).attr("y", 0).css("display", "unset")
-                                .attr("width", 478 - event.clientX).attr("height", 863 - event.clientY);
-                        this.selectBox[6].attr("x", 0).attr("y", event.clientY - 557).css("display", "unset")
-                                .attr("width", event.clientX - 3).attr("height", 863 - event.clientY);
-                        this.selectBox[7].attr("x", 0).attr("y", event.clientY - 557).css("display", "unset")
-                                .attr("width", event.clientX - 3).attr("height", 863 - event.clientY);
-                    }
-                }
-                onMouseMove={
-                    (event) => {
-                        if (this.selectBox[0].css("display") === "none") {
-                            return;
-                        }
-                        let width: number = event.clientX - 3 - parseInt(this.selectBox[0].attr("width")!);
-                        let height: number = event.clientY - 557 - parseInt(this.selectBox[0].attr("height")!);
-                        if (width <= 47.5 || height <= 30.6) {
-                            width = 47.5;
-                            height = 30.6;
-                        }
-                        if (width / 475 > height / 306) {
-                            width = height / 306 * 475;
-                        }
-                        else {
-                            height = width / 475 * 306;
-                        }
-                        this.offset.x2 = this.offset.x1 + width;
-                        this.offset.y2 = this.offset.y1 + height;
-                        this.selectBox[1].attr("width", width);
-                        this.selectBox[2].attr("x", width + parseInt(this.selectBox[0].attr("width")!))
-                                .attr("width", 475 - width - parseInt(this.selectBox[0].attr("width")!));
-                        this.selectBox[3].attr("x", width + parseInt(this.selectBox[0].attr("width")!))
-                                .attr("width", 475 - width -  parseInt(this.selectBox[0].attr("width")!))
-                                .attr("height", height);
-                        this.selectBox[4].attr("x", width + parseInt(this.selectBox[0].attr("width")!))
-                                .attr("width", 475 - width - parseInt(this.selectBox[0].attr("width")!))
-                                .attr("y", height + parseInt(this.selectBox[0].attr("height")!))
-                                .attr("height", 306 - height - parseInt(this.selectBox[0].attr("height")!));
-                        this.selectBox[5].attr("width", width)
-                                .attr("y", height + parseInt(this.selectBox[0].attr("height")!))
-                                .attr("height", 306 - height - parseInt(this.selectBox[0].attr("height")!));
-                        this.selectBox[6].attr("y", height + parseInt(this.selectBox[0].attr("height")!))
-                                .attr("height", 306 - height - parseInt(this.selectBox[0].attr("height")!));
-                        this.selectBox[7].attr("height", height);
-                    }
-                }
-                onMouseUp={
-                    (event) => {
-                        if (this.selectBox[0].css("display") === "none") {
-                            return;
-                        }
-                        let width: number = event.clientX - 3 - parseInt(this.selectBox[0].attr("width")!);
-                        let height: number = event.clientY - 557 - parseInt(this.selectBox[0].attr("height")!);
-                        for (let i: number = 0; i < 8; i++) {
-                            this.selectBox[i].css("display", "none");
-                        }
-                        if (width <= 47.5 || height <= 30.6) {
-                            return;
-                        }
-                        this.stretch(this.state);
-                        this.trans = {
-                            x1: (0 - this.offset.x1) * (this.trans.x2 - this.trans.x1) / (this.offset.x2 - this.offset.x1),
-                            x2: (475 - this.offset.x1) * (this.trans.x2 - this.trans.x1) / (this.offset.x2 - this.offset.x1),
-                            y1: (0 - this.offset.y1) * (this.trans.y2 - this.trans.y1) / (this.offset.y2 - this.offset.y1),
-                            y2: (306 - this.offset.y1) * (this.trans.y2 - this.trans.y1) / (this.offset.y2 - this.offset.y1)
-                        };
-                    }
-                }
-                style={{
-                    position: 'relative',
-                    left: '-60px'
-                }} />
                 <div id={ this.props.id + "-Bar" }
                 style={{
-                    position: 'relative',
-                    top: '-311px',
-                    left: '475px',
-                    height: '307px',
-                    width: '120px',
+                    width: '421px',
                     background: 'white'
                 }} >
                     <div
                     style={{
-                        width: '104px',
-                        // height: '110px',
+                        width: '411px',
                         background: 'rgb(120,151,213)',
                         color: 'white',
                         textAlign: 'left',
                         letterSpacing: '2px',
                         padding: '10px 0px 10px 12px',
-                        marginBottom: '-18px'
+                        marginBottom: '-24px'
                     }} >
                         Geographic Division
                         <hr
                         style={{
-                            marginLeft: '-6px',
+                            marginLeft: '-2px',
                             color: 'white',
-                            width: '100px'
+                            width: '400px'
                         }} />
                         <span
                         style={{
@@ -203,11 +114,11 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                         </span>
                     </div>
                     <br />
-                    <ValueBar label={ "Depth: " } width={ 120 } height={ 20 }
+                    <ValueBar label={ "Depth: " } width={ 150 } height={ 20 }
                     min={ 1 } max={ 15 } step={ 1 } defaultValue={ 3 }
                     style={{
-                        transform: 'none',
-                        display: 'unset'
+                        transform: 'translateY(19%)',
+                        display: 'inline-block'
                     }}
                     onValueChange={
                         (value: number) => {
@@ -217,21 +128,104 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                             this.svg!.append(this.selectBox);
                         }
                     } />
-                    <br />
                     <button type="button" name="relayout"
                     style={{
                         margin: '10px 0px'
                     }}
                     onClick={
                         () => {
-                            this.offset = { x1: 0, x2: 475, y1: 0, y2: 306 };
-                            this.trans = { x1: 0, x2: 475, y1: 0, y2: 306 };
+                            this.offset = { x1: 0, x2: 420, y1: 0, y2: 270 };
+                            this.trans = { x1: 0, x2: 420, y1: 0, y2: 270 };
                             this.stretch(this.state);
                         }
                     } >
                         Reset
                     </button>
                 </div>
+                <svg width="422px" height="272px" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
+                onMouseDown={
+                    (event) => {
+                        let x1: number = event.clientX - 1117;
+                        let y1: number = event.clientY - 201;
+                        this.offset.x1 = x1;
+                        this.offset.y1 = y1;
+                        this.selectBox[0].attr("x", 0).attr("y", 0).css("display", "unset")
+                                .attr("width", x1).attr("height", y1);
+                        this.selectBox[1].attr("x", x1).attr("y", 0).css("display", "unset")
+                                .attr("width", 0).attr("height", y1);
+                        this.selectBox[2].attr("x", x1).attr("y", 0).css("display", "unset")
+                                .attr("width", 420 - x1).attr("height", y1);
+                        this.selectBox[3].attr("x", x1).attr("y", y1).css("display", "unset")
+                                .attr("width", 420 - x1).attr("height", 0);
+                        this.selectBox[4].attr("x", x1).attr("y", y1).css("display", "unset")
+                                .attr("width", 420 - x1).attr("height", 863 - event.clientY);
+                        this.selectBox[5].attr("x", x1).attr("y", 0).css("display", "unset")
+                                .attr("width", 420 - x1).attr("height", 863 - event.clientY);
+                        this.selectBox[6].attr("x", 0).attr("y", y1).css("display", "unset")
+                                .attr("width", x1).attr("height", 863 - event.clientY);
+                        this.selectBox[7].attr("x", 0).attr("y", y1).css("display", "unset")
+                                .attr("width", x1).attr("height", 863 - event.clientY);
+                    }
+                }
+                onMouseMove={
+                    (event) => {
+                        if (this.selectBox[0].css("display") === "none") {
+                            return;
+                        }
+                        let width: number = event.clientX - 1117 - parseInt(this.selectBox[0].attr("width")!);
+                        let height: number = event.clientY - 201 - parseInt(this.selectBox[0].attr("height")!);
+                        if (width <= 42 || height <= 27) {
+                            width = 42;
+                            height = 27;
+                        }
+                        if (width / 420 > height / 270) {
+                            width = height / 270 * 420;
+                        }
+                        else {
+                            height = width / 420 * 270;
+                        }
+                        this.offset.x2 = this.offset.x1 + width;
+                        this.offset.y2 = this.offset.y1 + height;
+                        this.selectBox[1].attr("width", width);
+                        this.selectBox[2].attr("x", width + parseInt(this.selectBox[0].attr("width")!))
+                                .attr("width", 420 - width - parseInt(this.selectBox[0].attr("width")!));
+                        this.selectBox[3].attr("x", width + parseInt(this.selectBox[0].attr("width")!))
+                                .attr("width", 420 - width -  parseInt(this.selectBox[0].attr("width")!))
+                                .attr("height", height);
+                        this.selectBox[4].attr("x", width + parseInt(this.selectBox[0].attr("width")!))
+                                .attr("width", 420 - width - parseInt(this.selectBox[0].attr("width")!))
+                                .attr("y", height + parseInt(this.selectBox[0].attr("height")!))
+                                .attr("height", 270 - height - parseInt(this.selectBox[0].attr("height")!));
+                        this.selectBox[5].attr("width", width)
+                                .attr("y", height + parseInt(this.selectBox[0].attr("height")!))
+                                .attr("height", 270 - height - parseInt(this.selectBox[0].attr("height")!));
+                        this.selectBox[6].attr("y", height + parseInt(this.selectBox[0].attr("height")!))
+                                .attr("height", 270 - height - parseInt(this.selectBox[0].attr("height")!));
+                        this.selectBox[7].attr("height", height);
+                    }
+                }
+                onMouseUp={
+                    (event) => {
+                        if (this.selectBox[0].css("display") === "none") {
+                            return;
+                        }
+                        let width: number = event.clientX - 1117 - parseInt(this.selectBox[0].attr("width")!);
+                        let height: number = event.clientY - 201 - parseInt(this.selectBox[0].attr("height")!);
+                        for (let i: number = 0; i < 8; i++) {
+                            this.selectBox[i].css("display", "none");
+                        }
+                        if (width <= 42 || height <= 27) {
+                            return;
+                        }
+                        this.stretch(this.state);
+                        this.trans = {
+                            x1: (0 - this.offset.x1) * (this.trans.x2 - this.trans.x1) / (this.offset.x2 - this.offset.x1),
+                            x2: (420 - this.offset.x1) * (this.trans.x2 - this.trans.x1) / (this.offset.x2 - this.offset.x1),
+                            y1: (0 - this.offset.y1) * (this.trans.y2 - this.trans.y1) / (this.offset.y2 - this.offset.y1),
+                            y2: (270 - this.offset.y1) * (this.trans.y2 - this.trans.y1) / (this.offset.y2 - this.offset.y1)
+                        };
+                    }
+                } />
             </div>
         );
     }

@@ -30,9 +30,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
             style={{
                 width: this.props.width,
                 height: this.props.height,
-                border: '1px solid rgb(149,188,239)',
-                overflowX: 'hidden',
-                overflowY: 'scroll'
+                border: '1px solid rgb(149,188,239)'
             }}>
                 <div
                 style={{
@@ -50,37 +48,43 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                 <ul
                 style={{
                     margin: '0px',
-                    listStyle: 'none'
+                    height: this.props.height - 24,
+                    listStyle: 'none',
+                    overflowX: 'hidden',
+                    overflowY: 'scroll'
                 }}>
                     {
                         this.state.list.map((b: { text: string; city: string; sentiment: number; }, index: number) => {
                             return (
                                 <li key={ `row${ index }` }
                                 style={{
-                                    width: '98%',
+                                    width: '100%',
                                     marginRight: '4%',
-                                    marginLeft: '-4%',
-                                    borderBottom: '1px solid rgb(149,188,239)',
-                                    borderTop: '1px solid rgb(149,188,239)',
+                                    marginLeft: '-4%'
                                 }}>
-                                    <p key={ `text${ index }` } ref={ `bbs_text${ index }` }
+                                    <p key={ `text${ index }` }
                                     style={{
                                         textAlign: 'left',
                                         border: '1px solid rgb(149,188,239)',
                                         borderRadius: '10px 10px 0px 10px',
                                         padding: '8px 14px',
                                         background: 'rgb(234,242,252)',
-                                        marginBottom: '4px'
+                                        marginBottom: '4px',
+                                        marginTop: '14px'
                                     }}>
-                                        { b.text }
-                                    </p>
-                                    <p key={ `city${ index }` }
-                                    style={{
-                                        textAlign: 'right',
-                                        color: '#668',
-                                        marginTop: '4px'
-                                    }}>
-                                        shared in <u>{ b.city }</u>
+                                        <span ref={ `bbs_text${ index }`} >
+                                            { b.text }
+                                        </span>
+                                        <br />
+                                        <span key={ `city${ index }` }
+                                        style={{
+                                            display: 'block',
+                                            textAlign: 'right',
+                                            color: '#668',
+                                            marginTop: '4px'
+                                        }}>
+                                            shared in <u>{ b.city }</u>
+                                        </span>
                                     </p>
                                 </li>
                             )
@@ -96,27 +100,47 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
             let origin: string = $(this.refs[`bbs_text${ i }`] as any).html();
             let rich: string = "";
             let space: 'none' | 'at' | 'sharp' = 'none';
+            let tab: number = 0;
             for (let j: number = 0; j < origin.length; j++) {
-                if (origin[j] === "@") {
-                    space = 'at';
-                    rich += "<span style='color: blue;'><u>";
-                }
-                else if (origin[j] === "#") {
-                    space = 'sharp';
-                    rich += "<span style='color: rgb(255,145,0);'>";
+                if (space === 'none') {
+                    if (origin[j] === "@") {
+                        space = 'at';
+                        rich += "<span style='color: blue;'><u>";
+                        tab++;
+                    }
+                    else if (origin[j] === "#") {
+                        space = 'sharp';
+                        rich += "<span style='color: rgb(255,145,0);'>";
+                        tab++;
+                    }
                 }
                 else if (origin[j] === " ") {
                     if (space === 'at') {
                         rich += "</u></span>";
+                        tab--;
                     }
                     else if (space === 'sharp') {
                         rich += "</span>";
+                        tab--;
                     }
                     space = "none";
                 }
                 rich += origin[j];
+                if (j === origin.length - 1) {
+                    if (space === 'at') {
+                        rich += "</u></span>";
+                        tab--;
+                    }
+                    else if (space === 'sharp') {
+                        rich += "</span>";
+                        tab--;
+                    }
+                    space = "none";
+                }
             }
-            $(this.refs[`bbs_text${ i }`] as any).html(rich);
+            if (tab === 0) {
+                $(this.refs[`bbs_text${ i }`] as any).html(rich);
+            }
         }
     }
 

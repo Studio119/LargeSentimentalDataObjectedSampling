@@ -33,22 +33,20 @@ class App extends Component<{}, {}, {}> {
         <DataCenter ref="DataCenter"/>
         <ItemStrip id="ItemStrip" importSource={ this.loadSource } />
         <DataView id="MapSettings" ref="DataView" />
-        <Settings id="ActiveSettings" ref="topics" />
-        <MapView id="MapView" ref="map" center={ [-100, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 5 } />
         <div className="Chart"
         style={{
           position: 'absolute',
-          width: '422px',
-          top: '67px',
-          left: '1112px',
-          height: '148px',
+          width: '318px',
+          top: '305px',
+          left: '0px',
+          height: '158px',
           background: 'white',
           border: '1px solid rgb(149,188,239)'
         }} >
           <div
           style={{
               height: '24px',
-              width: '100%',
+              width: '302px',
               borderBottom: '1px solid rgb(149,188,239)',
               background: 'rgb(120,151,213)',
               color: 'white',
@@ -72,7 +70,7 @@ class App extends Component<{}, {}, {}> {
               }
             } />
           </div>
-          <PolylineChart id="p_dis" width={ 400 } height={ 80 } ref="dis"
+          <PolylineChart id="p_dis" width={ 318 } height={ 90 } ref="dis"
           padding={{
             top: 6,
             right: 24,
@@ -83,7 +81,7 @@ class App extends Component<{}, {}, {}> {
             margin: '38px 6px 6px 6px',
             background: 'none'
           }} />
-          <PolylineChart id="p_sum" width={ 400 } height={ 80 } ref="sum"
+          <PolylineChart id="p_sum" width={ 318 } height={ 90 } ref="sum"
           padding={{
             top: 6,
             right: 24,
@@ -96,17 +94,20 @@ class App extends Component<{}, {}, {}> {
             background: 'none'
           }} />
         </div>
+        <Settings id="ActiveSettings" ref="topics" />
+        <MapView id="MapView" ref="map" center={ [-100, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 5 } />
         <div
         style={{
           position: 'absolute',
           width: '422px',
-          top: '218px',
-          left: '1112px',
-          height: '335px',
+          top: '474px',
+          left: '1114px',
+          height: '386px',
           background: 'white'
         }} >
-          <BBS width={ 422 } height={ 335 } ref="bbs" />
+          <BBS width={ 422 } height={ 386 } ref="bbs" />
         </div>
+        <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } />
         <div className="Line"
           style={{
             position: 'absolute',
@@ -114,7 +115,6 @@ class App extends Component<{}, {}, {}> {
             height: '306px',
             width: '595px'
           }}>
-          <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } />
           <TreeMap id="TreeMap" ref="TreeMap"
           style={{
             background: 'white'
@@ -161,17 +161,18 @@ class App extends Component<{}, {}, {}> {
         });
         (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
         let list: Array<{ text: string; city: string; sentiment: number; }> = [];
-        for (let i: number = 0; i < 20; i++) {
+        let start: number = parseInt((Math.random() * (data.length - 50)).toString());
+        for (let i: number = 0; i < 50; i++) {
           list.push({
-            text: data[i].words,
-            city: data[i].city,
-            sentiment: parseFloat(data[i].sentiment)
+            text: data[start + i].words,
+            city: data[start + i].city,
+            sentiment: parseFloat(data[start + i].sentiment)
           });
         }
         (this.refs["bbs"] as BBS).import(list);
-        (this.refs["map"] as MapView).setState({
-          data: dataset
-        });
+        // (this.refs["map"] as MapView).setState({
+        //   data: dataset
+        // });
       });
       (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
         let dataset: RectNode = this.loadTree(data, null, 'left');
@@ -223,6 +224,7 @@ class App extends Component<{}, {}, {}> {
   private loadSource: (url: string, json: string, topic: string, dis: string, sum: string) => void
     = (url: string, json: string, topic: string, dis: string, sum: string) => {
       setTimeout(() => this.loadSource(url, json, topic, dis, sum), 1000);
+      return;
     };
 }
 

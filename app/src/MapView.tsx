@@ -35,12 +35,13 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
             <div id={ this.props.id }
             style={{
                 position: 'absolute',
-                left: '321px',
-                top: '67px',
+                left: '322px',
+                top: '59px',
                 height: '486px',
                 width: '788px',
                 background: 'white',
-                border: '1px solid rgb(149,188,239)'
+                border: '1px solid rgb(149,188,239)',
+                fontSize: '12.4px'
             }}>
                 <div
                 style={{

@@ -27,18 +27,18 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             <div id={ this.props.id }
             style={{
                 display: 'inline-block',
-                height: '242px',
+                height: '393.2px',
                 width: '318px',
                 background: 'white',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
-                top: '311px',
-                left: 0
+                top: '467px',
+                left: '0px'
             }}>
                 <div
                 style={{
                     height: '24px',
-                    width: '308px',
+                    width: '302px',
                     borderBottom: '1px solid rgb(149,188,239)',
                     background: 'rgb(120,151,213)',
                     color: 'white',
@@ -68,7 +68,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                 </div>
                 <div key="list"
                 style={{
-                    height: '180px',
+                    height: '331.2px',
                     overflowY: 'scroll',
                     overflowX: 'hidden'
                 }}>

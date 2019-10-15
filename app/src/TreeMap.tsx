@@ -52,7 +52,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
             ref: $("NULL")
         };
         this.layers = [];
-        this.width = 936;
+        this.width = 788;
         this.height = 282;
         this.padding = { top: 10, right: 20, bottom: 10, left: 20 };
         this.r = 3;
@@ -62,18 +62,17 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
         return (
             <div
             style={{
-                display: 'inline-block',
-                height: '102%',
-                width: '936px',
+                height: '311px',
+                width: '788px',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
-                top: '0px',
-                left: '598px'
+                top: '-7px',
+                left: '321.3px'
             }}>
                 <div
                 style={{
                     height: '24px',
-                    width: '100%',
+                    width: '772px',
                     borderBottom: '1px solid rgb(149,188,239)',
                     background: 'rgb(120,151,213)',
                     color: 'white',
@@ -83,7 +82,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                 }}>
                     Pruning of K-D Tree
                 </div>
-                <svg width="100%" height="294px" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
+                <svg width="788px" height="283px" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
                 style={{
                     ...this.props.style
                 }} />
@@ -266,7 +265,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
             setTimeout(() => {
                 let cx: number = parseFloat(e.attr("cx")!);
                 e.attr("cx", (cx - this.padding.left) * zoomRate + this.padding.left)
-                    .attr("r", this.r * Math.sqrt(zoomRate))
+                    .attr("r", this.r * zoomRate)
                     .css("fill-opacity", 1);
                 this.updateBranches(lines);
             }, index * 10);

@@ -29,9 +29,9 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             <>
                 <div id={ this.props.id } key="container"
                     style={{
-                        height: '53px',
-                        paddingTop: '10px',
-                        background: 'rgb(234, 242, 252)',
+                        height: '40px',
+                        padding: '5px 0px 9px 0px',
+                        background: 'rgb(224, 232, 240)',
                         border: '1px solid rgb(149,188,239)'
                     }}>
                     <label style={{ position: 'relative', top: 8, fontSize: '18px' }}>dataset</label>
