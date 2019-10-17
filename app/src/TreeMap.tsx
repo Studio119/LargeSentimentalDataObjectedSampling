@@ -39,6 +39,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     private height: number;
     private padding: { top: number, right: number, bottom: number, left: number };
     private r: number;
+    private handler: any | null;
 
     public constructor(props: TreeMapProps<T>) {
         super(props);
@@ -56,6 +57,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
         this.height = 282;
         this.padding = { top: 10, right: 20, bottom: 10, left: 20 };
         this.r = 3;
+        this.handler = null;
     }
 
     public render(): JSX.Element {
@@ -241,7 +243,9 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         }, 10);
                     }
                     else {
-                        this.adjustBorder(circles, lines);
+                        this.handler = setTimeout(() => {
+                            this.adjustBorder(circles, lines);
+                        }, 0);
                     }
                 }
             }, i * 10);
