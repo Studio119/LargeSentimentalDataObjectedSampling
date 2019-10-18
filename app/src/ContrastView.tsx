@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-07 20:57:13
+ * @Last Modified time: 2019-10-18 20:52:11
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -74,7 +74,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
         return (
             <div id={ this.props.id }
                 style={{
-                    height: '410px',
+                    height: '335px',
                     width: '421px',
                     background: 'white',
                     border: '1px solid rgb(149,188,239)',
@@ -94,24 +94,11 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                         color: 'white',
                         textAlign: 'left',
                         letterSpacing: '2px',
-                        padding: '10px 0px 10px 12px',
-                        marginBottom: '-24px'
+                        paddingLeft: '16px',
+                        marginBottom: '-24px',
+                        height: '25px'
                     }} >
                         Geographic Division
-                        <hr
-                        style={{
-                            marginLeft: '-2px',
-                            color: 'white',
-                            width: '400px'
-                        }} />
-                        <span
-                        style={{
-                            fontSize: 'small',
-                            letterSpacing: '0.7px',
-                            paddingRight: '10px'
-                        }} >
-                            Drag the value bar below to adjust the maximum depth of division level
-                        </span>
                     </div>
                     <br />
                     <ValueBar label={ "Depth: " } width={ 150 } height={ 20 }
@@ -145,8 +132,8 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                 <svg width="422px" height="272px" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
                 onMouseDown={
                     (event) => {
-                        let x1: number = event.clientX - 1117;
-                        let y1: number = event.clientY - 201;
+                        let x1: number = event.clientX - 1115;
+                        let y1: number = event.clientY - 122;
                         this.offset.x1 = x1;
                         this.offset.y1 = y1;
                         this.selectBox[0].attr("x", 0).attr("y", 0).css("display", "unset")
@@ -172,8 +159,8 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                         if (this.selectBox[0].css("display") === "none") {
                             return;
                         }
-                        let width: number = event.clientX - 1117 - parseInt(this.selectBox[0].attr("width")!);
-                        let height: number = event.clientY - 201 - parseInt(this.selectBox[0].attr("height")!);
+                        let width: number = event.clientX - 1115 - parseInt(this.selectBox[0].attr("width")!);
+                        let height: number = event.clientY - 122 - parseInt(this.selectBox[0].attr("height")!);
                         if (width <= 42 || height <= 27) {
                             width = 42;
                             height = 27;
@@ -209,8 +196,8 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                         if (this.selectBox[0].css("display") === "none") {
                             return;
                         }
-                        let width: number = event.clientX - 1117 - parseInt(this.selectBox[0].attr("width")!);
-                        let height: number = event.clientY - 201 - parseInt(this.selectBox[0].attr("height")!);
+                        let width: number = event.clientX - 1115 - parseInt(this.selectBox[0].attr("width")!);
+                        let height: number = event.clientY - 122 - parseInt(this.selectBox[0].attr("height")!);
                         for (let i: number = 0; i < 8; i++) {
                             this.selectBox[i].css("display", "none");
                         }

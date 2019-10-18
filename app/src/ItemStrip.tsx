@@ -30,14 +30,20 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                 <div id={ this.props.id } key="container"
                     style={{
                         height: '40px',
-                        padding: '5px 0px 9px 0px',
+                        padding: '5px 40px 9px 40px',
                         background: 'rgb(224, 232, 240)',
-                        border: '1px solid rgb(149,188,239)'
-                    }}>
+                        border: '1px solid rgb(149,188,239)',
+                        textAlign: 'left'
+                    }} >
                     <label style={{ position: 'relative', top: 8, fontSize: '18px' }}>dataset</label>
                     <Dropdown<string> width={ 100 } height={ 30 } optionList={ ['Tweet', 'yelp'] } onChange={ (option: string) => { this.load(option); } } />
 
+                    <div style={{ display: 'inline-block', width: '40px' }}/>
+
                     <ValueBar label={ "Sampling Rate" } width={ 160 } height={ 20 } min={ 0 } max={ 1 } defaultValue={ 0.4 } />
+                    
+                    <div style={{ display: 'inline-block', width: '40px' }}/>
+
                     <ValueBar label={ "α =" } width={ 120 } height={ 20 } min={ 0 } max={ 100 } step={ 5 } defaultValue={ 100 } />
                     <ValueBar label={ "β =" } width={ 120 } height={ 20 } min={ 0 } max={ 100 } defaultValue={ 100 } />
                     <ValueBar label={ "γ =" } width={ 120 } height={ 20 } min={ 0 } max={ 100 } defaultValue={ 100 } />

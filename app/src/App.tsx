@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-10 14:13:25
+ * @Last Modified time: 2019-10-18 20:31:52
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -15,7 +15,6 @@ import ContrastView, { RectNode } from './ContrastView';
 import DataCenter from './DataCenter';
 import TreeMap from './TreeMap';
 import PolylineChart from './PolylineChart';
-import Dropdown from './Dropdown';
 import BBS from './BBS';
 
 
@@ -56,19 +55,50 @@ class App extends Component<{}, {}, {}> {
           }}>
             Sampling Result Evaluation
             <br />
-            <Dropdown<string> width = { 260 } height = { 28 } optionList = { ["Active / Positive: Labels", "Active / Positive: Value"] }
-            onChange={
-              (option: string) => {
-                if (option === "Active / Positive: Labels") {
+            <button className="OptionButton" key="button1" id="button1"
+            style={{
+              position: 'relative',
+              left: '-16px',
+              top: '3px',
+              width: 159,
+              height: 34,
+              background: 'white',
+              border: 'none',
+              letterSpacing: '0.05em',
+              fontSize: '12px'
+            }}
+            onClick={
+                () => {
+                  $("#button1").css('background', 'white');
+                  $("#button2").css('background', 'rgb(199, 214, 240)');
                   $("#p_dis").show();
                   $("#p_sum").hide();
                 }
-                else {
-                  $("#p_dis").hide();
+            } >
+              Sentiment Type Density
+            </button>
+            <button className="OptionButton" key="button2" id="button2"
+            style={{
+              position: 'relative',
+              left: '143px',
+              top: '-31px',
+              width: 159,
+              height: 34,
+              background: 'rgb(199, 214, 240)',
+              border: 'none',
+              letterSpacing: '0.05em',
+              fontSize: '12px'
+            }}
+            onClick={
+                () => {
+                  $("#button1").css('background', 'rgb(199, 214, 240)');
+                  $("#button2").css('background', 'white');
                   $("#p_sum").show();
+                  $("#p_dis").hide();
                 }
-              }
-            } />
+            } >
+              Sentiment Characteristic Distribution
+            </button>
           </div>
           <PolylineChart id="p_dis" width={ 318 } height={ 90 } ref="dis"
           padding={{
@@ -100,12 +130,12 @@ class App extends Component<{}, {}, {}> {
         style={{
           position: 'absolute',
           width: '422px',
-          top: '474px',
+          top: '398px',
           left: '1114px',
-          height: '386px',
+          height: '464px',
           background: 'white'
         }} >
-          <BBS width={ 422 } height={ 386 } ref="bbs" />
+          <BBS width={ 422 } height={ 462 } ref="bbs" />
         </div>
         <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } />
         <div className="Line"
