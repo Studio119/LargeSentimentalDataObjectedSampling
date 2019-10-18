@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-10 12:08:06
+ * @Last Modified time: 2019-10-18 21:11:52
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -39,7 +39,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     private height: number;
     private padding: { top: number, right: number, bottom: number, left: number };
     private r: number;
-    private handler: any | null;
+    private handler: NodeJS.Timeout | null;
 
     public constructor(props: TreeMapProps<T>) {
         super(props);
@@ -232,7 +232,12 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                             let offsetNew: number = this.r * 3 - offset + lastX[level];
                             moving[t].element.attr("cx", originX + offsetNew);
                         }
-                        this.updateBranches(lines);
+                        if (this.handler) {
+                            clearTimeout(this.handler);
+                        }
+                        this.handler = setTimeout(() => {
+                            this.updateBranches(lines);
+                        }, 0);
                     }
                 }
                 lastX[level] = offset;
@@ -243,9 +248,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         }, 10);
                     }
                     else {
-                        this.handler = setTimeout(() => {
-                            this.adjustBorder(circles, lines);
-                        }, 0);
+                        this.adjustBorder(circles, lines);
                     }
                 }
             }, i * 10);

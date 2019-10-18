@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-18 20:31:52
+ * @Last Modified time: 2019-10-18 21:39:22
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -38,7 +38,7 @@ class App extends Component<{}, {}, {}> {
           width: '318px',
           top: '305px',
           left: '0px',
-          height: '158px',
+          height: '258px',
           background: 'white',
           border: '1px solid rgb(149,188,239)'
         }} >
@@ -100,7 +100,27 @@ class App extends Component<{}, {}, {}> {
               Sentiment Characteristic Distribution
             </button>
           </div>
-          <PolylineChart id="p_dis" width={ 318 } height={ 90 } ref="dis"
+          <p
+          style={{
+            position: 'relative',
+            left: '-30px',
+            top: '38px',
+            margin: '2px',
+            fontSize: '12px'
+          }} >
+            <b style={{ color: 'rgb(194,8,107)' }} >—— </b> Active Side: Before Sampling
+          </p>
+          <p
+          style={{
+            position: 'relative',
+            left: '-34.6px',
+            top: '36px',
+            margin: '2px',
+            fontSize: '12px'
+          }} >
+            <b style={{ color: 'rgb(22,83,202)' }} >—— </b> Active Side: After Sampling
+          </p>
+          <PolylineChart id="p_dis" width={ 318 } height={ 120 } ref="dis"
           padding={{
             top: 6,
             right: 24,
@@ -108,10 +128,10 @@ class App extends Component<{}, {}, {}> {
             left: 24
           }}
           style={{
-            margin: '38px 6px 6px 6px',
+            margin: '33px 6px 6px 6px',
             background: 'none'
           }} />
-          <PolylineChart id="p_sum" width={ 318 } height={ 90 } ref="sum"
+          <PolylineChart id="p_sum" width={ 318 } height={ 120 } ref="sum"
           padding={{
             top: 6,
             right: 24,
@@ -119,10 +139,32 @@ class App extends Component<{}, {}, {}> {
             left: 24
           }}
           style={{
-            margin: '38px 6px 6px 6px',
+            margin: '33px 6px 6px 6px',
             display: 'none',
             background: 'none'
           }} />
+          <p
+          style={{
+            position: 'relative',
+            right: '24px',
+            top: '-16px',
+            margin: '2px',
+            fontSize: '12px',
+            textAlign: 'right'
+          }} >
+            Positive Side: Before Sampling <b style={{ color: 'rgb(194,8,107)' }} > ——</b>
+          </p>
+          <p
+          style={{
+            position: 'relative',
+            right: '24px',
+            top: '-18px',
+            margin: '2px',
+            fontSize: '12px',
+            textAlign: 'right'
+          }} >
+            Positive Side: After Sampling <b style={{ color: 'rgb(22,83,202)' }} > ——</b>
+          </p>
         </div>
         <Settings id="ActiveSettings" ref="topics" />
         <MapView id="MapView" ref="map" center={ [-100, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 5 } />
@@ -204,11 +246,11 @@ class App extends Component<{}, {}, {}> {
         //   data: dataset
         // });
       });
-      (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
-        let dataset: RectNode = this.loadTree(data, null, 'left');
-        (this.refs["RectTree"] as ContrastView).import(dataset);
-        (this.refs["TreeMap"] as TreeMap).import(dataset);
-      });
+      // (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
+      //   let dataset: RectNode = this.loadTree(data, null, 'left');
+      //   (this.refs["RectTree"] as ContrastView).import(dataset);
+      //   (this.refs["TreeMap"] as TreeMap).import(dataset);
+      // });
       (this.refs["DataCenter"] as DataCenter).openJSON(topic, (data: Array<{ topic: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
       });

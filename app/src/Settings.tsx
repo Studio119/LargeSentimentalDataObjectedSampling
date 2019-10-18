@@ -2,9 +2,10 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-07 21:10:51
+ * @Last Modified time: 2019-10-18 21:26:04
  */
 import React, { Component } from 'react';
+import WordCloud from './WordCloud';
 
 export interface SettingsProps {
     id: string;
@@ -27,12 +28,12 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             <div id={ this.props.id }
             style={{
                 display: 'inline-block',
-                height: '393.2px',
+                height: '293.2px',
                 width: '318px',
                 background: 'white',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
-                top: '467px',
+                top: '567px',
                 left: '0px'
             }}>
                 <div
@@ -48,7 +49,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                 }} >
                     Hotspots
                 </div>
-                <div key="head">
+                {/* <div key="head">
                     <table
                     style={{
                         width: '100%',
@@ -68,7 +69,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                 </div>
                 <div key="list"
                 style={{
-                    height: '331.2px',
+                    height: '231.2px',
                     overflowY: 'scroll',
                     overflowX: 'hidden'
                 }}>
@@ -90,28 +91,33 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                             }
                         </tbody>
                     </table>
-                </div>
+                </div> */}
+                <WordCloud width={ 302 } height={ 231 } ref="WordCloud" />
             </div>
         )
     }
 
-    private static format(num: number): string {
-        let part: string = num.toString();
-        let temp: string = "";
-        while (part.length > 3) {
-            temp = part.substr(part.length - 3, part.length) + "," + temp;
-            part = part.substr(0, part.length - 3);
-        }
-        temp = part + "," + temp;
-        return temp.substr(0, temp.length - 1);
-    }
+    // private static format(num: number): string {
+    //     let part: string = num.toString();
+    //     let temp: string = "";
+    //     while (part.length > 3) {
+    //         temp = part.substr(part.length - 3, part.length) + "," + temp;
+    //         part = part.substr(0, part.length - 3);
+    //     }
+    //     temp = part + "," + temp;
+    //     return temp.substr(0, temp.length - 1);
+    // }
 
     public import(topics: Array<{ topic: string, count: number }>): void {
-        this.setState({
-            topics: topics.sort((a: { topic: string; count: number; }, b: { topic: string; count: number; }) => {
+        let box: Array<{ topic: string, count: number }>
+            = topics.sort((a: { topic: string; count: number; }, b: { topic: string; count: number; }) => {
                 return b.count - a.count;
-            })
+            });
+        let data: Array<{ text: string, value: number }> = [];
+        box.forEach((d: { topic: string, count: number }) => {
+            data.push({ text: d.topic.replace('#', ''), value: d.count });
         });
+        (this.refs["WordCloud"] as WordCloud).import(data);
     }
 }
 
