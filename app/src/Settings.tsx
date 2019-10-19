@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-18 21:26:04
+ * @Last Modified time: 2019-10-19 21:46:04
  */
 import React, { Component } from 'react';
 import WordCloud from './WordCloud';
@@ -92,7 +92,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                         </tbody>
                     </table>
                 </div> */}
-                <WordCloud width={ 302 } height={ 231 } ref="WordCloud" />
+                <WordCloud width={ 318 } height={ 273 } ref="WordCloud" />
             </div>
         )
     }
@@ -111,7 +111,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
     public import(topics: Array<{ topic: string, count: number }>): void {
         let box: Array<{ topic: string, count: number }>
             = topics.sort((a: { topic: string; count: number; }, b: { topic: string; count: number; }) => {
-                return b.count - a.count;
+                return Math.random() - 0.5;//a.count - b.count;
             });
         let data: Array<{ text: string, value: number }> = [];
         box.forEach((d: { topic: string, count: number }) => {
