@@ -68,7 +68,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
 
     private load(source: string): void {
         if (source === 'Tweet') {
-            this.props.importSource('/data/93.csv', '/data/rectangle_sentiment_tree_-0.15-0.01-20-new.json', '/data/93-topics.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json');
+            this.props.importSource('/data/93.csv', '/data/rectangle_sentiment_tree_-0.15-0.01-20-new.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json');
         }
         else if (source === 'yelp') {
             this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');

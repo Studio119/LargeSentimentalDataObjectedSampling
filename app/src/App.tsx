@@ -36,22 +36,22 @@ class App extends Component<{}, {}, {}> {
         style={{
           position: 'absolute',
           width: '318px',
-          top: '305px',
+          top: '281.8px',
           left: '0px',
-          height: '258px',
+          height: '263.2px',
           background: 'white',
           border: '1px solid rgb(149,188,239)'
         }} >
           <div
           style={{
-              height: '24px',
-              width: '302px',
-              borderBottom: '1px solid rgb(149,188,239)',
-              background: 'rgb(120,151,213)',
-              color: 'white',
-              textAlign: 'left',
-              paddingLeft: '16px',
-              letterSpacing: '2px'
+            height: '24px',
+            width: '302px',
+            borderBottom: '1px solid rgb(149,188,239)',
+            background: 'rgb(120,151,213)',
+            color: 'white',
+            textAlign: 'left',
+            paddingLeft: '16px',
+            letterSpacing: '2px'
           }}>
             Sampling Result Evaluation
             <br />
@@ -242,16 +242,16 @@ class App extends Component<{}, {}, {}> {
           });
         }
         (this.refs["bbs"] as BBS).import(list);
-        (this.refs["map"] as MapView).setState({
-          data: dataset
-        });
+        // (this.refs["map"] as MapView).setState({
+        //   data: dataset
+        // });
       });
       (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
         let dataset: RectNode = this.loadTree(data, null, 'left');
         (this.refs["RectTree"] as ContrastView).import(dataset);
         (this.refs["TreeMap"] as TreeMap).import(dataset);
       });
-      (this.refs["DataCenter"] as DataCenter).openJSON(topic, (data: Array<{ topic: string, count: number }>) => {
+      (this.refs["DataCenter"] as DataCenter).openJSON(topic, (data: Array<{ text: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
       });
       (this.refs["DataCenter"] as DataCenter).openJSON(dis, (data: Array<[[number, number], [number, number]]>) => {

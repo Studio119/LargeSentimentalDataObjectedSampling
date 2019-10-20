@@ -39,7 +39,7 @@ class DataView extends Component<DataViewProps, DataViewState, {}> {
             <div id={ this.props.id }
             style={{
                 display: 'inline-block',
-                height: '242px',
+                height: '218.8px',
                 width: '318px',
                 background: 'rgb(246, 249, 253)',
                 border: '1px solid rgb(149,188,239)',
@@ -62,19 +62,15 @@ class DataView extends Component<DataViewProps, DataViewState, {}> {
                 </div>
                 <table key={'table'}
                 style={{
-                    marginTop: '10px',
-                    marginBottom: '10px',
-                    marginLeft: 'auto',
-                    marginRight: 'auto'
+                    margin: '0px'
                 }} >
                     <tbody>
-                        <tr style={{ background: 'white', padding: '2px 6px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '220px' }} >Data Size</th><td style={{ border: '1px solid #abe', width: '48px' }} >{ DataView.format(this.state.total, false) }</td></tr>
-                        <tr style={{ background: 'white', padding: '2px 6px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '220px' }} >Active Data Size</th><td style={{ border: '1px solid #abe', width: '48px' }} >{ DataView.format(this.state.active, false) }</td></tr>
-                        <tr style={{ background: 'white', padding: '2px 6px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '220px' }} >Positive Data Size</th><td style={{ border: '1px solid #abe', width: '48px' }} >{ DataView.format(this.state.positive, false) }</td></tr>
-                        <tr style={{ background: 'white', padding: '2px 6px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '220px' }} >Neutral Data Size</th><td style={{ border: '1px solid #abe', width: '48px' }} >{ DataView.format(this.state.neutre, false) }</td></tr>
-                        <tr style={{ background: 'white', padding: '2px 6px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '220px' }} >Active Sentiment Average</th><td style={{ border: '1px solid #abe', width: '48px' }} >{ DataView.format(this.state.Aver_active, true) }</td></tr>
-                        <tr style={{ background: 'white', padding: '2px 6px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '220px' }} >Positive Sentiment Average</th><td style={{ border: '1px solid #abe', width: '48px' }} >{ DataView.format(this.state.Aver_positive, true) }</td></tr>
-                        <tr style={{ background: 'white', padding: '2px 6px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '220px' }} >Neutral Sentimental Average</th><td style={{ border: '1px solid #abe', width: '48px' }} >{ DataView.format(this.state.Aver_neutre, true) }</td></tr>
+                        <tr style={{ background: 'white', padding: '2px 6px', height: '30px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '230px' }} >Data Size</th><td style={{ border: '1px solid #abe', width: '76px' }} >{ DataView.format(this.state.total, false) }</td></tr>
+                        <tr style={{ background: 'white', padding: '2px 6px', height: '30px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '230px' }} >Active Data Size</th><td style={{ border: '1px solid #abe', width: '76px' }} >{ DataView.format(this.state.active, false) }</td></tr>
+                        <tr style={{ background: 'white', padding: '2px 6px', height: '30px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '230px' }} >Positive Data Size</th><td style={{ border: '1px solid #abe', width: '76px' }} >{ DataView.format(this.state.positive, false) }</td></tr>
+                        <tr style={{ background: 'white', padding: '2px 6px', height: '30px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '230px' }} >Neutral Data Size</th><td style={{ border: '1px solid #abe', width: '76px' }} >{ DataView.format(this.state.neutre, false) }</td></tr>
+                        <tr style={{ background: 'white', padding: '2px 6px', height: '30px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '230px' }} >Active Sentiment Average</th><td style={{ border: '1px solid #abe', width: '76px' }} >{ DataView.format(this.state.Aver_active, true) }</td></tr>
+                        <tr style={{ background: 'white', padding: '2px 6px', height: '30px' }} ><th style={{ paddingRight: '6px', border: '1px solid #78d', width: '230px' }} >Positive Sentiment Average</th><td style={{ border: '1px solid #abe', width: '76px' }} >{ DataView.format(this.state.Aver_positive, true) }</td></tr>
                     </tbody>
                 </table>
             </div>

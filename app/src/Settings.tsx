@@ -5,21 +5,29 @@
  * @Last Modified time: 2019-10-19 21:46:04
  */
 import React, { Component } from 'react';
-import WordCloud from './WordCloud';
+import '';
 
 export interface SettingsProps {
     id: string;
 }
 
 export interface SettingsState {
-    topics: Array<{ topic: string, count: number }>;
+    data: Array<{ text: string, count: number }>;
 }
 
 class Settings extends Component<SettingsProps, SettingsState, {}> {
+    public color: Array<string> = [
+        'rgb(100,54,60)', 'rgb(181,73,91)', 'rgb(204,84,58)', 'rgb(114,72,50)',
+        'rgb(240,94,28)', 'rgb(143,90,60)', 'rgb(148,122,109)', 'rgb(155,110,35)',
+        'rgb(209,152,38)', 'rgb(108,96,36)', 'rgb(108,106,45)', 'rgb(91,98,46)',
+        'rgb(66,96,45)', 'rgb(27,129,62)', 'rgb(32,96,79)', 'rgb(12,72,66)',
+        'rgb(8,25,45)', 'rgb(33,30,85)', 'rgb(102,50,124)', 'rgb(98,41,84)'
+    ];
+
     public constructor(props: SettingsProps) {
         super(props);
         this.state = {
-            topics: []
+            data: []
         };
     }
 
@@ -28,12 +36,12 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             <div id={ this.props.id }
             style={{
                 display: 'inline-block',
-                height: '293.2px',
+                height: '315.2px',
                 width: '318px',
                 background: 'white',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
-                top: '567px',
+                top: '549px',
                 left: '0px'
             }}>
                 <div
@@ -92,7 +100,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                         </tbody>
                     </table>
                 </div> */}
-                <WordCloud width={ 318 } height={ 273 } ref="WordCloud" />
+                {/* <WordCloud width={ 318 } height={ 291 } ref="WordCloud" /> */}
             </div>
         )
     }
@@ -108,16 +116,21 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
     //     return temp.substr(0, temp.length - 1);
     // }
 
-    public import(topics: Array<{ topic: string, count: number }>): void {
-        let box: Array<{ topic: string, count: number }>
-            = topics.sort((a: { topic: string; count: number; }, b: { topic: string; count: number; }) => {
-                return Math.random() - 0.5;//a.count - b.count;
+    public import(topics: Array<{ text: string, count: number }>): void {
+        let box: Array<{ text: string, count: number }>
+            = topics.sort((a: { text: string; count: number; }, b: { text: string; count: number; }) => {
+                return a.count - b.count;
             });
         let data: Array<{ text: string, value: number }> = [];
-        box.forEach((d: { topic: string, count: number }) => {
-            data.push({ text: d.topic.replace('#', ''), value: d.count });
+        box.forEach((d: { text: string, count: number }, index: number) => {
+            if (index >=  20) {
+                return;
+            }
+            data.push({ text: d.text, value: d.count });
         });
-        (this.refs["WordCloud"] as WordCloud).import(data);
+        // (this.refs["WordCloud"] as WordCloud).import(data.sort(() => {
+        //     return Math.random() - 0.5;
+        // }));
     }
 }
 
