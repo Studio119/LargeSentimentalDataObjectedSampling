@@ -6,7 +6,8 @@
  */
 import React, { Component } from 'react';
 import MapBox from './react-mapbox/MapBox';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import './react-mapbox/MapBox.css';
+
 
 export interface MapViewProps {
     id: string;
@@ -66,7 +67,7 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
                     {
                         this.mounted
                             ? <MapBox
-                                accessToken={ "pk.eyJ1IjoiaWNoZW4tYW50b2luZSIsImEiOiJjanp0OWE4OTcwMWpzM2hwZm55bzI3YW04In0.n1R77KvU56MZXAuHVez9hw" }
+                                accessToken={ "pk.eyJ1IjoiaWNoZW4tYW50b2luZSIsImEiOiJjazF5bDh5eWUwZ2tiM2NsaXQ3bnFvNGJ1In0.sFDwirFIqR4UEjFQoKB8uA" }
                                 styleURL={"mapbox://styles/ichen-antoine/ck1504bas09eu1cs1op2eqsnu"}
                                 containerID={ this.props.id } center={ this.props.center } zoom={ this.props.zoom }
                                 minZoom={ this.props.minZoom } maxZoom={ this.props.maxZoom } ref="map" />

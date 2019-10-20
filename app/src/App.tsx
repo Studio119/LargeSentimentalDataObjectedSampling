@@ -242,15 +242,15 @@ class App extends Component<{}, {}, {}> {
           });
         }
         (this.refs["bbs"] as BBS).import(list);
-        // (this.refs["map"] as MapView).setState({
-        //   data: dataset
-        // });
+        (this.refs["map"] as MapView).setState({
+          data: dataset
+        });
       });
-      // (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
-      //   let dataset: RectNode = this.loadTree(data, null, 'left');
-      //   (this.refs["RectTree"] as ContrastView).import(dataset);
-      //   (this.refs["TreeMap"] as TreeMap).import(dataset);
-      // });
+      (this.refs["DataCenter"] as DataCenter).openJSON(json, (data: TreeNode) => {
+        let dataset: RectNode = this.loadTree(data, null, 'left');
+        (this.refs["RectTree"] as ContrastView).import(dataset);
+        (this.refs["TreeMap"] as TreeMap).import(dataset);
+      });
       (this.refs["DataCenter"] as DataCenter).openJSON(topic, (data: Array<{ topic: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
       });
