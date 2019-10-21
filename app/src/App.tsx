@@ -234,7 +234,7 @@ class App extends Component<{}, {}, {}> {
         (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
         let list: Array<{ text: string; city: string; sentiment: number; }> = [];
         let start: number = parseInt((Math.random() * (data.length - 50)).toString());
-        for (let i: number = 0; i < 50; i++) {
+        for (let i: number = 0; i < 20; i++) {
           list.push({
             text: data[start + i].words,
             city: data[start + i].city,

@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-18 21:11:52
+ * @Last Modified time: 2019-10-21 14:44:17
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -142,6 +142,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
             let line: JQuery<HTMLElement> = parseFloat(d.parent.attr("cx")!) > parseFloat(d.child.attr("cx")!) // left child
                 ? $($.parseXML(
                     `<path `
+                    + `class="ll" `
                     + `id="${ `branch_${ index }` }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
                     + `d="M${ d.parent.attr("cx") },${ d.parent.attr("cy") } `
                         + `A${ (parseFloat(d.parent.attr("cx")!) - parseFloat(d.child.attr("cx")!)) * 1.2 },`
@@ -154,6 +155,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                     + `style="stroke: black; fill: none; " />`).documentElement)
                 : $($.parseXML(
                     `<path `
+                    + `class="ll" `
                     + `id="${ `branch_${ index }` }" xmlns="http://www.w3.org/2000/svg" version="1.0" `
                     + `d="M${ d.parent.attr("cx") },${ d.parent.attr("cy") } `
                         + `A${ (parseFloat(d.child.attr("cx")!) - parseFloat(d.parent.attr("cx")!)) * 1.2 },`
@@ -277,6 +279,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                 this.updateBranches(lines);
             }, index * 10);
         });
+        $('.ll').css('stroke-width', zoomRate + 'px');
     }
 
     private updateBranches(lines: Array< { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> } >): void {

@@ -5,14 +5,14 @@
  * @Last Modified time: 2019-10-19 21:46:04
  */
 import React, { Component } from 'react';
-import '';
+import ReactWordCloud, { Scale, Spiral } from 'react-wordcloud';
 
 export interface SettingsProps {
     id: string;
 }
 
 export interface SettingsState {
-    data: Array<{ text: string, count: number }>;
+    data: Array<{ text: string, value: number }>;
 }
 
 class Settings extends Component<SettingsProps, SettingsState, {}> {
@@ -101,6 +101,23 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                     </table>
                 </div> */}
                 {/* <WordCloud width={ 318 } height={ 291 } ref="WordCloud" /> */}
+                <ReactWordCloud
+                options={{
+                    colors: this.color,
+                    enableTooltip: true,
+                    deterministic: false,
+                    fontFamily: 'impact',
+                    fontSizes: [15, 50],
+                    fontStyle: 'normal',
+                    fontWeight: 'normal',
+                    padding: 1,
+                    rotations: 3,
+                    rotationAngles: [0, 90],
+                    scale: Scale.Sqrt,
+                    spiral: Spiral.Archimedean,
+                    transitionDuration: 100
+                }}
+                words={ this.state.data } />
             </div>
         )
     }
@@ -123,14 +140,16 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             });
         let data: Array<{ text: string, value: number }> = [];
         box.forEach((d: { text: string, count: number }, index: number) => {
-            if (index >=  20) {
+            if (index >=  30) {
                 return;
             }
             data.push({ text: d.text, value: d.count });
         });
-        // (this.refs["WordCloud"] as WordCloud).import(data.sort(() => {
-        //     return Math.random() - 0.5;
-        // }));
+        this.setState({
+            data: data.sort(() => {
+                return Math.random() - 0.5;
+            })
+        });
     }
 }
 
