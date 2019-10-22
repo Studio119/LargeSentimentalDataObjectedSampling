@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-18 21:39:22
+ * @Last Modified time: 2019-10-22 17:24:22
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -19,6 +19,7 @@ import BBS from './BBS';
 
 
 export interface TreeNode {
+  id: number;
   data: [number, number, number, number];
   left?: TreeNode;
   right?: TreeNode;
@@ -205,7 +206,7 @@ class App extends Component<{}, {}, {}> {
   }
 
   public componentDidMount(): void {
-    this.loadSource = (url: string, json: string, topic: string, dis: string, sum: string) => {
+    this.loadSource = (url: string, json: string, topic: string, dis: string, sum: string, prun: string) => {
       (this.refs["DataCenter"] as DataCenter).openCSV(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
@@ -264,11 +265,15 @@ class App extends Component<{}, {}, {}> {
         });
         (this.refs["sum"] as PolylineChart).import(pick);
       });
+      (this.refs["DataCenter"] as DataCenter).openJSON(prun, (data: Array<number>) => {
+        (this.refs["TreeMap"] as TreeMap).importPruning(data);
+      });
     }
   }
 
   private loadTree(data: TreeNode, parent: RectNode | null, side: 'left' | 'right'): RectNode {
     let node: RectNode = {
+      id: data.id,
       attr: {
         x: data.data[0] / 1000 * 475,
         y: data.data[1] / 600 * 306,
@@ -281,7 +286,8 @@ class App extends Component<{}, {}, {}> {
       leftChild: null,
       rightChild: null,
       sentiment: data.sentiment,
-      ref: $("NULL")
+      ref: $("NULL"),
+      reference: $("NULL")
     };
     if (data.left) {
       node.leftChild = this.loadTree(data.left, node, 'left');
@@ -293,9 +299,9 @@ class App extends Component<{}, {}, {}> {
     return node;
   }
 
-  private loadSource: (url: string, json: string, topic: string, dis: string, sum: string) => void
-    = (url: string, json: string, topic: string, dis: string, sum: string) => {
-      setTimeout(() => this.loadSource(url, json, topic, dis, sum), 1000);
+  private loadSource: (url: string, json: string, topic: string, dis: string, sum: string, prun: string) => void
+    = (url: string, json: string, topic: string, dis: string, sum: string, prun: string) => {
+      setTimeout(() => this.loadSource(url, json, topic, dis, sum, prun), 1000);
       return;
     };
 }

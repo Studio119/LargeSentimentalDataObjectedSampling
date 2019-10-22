@@ -14,6 +14,7 @@ export interface ContrastViewProps {
 }
 
 export interface RectNode {
+    id: number;
     attr?: { x: number, y: number, width: number, height: number };
     level: number;
     path: Array< 'root' | 'left' | 'right' >;
@@ -21,6 +22,7 @@ export interface RectNode {
     leftChild: RectNode | null;
     rightChild: RectNode | null;
     ref: JQuery<HTMLElement>;
+    reference: JQuery<HTMLElement>;
     sentiment?: number;
 }
 
@@ -38,6 +40,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
     public constructor(props: ContrastViewProps) {
         super(props);
         this.state = {
+            id: -1,
             attr: {
                 x: 0,
                 y: 0,
@@ -49,7 +52,8 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
             parent: null,
             leftChild: null,
             rightChild: null,
-            ref: $("NULL")
+            ref: $("NULL"),
+            reference: $("NULL")
         };
         this.base = this.state;
         this.baseLevel = 0;
@@ -80,7 +84,8 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     border: '1px solid rgb(149,188,239)',
                     position: 'absolute',
                     left: '1114px',
-                    top: '59px'
+                    top: '59px',
+                    textAlign: 'left'
                 }} >
                 <div id={ this.props.id + "-Bar" }
                 style={{
@@ -105,7 +110,8 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     min={ 1 } max={ 15 } step={ 1 } defaultValue={ 3 }
                     style={{
                         transform: 'translateY(19%)',
-                        display: 'inline-block'
+                        display: 'inline-block',
+                        marginLeft: '10px'
                     }}
                     onValueChange={
                         (value: number) => {

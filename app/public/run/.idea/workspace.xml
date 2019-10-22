@@ -2,13 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c9a7aac0-72ac-4f33-8541-ba5094574fae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../data/93-wordcount.json" beforeDir="false" afterPath="$PROJECT_DIR$/../data/93-wordcount.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wordcount.py" beforeDir="false" afterPath="$PROJECT_DIR$/wordcount.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/DataView.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/DataView.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/ItemStrip.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/ItemStrip.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/Settings.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/Settings.tsx" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,8 +26,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/wordcount.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="264" lean-forward="true" selection-start-line="264" selection-end-line="264" />
+            <state relative-caret-position="477">
+              <caret line="264" selection-start-line="264" selection-end-line="264" />
               <folding>
                 <element signature="e#23#32#0" expanded="true" />
               </folding>
@@ -81,7 +77,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -102,6 +97,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -267,8 +263,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/wordcount.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="264" lean-forward="true" selection-start-line="264" selection-end-line="264" />
+        <state relative-caret-position="477">
+          <caret line="264" selection-start-line="264" selection-end-line="264" />
           <folding>
             <element signature="e#23#32#0" expanded="true" />
           </folding>

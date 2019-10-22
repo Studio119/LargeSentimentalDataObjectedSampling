@@ -2,10 +2,11 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-21 14:44:17
+ * @Last Modified time: 2019-10-22 17:57:12
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
+
 
 export interface StyleReflection<T = any> {
     fill?: string | ((data: T) => string);
@@ -21,6 +22,7 @@ export interface TreeMapProps<T = any> {
 }
 
 export interface TreeNode<T = any> {
+    id: number;
     level: number;
     path: Array< 'root' | 'left' | 'right' >;
     parent: TreeNode<T> | null;
@@ -40,11 +42,15 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     private padding: { top: number, right: number, bottom: number, left: number };
     private r: number;
     private handler: NodeJS.Timeout | null;
+    private circlesDict: any;
+    private linesDict: any;
+    private prun: Array<number>;
 
     public constructor(props: TreeMapProps<T>) {
         super(props);
         this.svg = null;
         this.state = {
+            id: -1,
             level: 0,
             path: [ 'root' ],
             parent: null,
@@ -58,6 +64,9 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
         this.padding = { top: 10, right: 20, bottom: 10, left: 20 };
         this.r = 3;
         this.handler = null;
+        this.circlesDict = {};
+        this.linesDict = {};
+        this.prun = [];
     }
 
     public render(): JSX.Element {
@@ -84,10 +93,68 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                 }}>
                     Pruning of K-D Tree
                 </div>
-                <svg width="788px" height="283px" id={ this.props.id + '_svg' } ref="svg" xmlns={`http://www.w3.org/2000/svg`}
+                <svg width="788px" height="283px" id={ this.props.id + '_svg' } xmlns={`http://www.w3.org/2000/svg`}
                 style={{
                     ...this.props.style
-                }} />
+                }}>
+                    <g key="canvas" ref="svg" xmlns={`http://www.w3.org/2000/svg`} />
+                    <g key="tools" xmlns={`http://www.w3.org/2000/svg`} >
+                        <path xmlns={`http://www.w3.org/2000/svg`} key="origin" ref="button1"
+                        d="M10,4 L58,4 L68,18 L58,32 L10,32 Z"
+                        style={{
+                            stroke: 'black',
+                            fill: 'dimgrey'
+                        }} />
+                        <text xmlns={`http://www.w3.org/2000/svg`} key="originT"
+                        textAnchor="middle" x="38" y="22"
+                        style={{
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            userSelect: 'none'
+                        }}
+                        onDragStart={
+                            () => false
+                        } >
+                            before
+                        </text>
+                        <path xmlns={`http://www.w3.org/2000/svg`} key="prun" ref="button2"
+                        d="M66,4 L120,4 L130,18 L120,32 L66,32 L76,18 Z"
+                        style={{
+                            stroke: 'black',
+                            fill: 'dimgrey'
+                        }} />
+                        <text xmlns={`http://www.w3.org/2000/svg`} key="prunT" ref="bt2"
+                        textAnchor="middle" x="100" y="22"
+                        style={{
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            userSelect: 'none'
+                        }}
+                        onDragStart={
+                            () => false
+                        } >
+                            prun
+                        </text>
+                        <path xmlns={`http://www.w3.org/2000/svg`} key="after" ref="button3"
+                        d="M128,4 L182,4 L192,18 L182,32 L128,32 L138,18 Z"
+                        style={{
+                            stroke: 'black',
+                            fill: 'dimgrey'
+                        }} />
+                        <text xmlns={`http://www.w3.org/2000/svg`} key="afterT"
+                        textAnchor="middle" x="163" y="22"
+                        style={{
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            userSelect: 'none'
+                        }}
+                        onDragStart={
+                            () => false
+                        } >
+                            after
+                        </text>
+                    </g>
+                </svg>
             </div>
         );
     }
@@ -98,6 +165,11 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     }
 
     public componentDidUpdate(): void {
+        this.circlesDict = {};
+        this.linesDict = {};
+        $(this.refs['button1']).css('fill', 'dimgrey');
+        $(this.refs['button2']).css('fill', 'dimgrey');
+        $(this.refs['button3']).css('fill', 'dimgrey');
         this.draw(this.state);
     }
 
@@ -110,7 +182,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
         this.walk(node);
         let virtualCircles: Array< JQuery<HTMLElement> > = [];
         let circles: Array< Array< { node: TreeNode<T>, element: JQuery<HTMLElement>, level: number, index: number } > > = [];
-        let lines: Array< { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> } > = [];
+        let lines: Array< { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement>, id: number } > = [];
         for (let level: number = 0; level < this.layers.length; level++) {
             for (let index: number = 0; index < Math.pow(2, level); index++) {
                 let circle: JQuery<HTMLElement> = $($.parseXML(
@@ -129,16 +201,17 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
             circles.push([]);
             for (let index: number = 0; index < this.layers[level].length; index++) {
                 let pos: number = TreeMap.path2index(this.layers[level][index].path);
+                this.circlesDict["id_" + this.layers[level][index].id] = { node: this.layers[level][index], ref: virtualCircles[pos] };
                 if (this.layers[level][index].leftChild) {
-                    lines.push({ parent: virtualCircles[pos], child: virtualCircles[pos * 2 + 1] });
+                    lines.push({ parent: virtualCircles[pos], child: virtualCircles[pos * 2 + 1], id: this.layers[level][index].leftChild!.id });
                 }
                 if (this.layers[level][index].rightChild) {
-                    lines.push({ parent: virtualCircles[pos], child: virtualCircles[pos * 2 + 2] });
+                    lines.push({ parent: virtualCircles[pos], child: virtualCircles[pos * 2 + 2], id: this.layers[level][index].rightChild!.id });
                 }
                 circles[level].push({ node: this.layers[level][index], element: virtualCircles[pos], level: level, index: index });
             }
         }
-        lines.forEach((d: { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> }, index: number) => {
+        lines.forEach((d: { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement>, id: number }, index: number) => {
             let line: JQuery<HTMLElement> = parseFloat(d.parent.attr("cx")!) > parseFloat(d.child.attr("cx")!) // left child
                 ? $($.parseXML(
                     `<path `
@@ -167,6 +240,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                             + `${ d.child.attr("cy") }" `
                     + `style="stroke: black; fill: none; " />`).documentElement);
             this.svg!.append(line);
+            this.linesDict["id_" + d.id] = line;
             if (this.props.pathStyle) {
                 for (const key in this.props.pathStyle) {
                     if (this.props.pathStyle.hasOwnProperty(key)) {
@@ -277,6 +351,26 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                     .attr("r", this.r * zoomRate)
                     .css("fill-opacity", 1);
                 this.updateBranches(lines);
+                if (index === box.length - 1) {
+                    setTimeout(() => {
+                        $(this.refs['button1']).css('fill', 'paleturquoise');
+                        $(this.refs['button2']).css('fill', 'lawngreen')
+                            .css('stroke', 'none')
+                            .on('click', () => {
+                                $(this.refs['button2']).css('fill', 'paleturquoise')
+                                    .css('stroke', 'black')
+                                    .on('click', () => {});
+                                this.cut();
+                            });
+                        $(this.refs['bt2'])
+                            .on('click', () => {
+                                $(this.refs['button2']).css('fill', 'paleturquoise')
+                                    .css('stroke', 'black')
+                                    .on('click', () => {});
+                                this.cut();
+                            });
+                    });
+                }
             }, index * 10);
         });
         $('.ll').css('stroke-width', zoomRate + 'px');
@@ -341,6 +435,35 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
 
     public import(root: TreeNode<T>): void {
         this.setState(root);
+    }
+
+    private cut(): void {
+        this.prun.forEach((id: number) => {
+            this.cutChildren(id);
+        });
+        $(this.refs['button3']).css('fill', 'paleturquoise');
+    }
+
+    private cutChildren(id: number): void {
+        if (this.circlesDict["id_" + id]) {
+            const e: { node: TreeNode<T>; ref: JQuery<HTMLElement>; }
+                = (this.circlesDict["id_" + id] as { node: TreeNode<T>; ref: JQuery<HTMLElement>; });
+            e.ref.css("fill", "dimgrey").css('stroke', 'none').css('fill-opacity', 0.4);
+            if (e.node.leftChild) {
+                this.cutChildren(e.node.leftChild.id);
+            }
+            if (e.node.rightChild) {
+                this.cutChildren(e.node.rightChild.id);
+            }
+        }
+        if (this.linesDict["id_" + id]) {
+            const e: JQuery<HTMLElement> = (this.linesDict["id_" + id] as JQuery<HTMLElement>);
+            e.css('stroke', 'burlywood');
+        }
+    }
+
+    public importPruning(data: Array<number>): void {
+        this.prun = data;
     }
 }
 
