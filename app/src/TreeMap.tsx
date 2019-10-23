@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-22 17:57:12
+ * @Last Modified time: 2019-10-23 19:49:11
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -45,6 +45,10 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     private circlesDict: any;
     private linesDict: any;
     private prun: Array<number>;
+    private countTotalBefore: number;
+    private countLeavesBefore: number;
+    private countTotalAfter: number;
+    private countLeavesAfter: number;
 
     public constructor(props: TreeMapProps<T>) {
         super(props);
@@ -61,12 +65,16 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
         this.layers = [];
         this.width = 788;
         this.height = 282;
-        this.padding = { top: 10, right: 20, bottom: 10, left: 20 };
+        this.padding = { top: 50, right: 20, bottom: 10, left: 20 };
         this.r = 3;
         this.handler = null;
         this.circlesDict = {};
         this.linesDict = {};
         this.prun = [];
+        this.countTotalBefore = 0;
+        this.countLeavesBefore = 0;
+        this.countTotalAfter = 0;
+        this.countLeavesAfter = 0;
     }
 
     public render(): JSX.Element {
@@ -103,11 +111,13 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         d="M10,4 L58,4 L68,18 L58,32 L10,32 Z"
                         style={{
                             stroke: 'black',
+                            transform: 'translateX(294px)',
                             fill: 'dimgrey'
                         }} />
                         <text xmlns={`http://www.w3.org/2000/svg`} key="originT"
                         textAnchor="middle" x="38" y="22"
                         style={{
+                            transform: 'translateX(294px)',
                             WebkitUserSelect: 'none',
                             MozUserSelect: 'none',
                             userSelect: 'none'
@@ -121,11 +131,13 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         d="M66,4 L120,4 L130,18 L120,32 L66,32 L76,18 Z"
                         style={{
                             stroke: 'black',
+                            transform: 'translateX(294px)',
                             fill: 'dimgrey'
                         }} />
                         <text xmlns={`http://www.w3.org/2000/svg`} key="prunT" ref="bt2"
                         textAnchor="middle" x="100" y="22"
                         style={{
+                            transform: 'translateX(294px)',
                             WebkitUserSelect: 'none',
                             MozUserSelect: 'none',
                             userSelect: 'none'
@@ -139,11 +151,13 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         d="M128,4 L182,4 L192,18 L182,32 L128,32 L138,18 Z"
                         style={{
                             stroke: 'black',
+                            transform: 'translateX(294px)',
                             fill: 'dimgrey'
                         }} />
                         <text xmlns={`http://www.w3.org/2000/svg`} key="afterT"
                         textAnchor="middle" x="163" y="22"
                         style={{
+                            transform: 'translateX(294px)',
                             WebkitUserSelect: 'none',
                             MozUserSelect: 'none',
                             userSelect: 'none'
@@ -154,6 +168,84 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                             after
                         </text>
                     </g>
+                    <g key="view" xmlns={`http://www.w3.org/2000/svg`} >
+                        <rect key="bef" xmlns={`http://www.w3.org/2000/svg`}
+                        x="8" width="286" y="4" height="28"
+                        style={{
+                            fill: 'lightblue',
+                            stroke: 'black'
+                        }} />
+                        <text xmlns={`http://www.w3.org/2000/svg`} key="befo"
+                        textAnchor="start" x="8" y="22" dx="10"
+                        style={{
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            userSelect: 'none'
+                        }}
+                        onDragStart={
+                            () => false
+                        } >
+                            total:
+                            <tspan xmlns={`http://www.w3.org/2000/svg`} key="befo_1" ref="tspan_0_0"
+                            dx="10" >
+                                unloaded
+                            </tspan>
+                        </text>
+                        <text xmlns={`http://www.w3.org/2000/svg`} key="befo2"
+                        textAnchor="start" x="0" y="22" dx="150"
+                        style={{
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            userSelect: 'none'
+                        }}
+                        onDragStart={
+                            () => false
+                        } >
+                            leaves:
+                            <tspan xmlns={`http://www.w3.org/2000/svg`} key="befo_2" ref="tspan_0_1"
+                            dx="10" >
+                                unloaded
+                            </tspan>
+                        </text>
+                        <rect key="aft" xmlns={`http://www.w3.org/2000/svg`}
+                        x="494" width="286" y="4" height="28"
+                        style={{
+                            fill: 'lightblue',
+                            stroke: 'black'
+                        }} />
+                        <text xmlns={`http://www.w3.org/2000/svg`} key="afte"
+                        textAnchor="start" x="504" y="22"
+                        style={{
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            userSelect: 'none'
+                        }}
+                        onDragStart={
+                            () => false
+                        } >
+                            total:
+                            <tspan xmlns={`http://www.w3.org/2000/svg`} key="afte_1" ref="tspan_1_0"
+                            dx="10" >
+                                unloaded
+                            </tspan>
+                        </text>
+                        <text xmlns={`http://www.w3.org/2000/svg`} key="afte2"
+                        textAnchor="start" x="644" y="22"
+                        style={{
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            userSelect: 'none'
+                        }}
+                        onDragStart={
+                            () => false
+                        } >
+                            leaves:
+                            <tspan xmlns={`http://www.w3.org/2000/svg`} key="afte_2" ref="tspan_1_1"
+                            dx="10" >
+                                unloaded
+                            </tspan>
+                        </text>
+                    </g>
                 </svg>
             </div>
         );
@@ -162,6 +254,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     public componentDidMount(): void {
         this.svg = $((this.refs["svg"] as any));
         this.draw(this.state);
+        (window as any)["_"] = this.circlesDict;
     }
 
     public componentDidUpdate(): void {
@@ -170,6 +263,14 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
         $(this.refs['button1']).css('fill', 'dimgrey');
         $(this.refs['button2']).css('fill', 'dimgrey');
         $(this.refs['button3']).css('fill', 'dimgrey');
+        $(this.refs["tspan_0_0"]).text('unloaded');
+        $(this.refs["tspan_0_1"]).text('unloaded');
+        $(this.refs["tspan_1_0"]).text('unloaded');
+        $(this.refs["tspan_1_1"]).text('unloaded');
+        this.countTotalBefore = 0;
+        this.countLeavesBefore = 0;
+        this.countTotalAfter = 0;
+        this.countLeavesAfter = 0;
         this.draw(this.state);
     }
 
@@ -355,25 +456,28 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                     setTimeout(() => {
                         $(this.refs['button1']).css('fill', 'paleturquoise');
                         $(this.refs['button2']).css('fill', 'lawngreen')
-                            .css('stroke', 'none')
-                            .on('click', () => {
-                                $(this.refs['button2']).css('fill', 'paleturquoise')
-                                    .css('stroke', 'black')
-                                    .on('click', () => {});
-                                this.cut();
-                            });
+                            .css('stroke', 'none');
                         $(this.refs['bt2'])
                             .on('click', () => {
-                                $(this.refs['button2']).css('fill', 'paleturquoise')
-                                    .css('stroke', 'black')
-                                    .on('click', () => {});
-                                this.cut();
+                                $(this.refs['button2']).css('fill', 'paleturquoise').css('stroke', 'black');
+                                $(this.refs['bt2']).on('click', () => false);
+                                this.countTotalAfter = 0;
+                                this.countLeavesAfter = 0;
+                                if (!(window as any)["clicked"]) {
+                                    this.cut();
+                                    setTimeout(() => {
+                                        (window as any)["clicked"] = false;
+                                    }, 2000);
+                                    (window as any)["clicked"] = true;
+                                }
                             });
+                        $('.ll').css('stroke-width', zoomRate + 'px');
+                        $(this.refs["tspan_0_0"]).text(this.countTotalBefore);
+                        $(this.refs["tspan_0_1"]).text(this.countLeavesBefore);
                     });
                 }
             }, index * 10);
         });
-        $('.ll').css('stroke-width', zoomRate + 'px');
     }
 
     private updateBranches(lines: Array< { parent: JQuery<HTMLElement>, child: JQuery<HTMLElement> } >): void {
@@ -425,11 +529,15 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
             this.layers.push([]);
         }
         this.layers[node.level].push(node);
+        this.countTotalBefore++;
         if (node.leftChild) {
             this.walk(node.leftChild);
         }
         if (node.rightChild) {
             this.walk(node.rightChild);
+        }
+        if (!node.leftChild && !node.rightChild) {
+            this.countLeavesBefore++;
         }
     }
 
@@ -439,27 +547,62 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
 
     private cut(): void {
         this.prun.forEach((id: number) => {
-            this.cutChildren(id);
+            this.cutChildren(id, false);
         });
         $(this.refs['button3']).css('fill', 'paleturquoise');
+        this.reWalk(this.state);
     }
 
-    private cutChildren(id: number): void {
+    private cutChildren(id: number, self: boolean): void {
         if (this.circlesDict["id_" + id]) {
             const e: { node: TreeNode<T>; ref: JQuery<HTMLElement>; }
                 = (this.circlesDict["id_" + id] as { node: TreeNode<T>; ref: JQuery<HTMLElement>; });
-            e.ref.css("fill", "dimgrey").css('stroke', 'none').css('fill-opacity', 0.4);
+            if (self) {
+                e.ref.css("fill", "dimgrey").css('stroke', 'none').css('fill-opacity', 0.4).addClass("nodeCut");
+            }
+            else {
+                e.ref.css("fill", "lime").addClass("nodeToSample");
+            }
             if (e.node.leftChild) {
-                this.cutChildren(e.node.leftChild.id);
+                this.cutChildren(e.node.leftChild.id, true);
             }
             if (e.node.rightChild) {
-                this.cutChildren(e.node.rightChild.id);
+                this.cutChildren(e.node.rightChild.id, true);
             }
         }
-        if (this.linesDict["id_" + id]) {
+        if (self && this.linesDict["id_" + id]) {
             const e: JQuery<HTMLElement> = (this.linesDict["id_" + id] as JQuery<HTMLElement>);
             e.css('stroke', 'burlywood');
         }
+    }
+
+    private reWalk(node: TreeNode<T>): boolean {
+        let flag: boolean = false;
+        if (this.circlesDict["id_" + node.id]) {
+            const e: { node: TreeNode<T>; ref: JQuery<HTMLElement>; }
+                = (this.circlesDict["id_" + node.id] as { node: TreeNode<T>; ref: JQuery<HTMLElement>; });
+            if (!e.ref.hasClass("nodeCut")) {
+                flag = true;
+                this.countTotalAfter++;
+            }
+        }
+        let isLeaf: boolean = true;
+        if (node.leftChild) {
+            isLeaf = !this.reWalk(node.leftChild);
+        }
+        if (node.rightChild) {
+            isLeaf = !this.reWalk(node.rightChild) && !isLeaf;
+        }
+        if (isLeaf) {
+            this.countLeavesAfter++;
+        }
+        if ($(this.refs["tspan_1_0"]).text() === 'unloaded' || this.countTotalAfter > parseInt($(this.refs["tspan_1_0"]).text()!)) {
+            $(this.refs["tspan_1_0"]).text(this.countTotalAfter);
+        }
+        if ($(this.refs["tspan_1_1"]).text() === 'unloaded' || this.countLeavesAfter > parseInt($(this.refs["tspan_1_1"]).text()!)) {
+            $(this.refs["tspan_1_1"]).text(this.countLeavesAfter);
+        }
+        return flag;
     }
 
     public importPruning(data: Array<number>): void {
