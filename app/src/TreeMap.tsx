@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-23 19:49:11
+ * @Last Modified time: 2019-10-25 15:28:58
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -388,6 +388,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                 }
                 if (repeat) {
                     this.svg!.append(d.element);
+                    d.element.attr("id", d.element.attr("id") + "::id=" + d.node.id);
                 }
             });
         }
