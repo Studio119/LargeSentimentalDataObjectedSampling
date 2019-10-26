@@ -2,10 +2,11 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-25 15:28:58
+ * @Last Modified time: 2019-10-26 18:46:24
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
+import Color from './preference/Color';
 
 
 export interface StyleReflection<T = any> {
@@ -112,7 +113,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         style={{
                             stroke: 'black',
                             transform: 'translateX(294px)',
-                            fill: 'dimgrey'
+                            fill: Color.Nippon.Aonibi
                         }} />
                         <text xmlns={`http://www.w3.org/2000/svg`} key="originT"
                         textAnchor="middle" x="38" y="22"
@@ -120,7 +121,8 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                             transform: 'translateX(294px)',
                             WebkitUserSelect: 'none',
                             MozUserSelect: 'none',
-                            userSelect: 'none'
+                            userSelect: 'none',
+                            fill: Color.Nippon.Gohunn
                         }}
                         onDragStart={
                             () => false
@@ -132,7 +134,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         style={{
                             stroke: 'black',
                             transform: 'translateX(294px)',
-                            fill: 'dimgrey'
+                            fill: Color.Nippon.Aonibi
                         }} />
                         <text xmlns={`http://www.w3.org/2000/svg`} key="prunT" ref="bt2"
                         textAnchor="middle" x="100" y="22"
@@ -140,7 +142,8 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                             transform: 'translateX(294px)',
                             WebkitUserSelect: 'none',
                             MozUserSelect: 'none',
-                            userSelect: 'none'
+                            userSelect: 'none',
+                            fill: Color.Nippon.Gohunn
                         }}
                         onDragStart={
                             () => false
@@ -152,7 +155,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         style={{
                             stroke: 'black',
                             transform: 'translateX(294px)',
-                            fill: 'dimgrey'
+                            fill: Color.Nippon.Aonibi
                         }} />
                         <text xmlns={`http://www.w3.org/2000/svg`} key="afterT"
                         textAnchor="middle" x="163" y="22"
@@ -160,7 +163,8 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                             transform: 'translateX(294px)',
                             WebkitUserSelect: 'none',
                             MozUserSelect: 'none',
-                            userSelect: 'none'
+                            userSelect: 'none',
+                            fill: Color.Nippon.Gohunn
                         }}
                         onDragStart={
                             () => false
@@ -172,8 +176,8 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         <rect key="bef" xmlns={`http://www.w3.org/2000/svg`}
                         x="8" width="286" y="4" height="28"
                         style={{
-                            fill: 'lightblue',
-                            stroke: 'black'
+                            fill: 'none',
+                            stroke: Color.Nippon.Sionn
                         }} />
                         <text xmlns={`http://www.w3.org/2000/svg`} key="befo"
                         textAnchor="start" x="8" y="22" dx="10"
@@ -210,8 +214,8 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                         <rect key="aft" xmlns={`http://www.w3.org/2000/svg`}
                         x="494" width="286" y="4" height="28"
                         style={{
-                            fill: 'lightblue',
-                            stroke: 'black'
+                            fill: 'none',
+                            stroke: Color.Nippon.Sionn
                         }} />
                         <text xmlns={`http://www.w3.org/2000/svg`} key="afte"
                         textAnchor="start" x="504" y="22"
@@ -260,9 +264,9 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     public componentDidUpdate(): void {
         this.circlesDict = {};
         this.linesDict = {};
-        $(this.refs['button1']).css('fill', 'dimgrey');
-        $(this.refs['button2']).css('fill', 'dimgrey');
-        $(this.refs['button3']).css('fill', 'dimgrey');
+        $(this.refs['button1']).css('fill', Color.Nippon.Aonibi).css('stroke', Color.Nippon.Nibi);
+        $(this.refs['button2']).css('fill', Color.Nippon.Aonibi).css('stroke', Color.Nippon.Nibi);
+        $(this.refs['button3']).css('fill', Color.Nippon.Aonibi).css('stroke', Color.Nippon.Nibi);
         $(this.refs["tspan_0_0"]).text('unloaded');
         $(this.refs["tspan_0_1"]).text('unloaded');
         $(this.refs["tspan_1_0"]).text('unloaded');
@@ -455,12 +459,11 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                 this.updateBranches(lines);
                 if (index === box.length - 1) {
                     setTimeout(() => {
-                        $(this.refs['button1']).css('fill', 'paleturquoise');
-                        $(this.refs['button2']).css('fill', 'lawngreen')
-                            .css('stroke', 'none');
+                        $(this.refs['button1']).css('fill', Color.Nippon.Hasita);
+                        $(this.refs['button2']).css('fill', Color.Nippon.Mizuasagi).css('stroke', Color.Nippon.Seiheki);
                         $(this.refs['bt2'])
                             .on('click', () => {
-                                $(this.refs['button2']).css('fill', 'paleturquoise').css('stroke', 'black');
+                                $(this.refs['button2']).css('fill', Color.Nippon.Hasita).css('stroke', Color.Nippon.Nibi);
                                 $(this.refs['bt2']).on('click', () => false);
                                 this.countTotalAfter = 0;
                                 this.countLeavesAfter = 0;
@@ -550,7 +553,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
         this.prun.forEach((id: number) => {
             this.cutChildren(id, false);
         });
-        $(this.refs['button3']).css('fill', 'paleturquoise');
+        $(this.refs['button3']).css('fill', Color.Nippon.Hasita);
         this.reWalk(this.state);
     }
 
@@ -559,7 +562,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
             const e: { node: TreeNode<T>; ref: JQuery<HTMLElement>; }
                 = (this.circlesDict["id_" + id] as { node: TreeNode<T>; ref: JQuery<HTMLElement>; });
             if (self) {
-                e.ref.css("fill", "dimgrey").css('stroke', 'none').css('fill-opacity', 0.4).addClass("nodeCut");
+                e.ref.css("fill", "dimgrey").css('stroke', 'none').css('fill-opacity', 0.2).addClass("nodeCut");
             }
             else {
                 e.ref.css("fill", "lime").addClass("nodeToSample");
@@ -573,7 +576,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
         }
         if (self && this.linesDict["id_" + id]) {
             const e: JQuery<HTMLElement> = (this.linesDict["id_" + id] as JQuery<HTMLElement>);
-            e.css('stroke', 'burlywood');
+            e.css('stroke', 'burlywood').css('opacity', '0.5');
         }
     }
 
