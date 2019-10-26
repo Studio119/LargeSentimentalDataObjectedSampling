@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-02 15:53:12 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-26 16:56:56
+ * @Last Modified time: 2019-10-26 21:56:05
  */
 
 import React from 'react';
@@ -335,12 +335,15 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                 onDragStart={
                     () => false
                 } >
-                    <div ref="paper"
+                    <div ref="paper" key="left"
                     style={{
                         minHeight: '20px',
                         position: 'relative',
                         top: '0px',
-                        wordBreak: 'break-all'
+                        wordBreak: 'break-all',
+                        display: 'inline-block',
+                        width: '580px',
+                        marginRight: '-20px'
                     }} >
                         {
                             this.state.log.map((d: string, index: number) => {
@@ -370,6 +373,36 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                             })
                         }
                     </div>
+                    <div ref="bar" key="right"
+                    style={{
+                        float: 'right',
+                        height: '256px',
+                        padding: '0px 10px'
+                    }}
+                    onMouseEnter={
+                        () => {
+                            $(this.refs["handler"])
+                                .animate({
+                                    opacity: 0.4
+                                }, 100);
+                        }
+                    }
+                    onMouseLeave={
+                        () => {
+                            $(this.refs["handler"])
+                                .animate({
+                                    opacity: 0.1
+                                }, 100);
+                        }
+                    } >
+                        <div ref="handler"
+                        style={{
+                            width: 17,
+                            height: 256,
+                            background: Color.Nippon.Gohunn,
+                            opacity: 0.1
+                        }} />
+                    </div>
                 </div>
             </div>
         );
@@ -398,10 +431,31 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
             this.debounce = true;
             if (event.which === 81) /* Q */ {
                 if ($(this.refs["drag:target"]).css("display") === "none") {
-                    $(this.refs["drag:target"]).show();
+                    $(this.refs["drag:target"])
+                        .css('opacity', 0)
+                        .show()
+                        .animate({
+                            opacity: 1,
+                            width: 601.6,
+                            height: 300.4,
+                            top: $(this.refs["drag:target"]).attr('_y'),
+                            left: $(this.refs["drag:target"]).attr('_x')
+                        }, 200);
                 }
                 else {
-                    $(this.refs["drag:target"]).hide();
+                    $(this.refs["drag:target"])
+                        .css('opacity', 1)
+                        .attr('_x', $(this.refs["drag:target"]).css('left'))
+                        .attr('_y', $(this.refs["drag:target"]).css('top'))
+                        .animate({
+                            opacity: 0,
+                            top: 0,
+                            left: 0,
+                            width: 0,
+                            height: 0
+                        }, 200, () => {
+                            $(this.refs["drag:target"]).hide();
+                        });
                 }
             }
         })
@@ -414,7 +468,7 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
             }
             if (event.which === 38) /* up */ {
                 let cur: number = parseInt($(this.refs["paper"]).css("top")!) + 3;
-                cur = cur > 0 ? 0 : cur;
+                cur = cur > -2 ? -2 : cur;
                 $(this.refs["paper"]).css("top", cur + "px");
             }
             else if (event.which === 40) /* down */ {

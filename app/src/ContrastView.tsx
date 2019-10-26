@@ -7,6 +7,7 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
 import ValueBar from './ValueBar';
+import Color from './preference/Color';
 
 export interface ContrastViewProps {
     id: string;
@@ -107,7 +108,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
                     </div>
                     <br />
                     <ValueBar label={ "Depth: " } width={ 150 } height={ 20 }
-                    min={ 1 } max={ 15 } step={ 1 } defaultValue={ 3 }
+                    min={ 1 } max={ 15 } step={ 1 } defaultValue={ this.displayLevels }
                     style={{
                         transform: 'translateY(19%)',
                         display: 'inline-block',
@@ -337,7 +338,7 @@ class ContrastView extends Component<ContrastViewProps, ContrastViewState, {}> {
         }
         if (this.svg) {
             let sentiment: number = node.sentiment ? node.sentiment : -1;
-            let rgb: string = 'yellow';
+            let rgb: string = Color.Nippon.Ukonn;
             if (sentiment >= 1) {
                 rgb = `rgb(${ 194 + 61 * 1 / sentiment * 0.7 },${ 8 + 247 * 1 / sentiment * 0.7 },${ 107 + 148 * 1 / sentiment * 0.7 })`;
             }
