@@ -6,7 +6,6 @@
  */
 import React, { Component } from 'react';
 import MapBox from './react-mapbox/MapBox';
-import './react-mapbox/MapBox.css';
 
 
 export interface MapViewProps {

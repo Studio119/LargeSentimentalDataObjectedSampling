@@ -244,31 +244,31 @@ class App extends Component<{}, {}, {}> {
           });
         }
         (this.refs["bbs"] as BBS).import(list);
-        // (this.refs["map"] as MapView).setState({
-        //   data: dataset
-        // });
+        (this.refs["map"] as MapView).setState({
+          data: dataset
+        });
       });
-      (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode) => {
-        let dataset: RectNode = this.loadTree(data, null, 'left');
-        (this.refs["RectTree"] as ContrastView).import(dataset);
-        (this.refs["TreeMap"] as TreeMap).import(dataset);
+      // (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode) => {
+      //   let dataset: RectNode = this.loadTree(data, null, 'left');
+      //   (this.refs["RectTree"] as ContrastView).import(dataset);
+      //   (this.refs["TreeMap"] as TreeMap).import(dataset);
+      // });
+      (this.refs["DataCenter"] as TaskQueue).open(topic, (data: Array<{ text: string, count: number }>) => {
+        (this.refs["topics"] as Settings).import(data);
       });
-      // (this.refs["DataCenter"] as TaskQueue).open(topic, (data: Array<{ text: string, count: number }>) => {
-      //   (this.refs["topics"] as Settings).import(data);
-      // });
-      // (this.refs["DataCenter"] as TaskQueue).open(dis, (data: Array<[[number, number], [number, number]]>) => {
-      //   (this.refs["dis"] as PolylineChart).import(data);
-      // });
-      // (this.refs["DataCenter"] as TaskQueue).open(sum, (data: Array<[[number, number, number], [number, number, number]]>) => {
-      //   let pick: Array<[[number, number], [number, number]]> = [];
-      //   data.forEach((d: [[number, number, number], [number, number, number]]) => {
-      //     pick.push([[d[0][0], - d[0][1]], [d[1][0], - d[1][1]]]);
-      //   });
-      //   (this.refs["sum"] as PolylineChart).import(pick);
-      // });
-      (this.refs["DataCenter"] as TaskQueue).open(prun, (data: Array<number>) => {
-        (this.refs["TreeMap"] as TreeMap).importPruning(data);
+      (this.refs["DataCenter"] as TaskQueue).open(dis, (data: Array<[[number, number], [number, number]]>) => {
+        (this.refs["dis"] as PolylineChart).import(data);
       });
+      (this.refs["DataCenter"] as TaskQueue).open(sum, (data: Array<[[number, number, number], [number, number, number]]>) => {
+        let pick: Array<[[number, number], [number, number]]> = [];
+        data.forEach((d: [[number, number, number], [number, number, number]]) => {
+          pick.push([[d[0][0], - d[0][1]], [d[1][0], - d[1][1]]]);
+        });
+        (this.refs["sum"] as PolylineChart).import(pick);
+      });
+      // (this.refs["DataCenter"] as TaskQueue).open(prun, (data: Array<number>) => {
+      //   (this.refs["TreeMap"] as TreeMap).importPruning(data);
+      // });
     }
   }
 

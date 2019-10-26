@@ -151,6 +151,7 @@ class GetRequest {
                     return;
                 }
                 clearTimeout(this.timer);
+                this.send(`Parsing character stream from @url${ this.url }:! to JavaScript object...`);
                 let dataset: Array<{[key: string]: string}> = [];
                 let labelset: Array<string> = [];
                 try {
@@ -295,7 +296,7 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                 top: 0,
                 zIndex: 10000
             }}>
-                <div ref="drag:trigger"
+                <div ref="drag:trigger" key="head"
                 style={{
                     background: Color.Nippon.Aonibi,
                     width: '100%',
@@ -353,7 +354,7 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                                                     fontSize: '14px',
                                                     lineHeight: '20px'
                                                 }} />
-                                            :   <></>
+                                            :   []
                                         :   <p key={ index } ref={ `log_${ index }` }
                                             style={{
                                                 margin: '0px',

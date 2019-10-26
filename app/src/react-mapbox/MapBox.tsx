@@ -8,6 +8,8 @@
 import React, {Component} from 'react';
 import mapboxgl, { GeoJSONSource } from 'mapbox-gl';
 import { Feature, Geometry, GeoJsonProperties } from 'geojson';
+import './MapBox.css';
+
 
 export interface MapProps {
     accessToken: string;

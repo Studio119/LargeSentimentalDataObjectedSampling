@@ -258,7 +258,6 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
     public componentDidMount(): void {
         this.svg = $((this.refs["svg"] as any));
         this.draw(this.state);
-        (window as any)["_"] = this.circlesDict;
     }
 
     public componentDidUpdate(): void {
