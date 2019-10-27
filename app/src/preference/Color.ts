@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-24 17:47:11 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-26 18:42:49
+ * @Last Modified time: 2019-10-27 19:17:25
  */
 
 
@@ -489,9 +489,10 @@ const Color = {
          */
         /**
          ```
-         
+         苗 rgb(134,193,102)
          ```
          */
+        Nae: '#86C166',
         /**
          ```
          
