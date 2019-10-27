@@ -119,7 +119,7 @@ class GetRequest {
         if (this.url.endsWith('.json')) {
             this.timer = setTimeout(() => {
                 this.active = false;
-                this.send(`@errRunTimeError:! Url: ${ this.url }`);
+                this.send(`@errRunTimeError:! URL: @url${ this.url }:!`);
                 this.send("@r:!");
                 this.success(undefined);
                 GetRequest.occupied = false;
@@ -140,7 +140,7 @@ class GetRequest {
         else if (this.url.endsWith('.csv')) {
             this.timer = setTimeout(() => {
                 this.active = false;
-                this.send(`@errRunTimeError:! Url: ${ this.url }`);
+                this.send(`@errRunTimeError:! URL: @url${ this.url }:!`);
                 this.send("@r:!");
                 this.success(undefined);
                 GetRequest.occupied = false;
@@ -190,7 +190,7 @@ class GetRequest {
         else {
             this.timer = setTimeout(() => {
                 this.active = false;
-                this.send('@errRunTimeError:!');
+                this.send(`@errRunTimeError:! URL: @url${ this.url }:!`);
                 this.success(undefined);
                 GetRequest.occupied = false;
                 GetRequest.next();

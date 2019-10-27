@@ -42,17 +42,196 @@ const linearGradient: (colorset: Array< string | number >, direction?: 'bottom' 
             })
         })`;
     };
+
+
+/**
+ * Translates color code or rgb(a) to hsl(a)
+ * @param {string} color code input
+ */
+const toHsl: (color: string) => { code: string; h: number; s: number; l: number; a: number; }
+    = (color: string) => {
+        let h: number = 0;
+        let s: number = 0;
+        let l: number = 0;
+        let a: number = 1;
+        if (color.startsWith('#')) {
+            let r: number = 0;
+            let g: number = 0;
+            let b: number = 0;
+            if (color.length === 4) {
+                r = 255 * parseInt(color[1], 16) / 16;
+                g = 255 * parseInt(color[2], 16) / 16;
+                b = 255 * parseInt(color[3], 16) / 16;
+                color = `rgb(${ r },${ g },${ b })`;
+            }
+            else if (color.length === 5) {
+                r = 255 * parseInt(color[1], 16) / 16;
+                g = 255 * parseInt(color[2], 16) / 16;
+                b = 255 * parseInt(color[3], 16) / 16;
+                let alpha = 255 * parseInt(color[4], 16);
+                color = `rgba(${ r },${ g },${ b },${ alpha })`;
+            }
+            else if (color.length === 7) {
+                r = parseInt(color[1], 16);
+                g = parseInt(color[2], 16);
+                b = parseInt(color[3], 16);
+                color = `rgb(${ r },${ g },${ b })`;
+            }
+            else if (color.length === 9) {
+                r = parseInt(color[1], 16);
+                g = parseInt(color[2], 16);
+                b = parseInt(color[3], 16);
+                let alpha = 255 * parseInt(color[4], 256);
+                color = `rgba(${ r },${ g },${ b },${ alpha })`;
+            }
+        }
+        if (color.startsWith('rgb(')) {
+            let r: number = 0;
+            let g: number = 0;
+            let b: number = 0;
+            const paths: [ string, string, string ]
+                = color.substring(color.indexOf('(') + 1, color.indexOf(')')).split(',') as [string, string, string ];
+            r = parseFloat(paths[0]) / 255;
+            g = parseFloat(paths[1]) / 255;
+            b = parseFloat(paths[2]) / 255;
+            let max: number = Math.max(r, g, b);
+            let min: number = Math.min(r, g, b);
+            h = max === min
+                ? 0
+                : r === max
+                    ? g >= b
+                        ? 60 * (g - b) / (max - min)
+                        : 60 * (g - b) / (max - min) + 360
+                    : g === max
+                        ? 60 * (b - r) / (max - min) + 120
+                        : 60 * (r - g) / (max - min) + 240;
+            l = (max + min) / 2;
+            s = l === 0 || max === min ? 0
+                : l <= 1 / 2
+                    ? (max - min) / (max + min)
+                    : (max - min) / (2 - max - min);
+            return { code: `hsl(${ h },${ s },${ l })`, h: h, s: s, l: l, a: 1 };
+        }
+        else if (color.startsWith('rgba(')) {
+            let r: number = 0;
+            let g: number = 0;
+            let b: number = 0;
+            const paths: [ string, string, string, string ]
+                = color.substring(color.indexOf('(') + 1, color.indexOf(')')).split(',') as [string, string, string, string ];
+            r = parseFloat(paths[0]) / 255;
+            g = parseFloat(paths[1]) / 255;
+            b = parseFloat(paths[2]) / 255;
+            a = parseFloat(paths[3]);
+            let max: number = Math.max(r, g, b);
+            let min: number = Math.min(r, g, b);
+            h = max === min
+                ? 0
+                : r === max
+                    ? g >= b
+                        ? 60 * (g - b) / (max - min)
+                        : 60 * (g - b) / (max - min) + 360
+                    : g === max
+                        ? 60 * (b - r) / (max - min) + 120
+                        : 60 * (r - g) / (max - min) + 240;
+            l = (max + min) / 2;
+            s = l === 0 || max === min ? 0
+                : l <= 1 / 2
+                    ? (max - min) / (max + min)
+                    : (max - min) / (2 - max - min);
+            return { code: `hsla(${ h },${ s },${ l },${ a })`, h: h, s: s, l: l, a: a };
+        }
+        return { code: 'none', h: h, s: s, l: l, a: a };
+    };
+
+
+const toRgb: (hsl: string) => string
+    = (hsl: string) => {
+        let params: Array<string> = hsl.substring(hsl.indexOf('(') + 1, hsl.indexOf(')')).split(',');
+        if (params.length === 3 || params.length === 4) {
+            let h: number = parseFloat(params[0]);
+            let s: number = parseFloat(params[1]);
+            let l: number = parseFloat(params[2]);
+            let q: number = l < 1 / 2 ? l * (1 + s) : l + s - (l * s);
+            let p: number = 2 * l - q;
+            let h_k: number = h / 360;
+            let t_r: number = h_k + 1 / 3;
+            t_r = t_r > 1 ? t_r - 1 : t_r < 0 ? t_r + 1 : t_r;
+            let t_g: number = h_k;
+            t_g = t_g > 1 ? t_g - 1 : t_g < 0 ? t_g + 1 : t_g;
+            let t_b: number = h_k - 1 / 3;
+            t_b = t_b > 1 ? t_b - 1 : t_b < 0 ? t_b + 1 : t_b;
+
+            let r: number = t_r < 1 / 6
+                ? p + (q - p) * 6 * t_r
+                : t_r < 1 / 2
+                    ? q
+                    : t_r < 2 / 3
+                        ? p + (q - p) * 6 * (2 / 3 - t_r)
+                        : p;
+            let g: number = t_g < 1 / 6
+                ? p + (q - p) * 6 * t_g
+                : t_g < 1 / 2
+                    ? q
+                    : t_g < 2 / 3
+                        ? p + (q - p) * 6 * (2 / 3 - t_g)
+                        : p;
+            let b: number = t_b < 1 / 6
+                ? p + (q - p) * 6 * t_b
+                : t_b < 1 / 2
+                    ? q
+                    : t_b < 2 / 3
+                        ? p + (q - p) * 6 * (2 / 3 - t_b)
+                        : p;
+
+            if (params.length === 4) {
+                return `rgba(${ r * 255 },${ g * 255 },${ b * 255 },${ params[3] })`;
+            }
+            return `rgb(${ r * 255 },${ g * 255 },${ b * 255 })`;
+        }
+        return 'none';
+    };
+
+
+/**
+ * Sets lightness of a color.
+ * @param {string} color
+ * @param {number} degree
+ * @returns
+ */
+const setLightness: (color: string, degree: number) => string
+    = (color: string, degree: number) => {
+        const { h, s, a } = toHsl(color);
+        let hsl: string = a === 1 ? `hsl(${ h },${ s },${ degree })` : `hsla(${ h },${ s },${ degree },${ a })`;
+        return toRgb(hsl);
+    };
     
 
 /**
  * Color: namespace
  */
 const Color = {
+    /**
+     * Creates a linear gradient.
+     */
     linearGradient: linearGradient,
 
     /**
+     * Translates a color code to hsl(a).
+     */
+    toHsl: toHsl,
+    
+    /**
+     * Translates a hsl(a) code to rgb(a).
+     */
+    toRgb: toRgb,
+
+    /**
+     * Sets lightness of a color.
+     */
+    setLightness: setLightness,
+
+    /**
      * Colorset Nippon
-     * 
      * Traditional Japanese colors.
      */
     Nippon: {
@@ -258,6 +437,42 @@ const Color = {
          */
         /**
          ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         山吹 rgb(255,177,27)
+         ```
+         */
+        Yamabuki: '#FFB11B',
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
          鬱金 rgb(239,187,36)
          ```
          */
@@ -279,6 +494,38 @@ const Color = {
          */
         /**
          ```
+         
+         ```
+         */
+        /**
+         ```
+         常盤 rgb(27,129,62)
+         ```
+         */
+        Tokiwa: '#1B813E',
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         緑青 rgb(36,147,110)
+         ```
+         */
+        Rokusyou: '#24936E',
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
          水浅葱 rgb(102,186,183)
          ```
          */
@@ -289,6 +536,52 @@ const Color = {
          ```
          */
         Seiheki: '#268785',
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         水 rgb(129,199,212)
+         ```
+         */
+        Mizu: '#81C7D4',
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
+        /**
+         ```
+         
+         ```
+         */
         /**
          ```
          
@@ -432,3 +725,5 @@ const Color = {
 
 
 export default Color;
+
+(window as any)['Color'] = Color;

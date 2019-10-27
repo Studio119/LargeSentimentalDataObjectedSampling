@@ -6,6 +6,7 @@
  */
 
 import React, {Component} from 'react';
+import $ from 'jquery';
 import mapboxgl, { GeoJSONSource } from 'mapbox-gl';
 import { Feature, Geometry, GeoJsonProperties } from 'geojson';
 import './MapBox.css';
@@ -59,6 +60,7 @@ class MapBox extends Component<MapProps, {}, {}> {
         });
 
         this.map.on('load', () => {
+            $('.mapboxgl-canvas').css('position', 'relative').css('top', '-466px').css('height', '466px');
             this.map!.addSource('default', {
                 type: "geojson",
                 data: {
@@ -71,7 +73,7 @@ class MapBox extends Component<MapProps, {}, {}> {
                 type: "circle",
                 source: "default",
                 paint: {
-                    "circle-radius": 2,
+                    "circle-radius": 2.4,
                     "circle-color": ['get', 'color']
                 }
             });
@@ -97,7 +99,7 @@ class MapBox extends Component<MapProps, {}, {}> {
             type: "circle",
             source: id,
             paint: {
-                "circle-radius": 2,
+                "circle-radius": 2.4,
                 "circle-color": ['get', 'color']
             }
         });

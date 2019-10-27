@@ -169,7 +169,7 @@ class App extends Component<{}, {}, {}> {
           </p>
         </div>
         <Settings id="ActiveSettings" ref="topics" />
-        <MapView id="MapView" ref="map" center={ [-100, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 5 } />
+        <MapView id="MapView" ref="map" center={ [-98, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 6 } />
         <div
         style={{
           position: 'absolute',
@@ -248,11 +248,11 @@ class App extends Component<{}, {}, {}> {
           data: dataset
         });
       });
-      // (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode) => {
-      //   let dataset: RectNode = this.loadTree(data, null, 'left');
-      //   (this.refs["RectTree"] as ContrastView).import(dataset);
-      //   (this.refs["TreeMap"] as TreeMap).import(dataset);
-      // });
+      (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode) => {
+        let dataset: RectNode = this.loadTree(data, null, 'left');
+        (this.refs["RectTree"] as ContrastView).import(dataset);
+        (this.refs["TreeMap"] as TreeMap).import(dataset);
+      });
       (this.refs["DataCenter"] as TaskQueue).open(topic, (data: Array<{ text: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
       });
@@ -266,9 +266,9 @@ class App extends Component<{}, {}, {}> {
         });
         (this.refs["sum"] as PolylineChart).import(pick);
       });
-      // (this.refs["DataCenter"] as TaskQueue).open(prun, (data: Array<number>) => {
-      //   (this.refs["TreeMap"] as TreeMap).importPruning(data);
-      // });
+      (this.refs["DataCenter"] as TaskQueue).open(prun, (data: Array<number>) => {
+        (this.refs["TreeMap"] as TreeMap).importPruning(data);
+      });
     }
   }
 

@@ -6,6 +6,7 @@
  */
 import React, { Component } from 'react';
 import MapBox from './react-mapbox/MapBox';
+import Color from './preference/Color';
 
 
 export interface MapViewProps {
@@ -86,11 +87,17 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
         this.state.data.forEach((d: {
             id: string, lng: number, lat: number, words: string,
         day: string, city: string, sentiment: string}, index: number) => {
-            if (index % 10 !== 0) {
+            if (index % 100 !== 0) {
                 return;
             }
             if (d.lat >= 0 || d.lat < 0 || d.lng >= 0 || d.lng < 0) {
-                (this.refs["map"] as MapBox).appendPoint(d.id, [d.lat, d.lng], parseFloat(d.sentiment) < 0 ? 'red' : parseFloat(d.sentiment) > 0 ? 'green' : 'yellow');
+                (this.refs["map"] as MapBox).appendPoint(d.id, [d.lat, d.lng],
+                    parseFloat(d.sentiment) < 0
+                        ? Color.Nippon.Syozyohi
+                        : parseFloat(d.sentiment) > 0
+                            ? Color.Nippon.Tokiwa
+                            : Color.Nippon.Ukonn
+                );
                 count++;
             }
         });
