@@ -87,7 +87,7 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
         this.state.data.forEach((d: {
             id: string, lng: number, lat: number, words: string,
         day: string, city: string, sentiment: string}, index: number) => {
-            if (index % 100 !== 0) {
+            if (index % 10 !== 0) {
                 return;
             }
             if (d.lat >= 0 || d.lat < 0 || d.lng >= 0 || d.lng < 0) {
