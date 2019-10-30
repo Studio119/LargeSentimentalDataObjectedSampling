@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 from random import random as rand
-
-
 # from tqdm import tqdm
 
 
@@ -58,6 +56,8 @@ class SSM:
             children: Array<Point>  # set of points contained
         }
         """
+
+        self.tree = {}
         return
 
     def fit(self, data):
@@ -91,6 +91,7 @@ class SSM:
             pass
         self._max_distance = ((self._x_extends[1] - self._x_extends[0]) ** 2
                               + (self._y_extends[1] - self._y_extends[0]) ** 2) ** 0.5
+        self._max_distance = 646.5583419822547
         if self._base_threshold == -1:
             self._base_threshold = 0.2
             pass
@@ -123,7 +124,8 @@ class SSM:
                     best_clustering = self.leaves
                     count = 1
                     pass
-                else:
+                elif abs(self._expected_area - self._remember[-1]['result']) > \
+                        abs(self._expected_area - self._remember[-2]['result']):
                     count += 1
                     if count >= 5:
                         self.leaves = best_clustering
@@ -133,20 +135,36 @@ class SSM:
                 if source == 1:
                     target = 0
                     pass
-                best_dif = abs(self._expected_area - self._remember[target]['result'])
-                for idx in range(0, len(self._remember)):
-                    if idx == source:
-                        continue
-                    dif = abs(self._expected_area - self._remember[idx]['result'])
-                    if dif < best_dif:
-                        target = idx
-                        best_dif = dif
-                        pass
+                if count > 1 and source < len(self._remember) - 1:
+                    self._base_threshold = self._remember[-1]['threshold'] * self._eta \
+                                           + self._remember[source]['threshold'] * (1 - self._eta)
                     pass
-                self._base_threshold = self._remember[target]['threshold'] * self._eta \
-                                       + self._remember[source]['threshold'] * (1 - self._eta)
+                else:
+                    best_dif = abs(self._expected_area - self._remember[target]['result'])
+                    for idx in range(0, len(self._remember)):
+                        if idx == source:
+                            continue
+                        dif = abs(self._expected_area - self._remember[idx]['result'])
+                        if dif < best_dif:
+                            target = idx
+                            best_dif = dif
+                            pass
+                        pass
+                    self._base_threshold = self._remember[target]['threshold'] * self._eta \
+                                           + self._remember[source]['threshold'] * (1 - self._eta)
+                    pass
                 self._cluster()
                 pass
+            pass
+        result = {}
+        for i in range(len(self.leaves)):
+            node = self.leaves[i]
+            for point in node:
+                result[point['id']] = i
+                pass
+            pass
+        for d in self.data:
+            d['leaf_id'] = result[d['id']]
             pass
         return
 
@@ -177,7 +195,7 @@ class SSM:
         """
         Generator of a new area
         """
-        center = self.data[center_idx]
+        center = self._not_included[center_idx]
         area = [center]
         others = []
         for i in range(len(self._not_included)):
@@ -200,6 +218,103 @@ class SSM:
             return -1
         else:
             return int(rand() * len(self._not_included))
+
+    def linkage(self):
+        """
+        Find a suitable binary-tree structure
+        :return: void
+        """
+        self.tree = {}
+        un_linked = []
+        for i in range(len(self.leaves)):
+            leaf = self.leaves[i]
+            un_linked.append({
+                'id': i,
+                'x': 0,
+                'y': 0,
+                'value': 0,
+                'set': leaf,
+                'children': []
+            })
+            pass
+        while len(un_linked) > 1:
+            print("Linking... {} nodes left".format(len(un_linked)))
+            for node in un_linked:
+                for d in node['set']:
+                    node['x'] += d['x']
+                    node['y'] += d['y']
+                    node['value'] += d['value']
+                    pass
+                node['x'] /= len(node['set'])
+                node['y'] /= len(node['set'])
+                node['value'] /= len(node['set'])
+                pass
+            min_dif = ((un_linked[1]['x'] - un_linked[0]['x']) ** 2 + (un_linked[1]['y'] - un_linked[0]['y']) ** 2) \
+                      * self._alpha + (un_linked[1]['value'] - un_linked[0]['value']) * (1 - self._alpha)
+            min_cp = [0, 1]
+            for i in range(len(un_linked) - 1):
+                for j in range(i + 1, len(un_linked)):
+                    dif = self._alpha * ((un_linked[j]['x'] - un_linked[i]['x']) ** 2
+                                         + (un_linked[j]['x'] - un_linked[i]['x']) ** 2) \
+                          + (1 - self._alpha) * (un_linked[j]['value'] - un_linked[i]['value'])
+                    if dif < min_dif:
+                        min_dif = dif
+                        min_cp = [i, j]
+                        pass
+                    pass
+                pass
+            set_a = []
+            for each in un_linked[min_cp[0]]['set']:
+                set_a.append(each)
+                pass
+            for each in un_linked[min_cp[1]]['set']:
+                set_a.append(each)
+                pass
+            next_un_linked = []
+            new_children = []
+            if len(un_linked[min_cp[0]]['children']) != 0:
+                new_children.append({'children': un_linked[min_cp[0]]['children'],
+                                     'value': len(un_linked[min_cp[0]]['set'])})
+                pass
+            else:
+                new_children.append({'id': un_linked[min_cp[0]]['id'],
+                                     'value': len(un_linked[min_cp[0]]['set'])})
+            if len(un_linked[min_cp[1]]['children']) != 0:
+                new_children.append({'children': un_linked[min_cp[1]]['children'],
+                                     'value': len(un_linked[min_cp[1]]['set'])})
+                pass
+            else:
+                new_children.append({'id': un_linked[min_cp[1]]['id'],
+                                     'value': len(un_linked[min_cp[1]]['set'])})
+                pass
+            next_un_linked.append({
+                'x': 0,
+                'y': 0,
+                'value': 0,
+                'set': set_a,
+                'children': new_children
+            })
+            del un_linked[min_cp[0]]['set']
+            del un_linked[min_cp[0]]['x']
+            del un_linked[min_cp[0]]['y']
+            # del un_linked[min_cp[0]]['value']
+            del un_linked[min_cp[1]]['set']
+            del un_linked[min_cp[1]]['x']
+            del un_linked[min_cp[1]]['y']
+            # del un_linked[min_cp[1]]['value']
+            for s in range(len(un_linked)):
+                if s not in min_cp:
+                    next_un_linked.append(un_linked[s])
+                    pass
+                pass
+            un_linked = next_un_linked
+            pass
+        del un_linked[0]['set']
+        del un_linked[0]['x']
+        del un_linked[0]['y']
+        # del un_linked[0]['value']
+        self.tree = un_linked[0]
+        return
 
     def __str__(self):
         """
