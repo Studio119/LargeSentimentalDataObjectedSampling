@@ -48,6 +48,8 @@ class MapBox extends Component<MapProps, {}, {}> {
         mapboxgl.accessToken = this.props.accessToken;
 
         this.map = new mapboxgl.Map({
+            attributionControl: false,
+            interactive: false,
             style: this.props.styleURL ? this.props.styleURL : 'mapbox://styles/mapbox/streets-v10',
             center: [this.props.center[0], this.props.center[1]],
             zoom: this.props.zoom,
@@ -56,11 +58,12 @@ class MapBox extends Component<MapProps, {}, {}> {
             pitch: this.props.pitch ? this.props.pitch : 0,
             bearing: this.props.bearing ? this.props.bearing : 0,
             container: this.props.containerID,
-            maxBounds: this.props.bounds
+            maxBounds: this.props.bounds,
+            refreshExpiredTiles: false
         });
 
         this.map.on('load', () => {
-            $('.mapboxgl-canvas').css('position', 'relative').css('top', '-466px').css('height', '466px');
+            $('.mapboxgl-canvas').css('opacity', '0.5').css('position', 'relative');//.css('top', '-472px').css('height', '466px');
             this.map!.addSource('default', {
                 type: "geojson",
                 data: {

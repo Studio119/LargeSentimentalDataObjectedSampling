@@ -4,7 +4,7 @@ from random import random as rand
 
 
 class SSM:
-    def __init__(self, eta=0.5, expected_area=-1, alpha=0.5, base_threshold=-1):
+    def __init__(self, eta=0.5, expected_area=-1, alpha=0.9, base_threshold=-1, max_threshold=0.2):
         """
         :param eta: Learning rate, for adjusting the base_threshold
         :param expected_area: Amount of areas expected to cluster
@@ -12,10 +12,13 @@ class SSM:
             use this function:
             dif = alpha * ((A.x - B.x) ** 2 + (A.y - B.y) ** 2) + beta * (A.value - B.value)
             in which beta = 1.0 - alpha
+        :param max_threshold: Max threshold of difference of each variable
         """
 
         self._expected_area = expected_area
         self._alpha = alpha
+        self._max_threshold = max_threshold
+
         self._remember = []
 
         self.data = []
@@ -95,67 +98,68 @@ class SSM:
         if self._base_threshold == -1:
             self._base_threshold = 0.2
             pass
+        print(self)
         print("Start clustering...")
         self._cluster()
         count = 0
         best_clustering = self.leaves
+        best_dis = self._remember[0]['result']
+        source = self._remember[0]['threshold']
         while self._remember[-1]['result'] != self._expected_area:
-            if len(self._remember) == 1:
-                best_clustering = self.leaves
-                if len(self.leaves) < self._expected_area:
-                    self._base_threshold *= self._eta
+            left = 0
+            right = 1
+            target_index = -1
+            target_result = -1
+            for idx in range(len(self._remember)):
+                dis = self._expected_area - self._remember[idx]['result']
+                if dis > 0 and best_dis > 0:
+                    continue
+                if dis < 0 and best_dis < 0:
+                    continue
+                if target_result == -1:
+                    target_index = idx
+                    target_result = abs(dis)
                     pass
-                else:
-                    self._base_threshold = self._eta + self._base_threshold * (1 - self._eta)
+                elif abs(dis) <= target_result:
+                    target_index = idx
+                    target_result = abs(dis)
+                    count = 0
                     pass
-                self._cluster()
-                continue
-            else:
-                source = 0
-                best_dif = abs(self._expected_area - self._remember[0]['result'])
-                for idx in range(1, len(self._remember)):
-                    dif = abs(self._expected_area - self._remember[idx]['result'])
-                    if dif < best_dif:
-                        source = idx
-                        best_dif = dif
-                        pass
-                    pass
-                if source == len(self._remember) - 1:
-                    best_clustering = self.leaves
-                    count = 1
-                    pass
-                elif abs(self._expected_area - self._remember[-1]['result']) > \
-                        abs(self._expected_area - self._remember[-2]['result']):
-                    count += 1
-                    if count >= 5:
-                        self.leaves = best_clustering
-                        break
-                    pass
-                target = 1
-                if source == 1:
-                    target = 0
-                    pass
-                if count > 1 and source < len(self._remember) - 1:
-                    self._base_threshold = self._remember[-1]['threshold'] * self._eta \
-                                           + self._remember[source]['threshold'] * (1 - self._eta)
-                    pass
-                else:
-                    best_dif = abs(self._expected_area - self._remember[target]['result'])
-                    for idx in range(0, len(self._remember)):
-                        if idx == source:
-                            continue
-                        dif = abs(self._expected_area - self._remember[idx]['result'])
-                        if dif < best_dif:
-                            target = idx
-                            best_dif = dif
-                            pass
-                        pass
-                    self._base_threshold = self._remember[target]['threshold'] * self._eta \
-                                           + self._remember[source]['threshold'] * (1 - self._eta)
-                    pass
-                self._cluster()
                 pass
+            if best_dis > 0:
+                # not enough, wanna lower
+                right = source
+                if target_index != -1:
+                    left = self._remember[target_index]['threshold']
+                    pass
+                pass
+            else:
+                left = source
+                if target_index != -1:
+                    right = self._remember[target_index]['threshold']
+                    pass
+                pass
+            if self._expected_area - self._remember[-1]['result'] > 0:
+                self._base_threshold = self._base_threshold * (1 - self._alpha) + left * self._alpha
+                pass
+            else:
+                self._base_threshold = self._base_threshold * (1 - self._alpha) + right * self._alpha
+                pass
+            self._cluster()
+            if abs(self._expected_area - self._remember[-1]['result']) < abs(best_dis):
+                best_clustering = self.leaves
+                best_dis = self._expected_area - self._remember[-1]['result']
+                source = self._remember[-1]['threshold']
+                pass
+            elif len(self._remember) >= 2 and \
+                abs(self._expected_area - self._remember[-1]['result']) \
+                >= abs(self._expected_area - self._remember[-2]['result']) and \
+                    abs(self._expected_area - self._remember[-2]['result']) < self._expected_area ** 0.3:
+                count += 1
+                if count >= 5:
+                    break
             pass
+        self.leaves = best_clustering
         result = {}
         for i in range(len(self.leaves)):
             node = self.leaves[i]
@@ -202,9 +206,16 @@ class SSM:
             if i == center_idx:
                 continue
             candidate = self._not_included[i]
-            dif = self._alpha * ((center['x'] - candidate['x']) ** 2 + (center['y'] - candidate['y']) ** 2) ** 0.5 \
-                  / self._max_distance + (1 - self._alpha) * (center['value'] - candidate['value']) \
-                  / (self._value_extends[1] - self._value_extends[0])
+            dis_geo = ((center['x'] - candidate['x']) ** 2 + (center['y'] - candidate['y']) ** 2) ** 0.5 \
+                      / self._max_distance
+            if dis_geo > self._max_threshold:
+                others.append(candidate)
+                continue
+            dis_val = (center['value'] - candidate['value']) / (self._value_extends[1] - self._value_extends[0])
+            if dis_val > self._max_threshold:
+                others.append(candidate)
+                continue
+            dif = self._alpha * dis_geo + (1 - self._alpha) * dis_val
             if dif <= self._base_threshold:
                 area.append(candidate)
                 pass
@@ -238,7 +249,8 @@ class SSM:
             })
             pass
         while len(un_linked) > 1:
-            print("Linking... {} nodes left".format(len(un_linked)))
+            # for i in tqdm(range(len(un_linked))):
+            # print("Linking... {} nodes left".format(len(un_linked)))
             for node in un_linked:
                 for d in node['set']:
                     node['x'] += d['x']
@@ -320,12 +332,19 @@ class SSM:
         """
         Show some info
         """
-        return "{} points included\n".format(len(self.data)) \
+        return "Model params:\n" \
+               + "expected_area={}, eta={}, alpha={}, ".format(
+                    self._expected_area, self._eta, self._alpha
+                ) \
+               + "base_threshold={}, max_threshold={}\n".format(
+                    self._base_threshold, self._max_threshold
+                ) \
+               + "{} points included\n".format(len(self.data)) \
                + "x extent: {}\n".format(tuple(self._x_extends)) \
                + "y extent: {}\n".format(tuple(self._y_extends)) \
                + "value extent: {}\n".format(tuple(self._value_extends)) \
                + "max geographic distance: {}\n".format(self._max_distance) \
-               + "dif:\n\t(a, b) =>" \
+               + "dif:\n\t(a, b) => " \
                + "{} * ((A.x - B.x) ** 2 + (A.y - B.y) ** 2) / {} ".format(self._alpha,
                                                                            self._max_distance) \
                + "+ {} * (A.value - B.value) / {}".format(1 - self._alpha,

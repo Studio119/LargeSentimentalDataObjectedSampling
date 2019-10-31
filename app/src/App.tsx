@@ -12,7 +12,6 @@ import MapView from './MapView';
 import DataView from './DataView';
 import Settings from './Settings';
 import ContrastView, { RectNode } from './ContrastView';
-// import DataCenter from './DataCenter';
 import TaskQueue from './tools/TaskQueue';
 import TreeMap from './TreeMap';
 import PolylineChart from './PolylineChart';
@@ -211,7 +210,7 @@ class App extends Component<{}, {}, {}> {
       (this.refs["DataCenter"] as TaskQueue).open(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
-          day: string, city: string, sentiment: string}> = [];
+          day: string, city: string, sentiment: string, class: number}> = [];
         let active: number = 0;
         let positive: number = 0;
         let neutre: number = 0;
@@ -231,11 +230,11 @@ class App extends Component<{}, {}, {}> {
             neutre++;
             A_neutre += parseFloat(d.sentiment);
           }
-          dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng) });
+          dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng), class: 1 });
         });
         (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
         let list: Array<{ text: string; city: string; sentiment: number; }> = [];
-        let start: number = parseInt((Math.random() * (data.length - 50)).toString());
+        let start: number = 985//parseInt((Math.random() * (data.length - 50)).toString());
         for (let i: number = 0; i < 20; i++) {
           list.push({
             text: data[start + i].words,
@@ -246,6 +245,13 @@ class App extends Component<{}, {}, {}> {
         (this.refs["bbs"] as BBS).import(list);
         (this.refs["map"] as MapView).setState({
           data: dataset
+        });
+        (this.refs["DataCenter"] as TaskQueue).open('./solution/a1024.csv', (info: Array<{class: string; id: string; x: string; y: string; value: string;}>) => {
+          let box: Array<number> = [];
+          info.forEach((d: {class: string; id: string; x: string; y: string; value: string;}) => {
+            box.push(parseInt(d.class));
+          });
+          (this.refs["map"] as MapView).importClass(box);
         });
       });
       (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode) => {
