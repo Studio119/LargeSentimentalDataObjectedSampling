@@ -23,6 +23,9 @@ if __name__ == '__main__':
             elif params[i] == '--eta':
                 eta = float(values[i])
                 pass
+            elif params[i] == '--max_clustered':
+                max_clustered = float(values[i])
+                pass
             elif params[i] == '--alpha':
                 alpha = float(values[i])
                 pass
@@ -76,11 +79,20 @@ if __name__ == '__main__':
         pass
     # print(str(ssm))
     print("分类数量：", len(ssm.leaves), "类内容量标准差：", dt ** 0.5 / len(ssm.leaves))
-    with open('{}.csv'.format(save_file), mode='w', encoding='utf-8') as f:
-        f.write('class,id,x,y,value\r')
-        for d in ssm.data:
-            f.write('{},{},{},{},{}\r'.format(d['leaf_id'], d['id'], d['x'], d['y'], d['value']))
-            pass
+    with open('{}.json'.format(save_file), mode='w', encoding='utf-8') as f:
+        f.write(str(ssm.data).replace("'", '"'))
+        # f.write('[')
+        # for i in range(len(ssm.data)):
+        #     d = ssm.data[i]
+        #     if i > 0:
+        #         f.write(',')
+        #         pass
+        #     f.write('{"class": ' + '{}, "id": {}, "x": {}, "y": {}, "value": {}\r'.format(
+        #         d['leaf_id'], d['id'], d['x'], d['y'], d['value']) + "}")
+        # for d in ssm.data:
+        #     f.write('{},{},{},{},{}\r'.format(d['leaf_id'], d['id'], d['x'], d['y'], d['value']))
+        #     pass
+        # f.write(']')
         pass
     ssm.linkage()
     with open('{}-tree.json'.format(save_file), mode='w', encoding='utf-8') as f:

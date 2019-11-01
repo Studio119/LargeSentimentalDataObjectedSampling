@@ -107,7 +107,7 @@ class SSM:
         source = self._remember[0]['threshold']
         while self._remember[-1]['result'] != self._expected_area:
             left = 0
-            right = 1
+            right = 0.3 # 1
             target_index = -1
             target_result = -1
             for idx in range(len(self._remember)):
@@ -123,7 +123,7 @@ class SSM:
                 elif abs(dis) <= target_result:
                     target_index = idx
                     target_result = abs(dis)
-                    count = 0
+                    # count = 0
                     pass
                 pass
             if best_dis > 0:
@@ -150,11 +150,12 @@ class SSM:
                 best_clustering = self.leaves
                 best_dis = self._expected_area - self._remember[-1]['result']
                 source = self._remember[-1]['threshold']
+                count = 0
                 pass
             elif len(self._remember) >= 2 and \
                 abs(self._expected_area - self._remember[-1]['result']) \
                 >= abs(self._expected_area - self._remember[-2]['result']) and \
-                    abs(self._expected_area - self._remember[-2]['result']) < self._expected_area ** 0.3:
+                    abs(self._expected_area - self._remember[-2]['result']) < self._expected_area ** 0.5:
                 count += 1
                 if count >= 5:
                     break
@@ -208,11 +209,16 @@ class SSM:
             candidate = self._not_included[i]
             dis_geo = ((center['x'] - candidate['x']) ** 2 + (center['y'] - candidate['y']) ** 2) ** 0.5 \
                       / self._max_distance
-            if dis_geo > self._max_threshold:
-                others.append(candidate)
-                continue
+            if center['value'] == 0.0:
+                if candidate['value'] != 0.0:
+                    others.append(candidate)
+                    continue
+                pass
+            # if dis_geo > self._max_threshold:
+            #     others.append(candidate)
+            #     continue
             dis_val = (center['value'] - candidate['value']) / (self._value_extends[1] - self._value_extends[0])
-            if dis_val > self._max_threshold:
+            if abs(dis_val) > self._max_threshold:
                 others.append(candidate)
                 continue
             dif = self._alpha * dis_geo + (1 - self._alpha) * dis_val
@@ -261,14 +267,17 @@ class SSM:
                 node['y'] /= len(node['set'])
                 node['value'] /= len(node['set'])
                 pass
-            min_dif = ((un_linked[1]['x'] - un_linked[0]['x']) ** 2 + (un_linked[1]['y'] - un_linked[0]['y']) ** 2) \
-                      * self._alpha + (un_linked[1]['value'] - un_linked[0]['value']) * (1 - self._alpha)
+            # min_dif = ((un_linked[1]['x'] - un_linked[0]['x']) ** 2 + (un_linked[1]['y'] - un_linked[0]['y']) ** 2) \
+            #           * self._alpha + (un_linked[1]['value'] - un_linked[0]['value']) * (1 - self._alpha)
+            min_dif = ((un_linked[1]['x'] - un_linked[0]['x']) ** 2 + (un_linked[1]['y'] - un_linked[0]['y']) ** 2)
             min_cp = [0, 1]
             for i in range(len(un_linked) - 1):
                 for j in range(i + 1, len(un_linked)):
-                    dif = self._alpha * ((un_linked[j]['x'] - un_linked[i]['x']) ** 2
-                                         + (un_linked[j]['x'] - un_linked[i]['x']) ** 2) \
-                          + (1 - self._alpha) * (un_linked[j]['value'] - un_linked[i]['value'])
+                    # dif = self._alpha * ((un_linked[j]['x'] - un_linked[i]['x']) ** 2
+                    #                      + (un_linked[j]['x'] - un_linked[i]['x']) ** 2) \
+                    #       + (1 - self._alpha) * (un_linked[j]['value'] - un_linked[i]['value'])
+                    dif = ((un_linked[j]['x'] - un_linked[i]['x']) ** 2
+                                         + (un_linked[j]['x'] - un_linked[i]['x']) ** 2)
                     if dif < min_dif:
                         min_dif = dif
                         min_cp = [i, j]
