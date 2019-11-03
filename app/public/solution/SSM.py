@@ -21,6 +21,8 @@ class SSM:
 
         self._remember = []
 
+        self._index = {}
+
         self.data = []
         """
         Origin data points,
@@ -46,6 +48,7 @@ class SSM:
         self._eta = eta
         self._base_threshold = base_threshold
 
+        self._count = 0
         self.leaves = []
         """
         The base level,
@@ -99,6 +102,7 @@ class SSM:
             self._base_threshold = 0.2
             pass
         print(self)
+        self._index = {}
         print("Start clustering...")
         self._cluster()
         count = 0
@@ -107,7 +111,7 @@ class SSM:
         source = self._remember[0]['threshold']
         while self._remember[-1]['result'] != self._expected_area:
             left = 0
-            right = 0.3 # 1
+            right = 0.1     # 1
             target_index = -1
             target_result = -1
             for idx in range(len(self._remember)):
@@ -164,6 +168,7 @@ class SSM:
         result = {}
         for i in range(len(self.leaves)):
             node = self.leaves[i]
+            self._index[i] = [n['id'] for n in node]
             for point in node:
                 result[point['id']] = i
                 pass
@@ -335,7 +340,128 @@ class SSM:
         del un_linked[0]['y']
         # del un_linked[0]['value']
         self.tree = un_linked[0]
+        self._count = 0
+
+        self.tree = self._resolve(self.tree)
         return
+
+    def _resolve(self, parent):
+        leftChild = None
+        rightChild = None
+        form = {
+            'id': self._count,
+            'leftChild': None,
+            'rightChild': None,
+            'containedPoints': [],
+            'averDiff': None,
+            'averVal': None
+        }
+        self._count += 1
+        try:
+            if len(parent['children']) > 0:
+                if len(parent['children']) > 1:
+                    rightChild = parent['children'][1]
+                    pass
+                leftChild = parent['children'][0]
+                pass
+            else:
+                form['containedPoints'] = self._index[parent['id']]
+                pass
+            pass
+        except KeyError:
+            form['containedPoints'] = self._index[parent['id']]
+            pass
+        if leftChild:
+            form['leftChild'] = self._resolve(leftChild)
+            form['containedPoints'] = form['containedPoints'] + form['leftChild']['containedPoints']
+            pass
+        if rightChild:
+            form['rightChild'] = self._resolve(rightChild)
+            form['containedPoints'] = form['containedPoints'] + form['rightChild']['containedPoints']
+            pass
+        if leftChild and rightChild:
+            form['averDiff'] = abs(form['leftChild']['averVal'] - form['rightChild']['averVal'])
+            pass
+        form['averVal'] = 0
+        for n in form['containedPoints']:
+            form['averVal'] += (self.data[n]['value'] + 1) / 2
+            pass
+        form['averVal'] /= len(form['containedPoints'])
+        return form
+
+    def cut(self):
+        thrmax = 0
+        resmax = 0
+        for thr in range(1000):
+            tree = self._maycut(self.tree, thr / 1000)
+            box = self._diff_all(tree, [])
+            aver = 0
+            for i in range(len(box) - 1):
+                for j in range(i + 1, len(box)):
+                    aver += abs(box[i] - box[j])
+                    pass
+                pass
+            aver /= int(len(box) * (len(box) - 1) / 2)
+            print("[{}, {}],".format(thr / 1000, aver * (len(box) / len(self.leaves)) ** 0.5))
+            if thr == 0 or aver > resmax:
+                resmax = aver
+                thrmax = thr / 1000
+                pass
+            pass
+        self.tree = self._maycut(self.tree, thrmax)
+        return
+
+    def _diff_all(self, parent, box):
+        if parent['leftChild']['leftChild'] and parent['leftChild']['rightChild']:
+            self._diff_all(parent['leftChild'], box)
+            pass
+        else:
+            box.append(parent['leftChild']['averVal'])
+            pass
+        if parent['rightChild']['leftChild'] and parent['rightChild']['rightChild']:
+            self._diff_all(parent['rightChild'], box)
+            pass
+        else:
+            box.append(parent['rightChild']['averVal'])
+            pass
+        return box
+
+    def _maycut(self, parent, threshold):
+        node = {
+            'id': parent['id'],
+            'leftChild': None,
+            'rightChild': None,
+            'containedPoints': parent['containedPoints'],
+            'averDiff': parent['averDiff'],
+            'averVal': parent['averVal']
+        }
+        if parent['averDiff'] and parent['averDiff'] > threshold:
+            node['leftChild'] = {
+                'id': parent['leftChild']['id'],
+                'leftChild': None,
+                'rightChild': None,
+                'containedPoints': parent['leftChild']['containedPoints'],
+                'averDiff': parent['leftChild']['averDiff'],
+                'averVal': parent['leftChild']['averVal']
+            }
+            node['rightChild'] = {
+                'id': parent['rightChild']['id'],
+                'leftChild': None,
+                'rightChild': None,
+                'containedPoints': parent['rightChild']['containedPoints'],
+                'averDiff': parent['rightChild']['averDiff'],
+                'averVal': parent['rightChild']['averVal']
+            }
+            pass
+        else:
+            if parent['leftChild']:
+                node['leftChild'] = self._maycut(parent['leftChild'], threshold)
+                pass
+            if parent['rightChild']:
+                node['rightChild'] = self._maycut(parent['rightChild'], threshold)
+                pass
+            pass
+        return node
 
     def __str__(self):
         """

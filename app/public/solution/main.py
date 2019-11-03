@@ -57,7 +57,7 @@ if __name__ == '__main__':
             data_set.append({
                 'x': float(b[0]),
                 'y': float(b[1]),
-                'id': t,
+                'id': t - 1,
                 'value': float(b[2])
             })
             pass
@@ -95,8 +95,9 @@ if __name__ == '__main__':
         # f.write(']')
         pass
     ssm.linkage()
+    ssm.cut()
     with open('{}-tree.json'.format(save_file), mode='w', encoding='utf-8') as f:
-        f.write(str(ssm.tree).replace("'", '"'))
+        f.write(str(ssm.tree).replace("'", '"').replace('None', 'null'))
         pass
     print("Completed")
     pass
