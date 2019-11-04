@@ -234,7 +234,7 @@ class App extends Component<{}, {}, {}> {
         });
         (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
         let list: Array<{ text: string; city: string; sentiment: number; }> = [];
-        let start: number = 985//parseInt((Math.random() * (data.length - 50)).toString());
+        let start: number = 985;    //parseInt((Math.random() * (data.length - 50)).toString());
         for (let i: number = 0; i < 20; i++) {
           list.push({
             text: data[start + i].words,
@@ -246,11 +246,19 @@ class App extends Component<{}, {}, {}> {
         (this.refs["map"] as MapView).setState({
           data: dataset
         });
-        (this.refs["DataCenter"] as TaskQueue).open('./solution/a1024.csv', (info: Array<{class: string; id: string; x: string; y: string; value: string;}>) => {
+        // (this.refs["DataCenter"] as TaskQueue).open('./solution/a1024.csv', (info: Array<{class: string; id: string; x: string; y: string; value: string;}>) => {
+        //   let box: Array<number> = [];
+        //   info.forEach((d: {class: string; id: string; x: string; y: string; value: string;}) => {
+        //     box.push(parseInt(d.class));
+        //   });
+        //   (this.refs["map"] as MapView).importClass(box);
+        // });
+        (this.refs["DataCenter"] as TaskQueue).open('./solution/test_presentation.json', (info: Array<{x: number, y: number, id: number, value: number, leaf_id: number}>) => {
           let box: Array<number> = [];
-          info.forEach((d: {class: string; id: string; x: string; y: string; value: string;}) => {
-            box.push(parseInt(d.class));
+          info.forEach((d: {x: number, y: number, id: number, value: number, leaf_id: number}) => {
+            box.push(d.leaf_id);
           });
+          console.log(box);
           (this.refs["map"] as MapView).importClass(box);
         });
       });

@@ -4,7 +4,7 @@
     <list default="true" id="80959c88-bd88-430c-bcfd-b43c4fe4939d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SSM.py" beforeDir="false" afterPath="$PROJECT_DIR$/SSM.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/App.tsx" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,8 +20,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="326">
-              <caret line="97" column="12" selection-start-line="97" selection-start-column="12" selection-end-line="97" selection-end-column="12" />
+            <state relative-caret-position="2880">
+              <caret line="97" column="9" selection-start-line="97" selection-start-column="9" selection-end-line="97" selection-end-column="9" />
               <folding>
                 <element signature="e#23#49#0" expanded="true" />
               </folding>
@@ -32,8 +32,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SSM.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="404" column="92" selection-start-line="404" selection-start-column="92" selection-end-line="404" selection-end-column="92" />
+            <state relative-caret-position="210">
+              <caret line="433" column="56" selection-start-line="433" selection-start-column="56" selection-end-line="433" selection-end-column="56" />
             </state>
           </provider>
         </entry>
@@ -243,8 +243,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="326">
-          <caret line="97" column="12" selection-start-line="97" selection-start-column="12" selection-end-line="97" selection-end-column="12" />
+        <state relative-caret-position="2880">
+          <caret line="97" column="9" selection-start-line="97" selection-start-column="9" selection-end-line="97" selection-end-column="9" />
           <folding>
             <element signature="e#23#49#0" expanded="true" />
           </folding>
@@ -253,8 +253,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/SSM.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="404" column="92" selection-start-line="404" selection-start-column="92" selection-end-line="404" selection-end-column="92" />
+        <state relative-caret-position="210">
+          <caret line="433" column="56" selection-start-line="433" selection-start-column="56" selection-end-line="433" selection-end-column="56" />
         </state>
       </provider>
     </entry>

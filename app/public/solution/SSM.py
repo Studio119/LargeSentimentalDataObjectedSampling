@@ -111,7 +111,7 @@ class SSM:
         source = self._remember[0]['threshold']
         while self._remember[-1]['result'] != self._expected_area:
             left = 0
-            right = 0.1     # 1
+            right = 0.15     # 1
             target_index = -1
             target_result = -1
             for idx in range(len(self._remember)):
@@ -390,24 +390,24 @@ class SSM:
         return form
 
     def cut(self):
-        thrmax = 0
+        thrmax = 0.99
         resmax = 0
-        for thr in range(1000):
-            tree = self._maycut(self.tree, thr / 1000)
-            box = self._diff_all(tree, [])
-            aver = 0
-            for i in range(len(box) - 1):
-                for j in range(i + 1, len(box)):
-                    aver += abs(box[i] - box[j])
-                    pass
-                pass
-            aver /= int(len(box) * (len(box) - 1) / 2)
-            print("[{}, {}],".format(thr / 1000, aver * (len(box) / len(self.leaves)) ** 0.5))
-            if thr == 0 or aver > resmax:
-                resmax = aver
-                thrmax = thr / 1000
-                pass
-            pass
+        # for thr in range(1000):
+        #     tree = self._maycut(self.tree, thr / 1000)
+        #     box = self._diff_all(tree, [])
+        #     aver = 0
+        #     for i in range(len(box) - 1):
+        #         for j in range(i + 1, len(box)):
+        #             aver += abs(box[i] - box[j])
+        #             pass
+        #         pass
+        #     aver /= int(len(box) * (len(box) - 1) / 2)
+        #     print("[{}, {}],".format(thr / 1000, aver * (len(box) / len(self.leaves)) ** 0.5))
+        #     if thr ==  or aver > resmax:
+        #         resmax = aver
+        #         thrmax = thr / 1000
+        #         pass
+        #     pass
         self.tree = self._maycut(self.tree, thrmax)
         return
 
@@ -432,8 +432,8 @@ class SSM:
             'leftChild': None,
             'rightChild': None,
             'containedPoints': parent['containedPoints'],
-            'averDiff': parent['averDiff'],
-            'averVal': parent['averVal']
+            # 'averDiff': parent['averDiff'],
+            # 'averVal': parent['averVal']
         }
         if parent['averDiff'] and parent['averDiff'] > threshold:
             node['leftChild'] = {
