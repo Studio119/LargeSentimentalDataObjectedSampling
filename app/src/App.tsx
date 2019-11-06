@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-26 17:52:06
+ * @Last Modified time: 2019-11-06 18:25:34
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -11,19 +11,20 @@ import ItemStrip from './ItemStrip';
 import MapView from './MapView';
 import DataView from './DataView';
 import Settings from './Settings';
-import ContrastView, { RectNode } from './ContrastView';
+// import ContrastView, { RectNode } from './ContrastView';
+// import { RectNode } from './ContrastView';
 import TaskQueue from './tools/TaskQueue';
-import TreeMap from './TreeMap';
+// import TreeMap from './TreeMap';
 import PolylineChart from './PolylineChart';
 import BBS from './BBS';
+import TreeChart, { TreeChartNode } from './TreeChart';
 
 
-export interface TreeNode {
+export interface TreeNode<T = any> {
   id: number;
-  data: [number, number, number, number];
-  left?: TreeNode;
-  right?: TreeNode;
-  sentiment?: number;
+  parent: TreeNode | null;
+  children: Array<TreeNode>;
+  data: T;
 }
 
 class App extends Component<{}, {}, {}> {
@@ -173,15 +174,15 @@ class App extends Component<{}, {}, {}> {
         style={{
           position: 'absolute',
           width: '422px',
-          top: '398px',
+          top: '59px',
           left: '1114px',
-          height: '464px',
+          height: '488px',
           background: 'white'
         }} >
-          <BBS width={ 422 } height={ 462 } ref="bbs" />
+          <BBS width={ 422 } height={ 486 } ref="bbs" />
         </div>
-        <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } />
-        <div className="Line"
+        {/* <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } /> */}
+        {/* <div className="Line"
           style={{
             position: 'absolute',
             top: '556px',
@@ -200,13 +201,29 @@ class App extends Component<{}, {}, {}> {
           pathStyle={{
             stroke: 'rgb(71,23,120)'
           }} />
-        </div>
+        </div> */}
+        <TreeChart<Array<number>> id="TreeChart" ref="TreeChart"
+          width={1212.5} height={289}
+          style={{
+            background: 'white',
+            position: 'relative',
+            top: '492.2px',
+            left: '321.4px'
+          }}
+          circleStyle={{
+            stroke: 'rgb(134,44,59)',
+            strokeWidth: '0.6px',
+            fill: 'rgb(230,28,65)'
+          }}
+          pathStyle={{
+            stroke: 'rgb(71,23,120)'
+          }} />
       </div>
     );
   }
 
   public componentDidMount(): void {
-    this.loadSource = (url: string, json: string, topic: string, dis: string, sum: string, prun: string) => {
+    this.loadSource = (url: string, json: string, topic: string, dis: string, sum: string) => {
       (this.refs["DataCenter"] as TaskQueue).open(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
@@ -246,26 +263,19 @@ class App extends Component<{}, {}, {}> {
         (this.refs["map"] as MapView).setState({
           data: dataset
         });
-        // (this.refs["DataCenter"] as TaskQueue).open('./solution/a1024.csv', (info: Array<{class: string; id: string; x: string; y: string; value: string;}>) => {
-        //   let box: Array<number> = [];
-        //   info.forEach((d: {class: string; id: string; x: string; y: string; value: string;}) => {
-        //     box.push(parseInt(d.class));
-        //   });
-        //   (this.refs["map"] as MapView).importClass(box);
-        // });
         (this.refs["DataCenter"] as TaskQueue).open('./solution/test_presentation.json', (info: Array<{x: number, y: number, id: number, value: number, leaf_id: number}>) => {
           let box: Array<number> = [];
           info.forEach((d: {x: number, y: number, id: number, value: number, leaf_id: number}) => {
             box.push(d.leaf_id);
           });
-          console.log(box);
           (this.refs["map"] as MapView).importClass(box);
         });
       });
-      (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode) => {
-        let dataset: RectNode = this.loadTree(data, null, 'left');
-        (this.refs["RectTree"] as ContrastView).import(dataset);
-        (this.refs["TreeMap"] as TreeMap).import(dataset);
+      (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode<Array<number>>) => {
+        let dataset: TreeChartNode<Array<number>> = this.loadTree(data, null, 'root');
+        // (this.refs["RectTree"] as ContrastView).import(dataset);
+        // (this.refs["TreeMap"] as TreeMap).import(dataset);
+        (this.refs["TreeChart"] as TreeChart<Array<number>>).import(dataset);
       });
       (this.refs["DataCenter"] as TaskQueue).open(topic, (data: Array<{ text: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
@@ -280,35 +290,26 @@ class App extends Component<{}, {}, {}> {
         });
         (this.refs["sum"] as PolylineChart).import(pick);
       });
-      (this.refs["DataCenter"] as TaskQueue).open(prun, (data: Array<number>) => {
-        (this.refs["TreeMap"] as TreeMap).importPruning(data);
-      });
+      // (this.refs["DataCenter"] as TaskQueue).open(prun, (data: Array<number>) => {
+      //   (this.refs["TreeMap"] as TreeMap).importPruning(data);
+      // });
     }
   }
 
-  private loadTree(data: TreeNode, parent: RectNode | null, side: 'left' | 'right'): RectNode {
-    let node: RectNode = {
+  private loadTree(data: TreeNode<Array<number>>, parent: TreeChartNode<Array<number>> | null, pos: 'root' | number): TreeChartNode<Array<number>> {
+    let node: TreeChartNode<Array<number>> = {
       id: data.id,
-      attr: {
-        x: data.data[0] / 1000 * 475,
-        y: data.data[1] / 600 * 306,
-        width: (data.data[2] - data.data[0]) / 1000 * 475,
-        height: (data.data[3] - data.data[1]) / 600 * 306
-      },
-      level: parent === null ? 0 : parent.level + 1,
-      path: parent ? [ ...parent.path, side ] : [ 'root' ],
+      name: data.id,
+      path: parent ? [ ...parent.path, pos ] : [ 'root' ],
       parent: parent,
-      leftChild: null,
-      rightChild: null,
-      sentiment: data.sentiment,
+      children: [],
       ref: $("NULL"),
-      reference: $("NULL")
+      data: (data as any)["containedpoint"]
     };
-    if (data.left) {
-      node.leftChild = this.loadTree(data.left, node, 'left');
-    }
-    if (data.right) {
-      node.rightChild = this.loadTree(data.right, node, 'right');
+    if (data.children.length > 0) {
+      node.children = data.children.map((child: TreeNode<Array<number>>) => {
+        return this.loadTree(child, node, child.id);
+      });
     }
 
     return node;

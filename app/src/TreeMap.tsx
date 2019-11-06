@@ -64,7 +64,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
             ref: $("NULL")
         };
         this.layers = [];
-        this.width = 788;
+        this.width = 1212.5;
         this.height = 282;
         this.padding = { top: 50, right: 20, bottom: 10, left: 20 };
         this.r = 3;
@@ -83,7 +83,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
             <div
             style={{
                 height: '311px',
-                width: '788px',
+                width: '1212.5px',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
                 top: '-7px',
@@ -92,7 +92,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                 <div
                 style={{
                     height: '24px',
-                    width: '772px',
+                    width: '1196.5px',
                     borderBottom: '1px solid rgb(149,188,239)',
                     background: 'rgb(120,151,213)',
                     color: 'white',
@@ -102,7 +102,7 @@ class TreeMap<T = any> extends Component<TreeMapProps<T>, TreeMapState<T>, {}> {
                 }}>
                     Pruning of K-D Tree
                 </div>
-                <svg width="788px" height="283px" id={ this.props.id + '_svg' } xmlns={`http://www.w3.org/2000/svg`}
+                <svg width="1212px" height="283px" id={ this.props.id + '_svg' } xmlns={`http://www.w3.org/2000/svg`}
                 style={{
                     ...this.props.style
                 }}>

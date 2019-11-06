@@ -194,6 +194,7 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
             data: box
         });
         (window as any)['show'] = this.highLightClass.bind(this);
+        (window as any)['highlight'] = this.highlight.bind(this);
     }
 
     private highLightClass(index: number): void {
@@ -215,6 +216,32 @@ class MapView extends Component<MapViewProps, MapViewState, {}> {
                                                             ? Color.Nippon.Tokiwa
                                                             : Color.Nippon.Ukonn]);
                 }
+            });
+            ready.forEach((d: [number, number, string]) => {
+                this.highLightPoint(d[0], d[1], d[2]);
+            });
+        }
+    }
+
+    private highlight(points: Array<number> | 'all'): void {
+        this.ctx_2!.clearRect(-2, -2, 790, 464.4);
+        if (points === 'all') {
+            $("#map_layer_canvas").css('opacity', 1);
+            return;
+        }
+        else {
+            $("#map_layer_canvas").css('opacity', 0.2);
+            let ready: Array<[number, number, string]> = [];
+            points.forEach((index: number) => {
+                const d: {
+                    id: string, lng: number, lat: number, words: string,
+                    day: string, city: string, sentiment: string, class: number
+                } = this.state.data[index];
+                ready.push([d.lng, d.lat, parseFloat(d.sentiment) < 0
+                                                        ? Color.Nippon.Syozyohi
+                                                        : parseFloat(d.sentiment) > 0
+                                                            ? Color.Nippon.Tokiwa
+                                                            : Color.Nippon.Ukonn]);
             });
             ready.forEach((d: [number, number, string]) => {
                 this.highLightPoint(d[0], d[1], d[2]);

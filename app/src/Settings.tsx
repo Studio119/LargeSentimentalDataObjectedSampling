@@ -101,23 +101,28 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                     </table>
                 </div> */}
                 {/* <WordCloud width={ 318 } height={ 291 } ref="WordCloud" /> */}
-                <ReactWordCloud
-                options={{
-                    colors: this.color,
-                    enableTooltip: true,
-                    deterministic: false,
-                    fontFamily: 'impact',
-                    fontSizes: [15, 50],
-                    fontStyle: 'normal',
-                    fontWeight: 'normal',
-                    padding: 1,
-                    rotations: 3,
-                    rotationAngles: [0, 90],
-                    scale: Scale.Sqrt,
-                    spiral: Spiral.Archimedean,
-                    transitionDuration: 100
-                }}
-                words={ this.state.data } />
+                <div
+                style={{
+                    width: '290px'
+                }} >
+                    <ReactWordCloud
+                    options={{
+                        colors: this.color,
+                        enableTooltip: true,
+                        deterministic: false,
+                        fontFamily: 'impact',
+                        fontSizes: [15, 50],
+                        fontStyle: 'normal',
+                        fontWeight: 'normal',
+                        padding: 1,
+                        rotations: 3,
+                        rotationAngles: [0, 90],
+                        scale: Scale.Sqrt,
+                        spiral: Spiral.Archimedean,
+                        transitionDuration: 100
+                    }}
+                    words={ this.state.data } />
+                </div>
             </div>
         )
     }
