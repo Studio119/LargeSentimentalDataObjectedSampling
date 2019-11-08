@@ -17,7 +17,7 @@ import TaskQueue from './tools/TaskQueue';
 // import TreeMap from './TreeMap';
 import PolylineChart from './PolylineChart';
 import BBS from './BBS';
-import TreeChart, { TreeChartNode } from './TreeChart';
+import TreeBar, { TreeBarNode } from './TreeBar';
 
 
 export interface TreeNode<T = any> {
@@ -202,7 +202,7 @@ class App extends Component<{}, {}, {}> {
             stroke: 'rgb(71,23,120)'
           }} />
         </div> */}
-        <TreeChart<Array<number>> id="TreeChart" ref="TreeChart"
+        <TreeBar<Array<number>> id="TreeBar" ref="TreeBar"
           width={1212.5} height={289}
           style={{
             background: 'white',
@@ -272,10 +272,10 @@ class App extends Component<{}, {}, {}> {
         });
       });
       (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode<Array<number>>) => {
-        let dataset: TreeChartNode<Array<number>> = this.loadTree(data, null, 'root');
+        let dataset: TreeBarNode<Array<number>> = this.loadTree(data, null, 'root');
         // (this.refs["RectTree"] as ContrastView).import(dataset);
         // (this.refs["TreeMap"] as TreeMap).import(dataset);
-        (this.refs["TreeChart"] as TreeChart<Array<number>>).import(dataset);
+        (this.refs["TreeBar"] as TreeBar<Array<number>>).import(dataset);
       });
       (this.refs["DataCenter"] as TaskQueue).open(topic, (data: Array<{ text: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
@@ -296,8 +296,8 @@ class App extends Component<{}, {}, {}> {
     }
   }
 
-  private loadTree(data: TreeNode<Array<number>>, parent: TreeChartNode<Array<number>> | null, pos: 'root' | number): TreeChartNode<Array<number>> {
-    let node: TreeChartNode<Array<number>> = {
+  private loadTree(data: TreeNode<Array<number>>, parent: TreeBarNode<Array<number>> | null, pos: 'root' | number): TreeBarNode<Array<number>> {
+    let node: TreeBarNode<Array<number>> = {
       id: data.id,
       name: data.id,
       path: parent ? [ ...parent.path, pos ] : [ 'root' ],
