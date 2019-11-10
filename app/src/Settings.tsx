@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-19 21:46:04
+ * @Last Modified time: 2019-11-10 14:57:59
  */
 import React, { Component } from 'react';
 import ReactWordCloud, { Scale, Spiral } from 'react-wordcloud';
@@ -36,12 +36,12 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             <div id={ this.props.id }
             style={{
                 display: 'inline-block',
-                height: '315.2px',
+                height: '263.2px',
                 width: '318px',
                 background: 'white',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
-                top: '549px',
+                top: '281.5px',
                 left: '0px'
             }}>
                 <div
@@ -103,15 +103,16 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                 {/* <WordCloud width={ 318 } height={ 291 } ref="WordCloud" /> */}
                 <div
                 style={{
-                    width: '290px'
+                    marginTop: '-30px'
                 }} >
                     <ReactWordCloud
+                    size={[240, 240]}
                     options={{
                         colors: this.color,
                         enableTooltip: true,
                         deterministic: false,
                         fontFamily: 'impact',
-                        fontSizes: [15, 50],
+                        fontSizes: [10, 24],
                         fontStyle: 'normal',
                         fontWeight: 'normal',
                         padding: 1,

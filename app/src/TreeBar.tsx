@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-08 22:08:17
+ * @Last Modified time: 2019-11-10 15:04:05
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -61,7 +61,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                 <div
                 style={{
                     height: '24px',
-                    width: `${ this.props.width }px`,
+                    width: `${ this.props.width - 16 }px`,
                     borderBottom: '1px solid rgb(149,188,239)',
                     background: 'rgb(120,151,213)',
                     color: 'white',

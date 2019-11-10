@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-06 18:25:34
+ * @Last Modified time: 2019-11-10 15:11:21
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -34,7 +34,7 @@ class App extends Component<{}, {}, {}> {
         <TaskQueue ref="DataCenter"/>
         <ItemStrip id="ItemStrip" importSource={ this.loadSource } />
         <DataView id="MapSettings" ref="DataView" />
-        <div className="Chart"
+        {/* <div className="Chart"
         style={{
           position: 'absolute',
           width: '318px',
@@ -43,8 +43,8 @@ class App extends Component<{}, {}, {}> {
           height: '263.2px',
           background: 'white',
           border: '1px solid rgb(149,188,239)'
-        }} >
-          <div
+        }} > */}
+          {/* <div
           style={{
             height: '24px',
             width: '302px',
@@ -101,8 +101,8 @@ class App extends Component<{}, {}, {}> {
             } >
               Sentiment Characteristic Distribution
             </button>
-          </div>
-          <p
+          </div> */}
+          {/* <p
           style={{
             position: 'relative',
             left: '-30px',
@@ -167,7 +167,7 @@ class App extends Component<{}, {}, {}> {
           }} >
             Positive Side: After Sampling <b style={{ color: 'rgb(22,83,202)' }} > ——</b>
           </p>
-        </div>
+        </div> */}
         <Settings id="ActiveSettings" ref="topics" />
         <MapView id="MapView" ref="map" center={ [-98, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 6 } />
         <div
@@ -179,7 +179,7 @@ class App extends Component<{}, {}, {}> {
           height: '488px',
           background: 'white'
         }} >
-          <BBS width={ 422 } height={ 486 } ref="bbs" />
+          <BBS width={ 422 } height={ 805 } ref="bbs" />
         </div>
         {/* <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } /> */}
         {/* <div className="Line"
@@ -203,12 +203,11 @@ class App extends Component<{}, {}, {}> {
           }} />
         </div> */}
         <TreeBar<Array<number>> id="TreeBar" ref="TreeBar"
-          width={1212.5} height={289}
+          width={1109.8} height={289}
           style={{
             background: 'white',
             position: 'relative',
-            top: '492.2px',
-            left: '321.4px'
+            top: '492.2px'
           }}
           circleStyle={{
             stroke: 'rgb(134,44,59)',
@@ -223,7 +222,7 @@ class App extends Component<{}, {}, {}> {
   }
 
   public componentDidMount(): void {
-    this.loadSource = (url: string, json: string, topic: string, dis: string, sum: string) => {
+    this.loadSource = (url: string, json: string, topic: string/*, dis: string, sum: string*/) => {
       (this.refs["DataCenter"] as TaskQueue).open(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
@@ -280,16 +279,16 @@ class App extends Component<{}, {}, {}> {
       (this.refs["DataCenter"] as TaskQueue).open(topic, (data: Array<{ text: string, count: number }>) => {
         (this.refs["topics"] as Settings).import(data);
       });
-      (this.refs["DataCenter"] as TaskQueue).open(dis, (data: Array<[[number, number], [number, number]]>) => {
-        (this.refs["dis"] as PolylineChart).import(data);
-      });
-      (this.refs["DataCenter"] as TaskQueue).open(sum, (data: Array<[[number, number, number], [number, number, number]]>) => {
-        let pick: Array<[[number, number], [number, number]]> = [];
-        data.forEach((d: [[number, number, number], [number, number, number]]) => {
-          pick.push([[d[0][0], - d[0][1]], [d[1][0], - d[1][1]]]);
-        });
-        (this.refs["sum"] as PolylineChart).import(pick);
-      });
+      // (this.refs["DataCenter"] as TaskQueue).open(dis, (data: Array<[[number, number], [number, number]]>) => {
+      //   (this.refs["dis"] as PolylineChart).import(data);
+      // });
+      // (this.refs["DataCenter"] as TaskQueue).open(sum, (data: Array<[[number, number, number], [number, number, number]]>) => {
+      //   let pick: Array<[[number, number], [number, number]]> = [];
+      //   data.forEach((d: [[number, number, number], [number, number, number]]) => {
+      //     pick.push([[d[0][0], - d[0][1]], [d[1][0], - d[1][1]]]);
+      //   });
+      //   (this.refs["sum"] as PolylineChart).import(pick);
+      // });
       // (this.refs["DataCenter"] as TaskQueue).open(prun, (data: Array<number>) => {
       //   (this.refs["TreeMap"] as TreeMap).importPruning(data);
       // });
@@ -315,9 +314,9 @@ class App extends Component<{}, {}, {}> {
     return node;
   }
 
-  private loadSource: (url: string, json: string, topic: string, dis: string, sum: string, prun: string) => void
-    = (url: string, json: string, topic: string, dis: string, sum: string, prun: string) => {
-      setTimeout(() => this.loadSource(url, json, topic, dis, sum, prun), 1000);
+  private loadSource: (url: string, json: string, topic: string/*, dis: string, sum: string, prun: string*/) => void
+    = (url: string, json: string, topic: string/*, dis: string, sum: string, prun: string*/) => {
+      setTimeout(() => this.loadSource(url, json, topic/*, dis, sum, prun*/), 1000);
       return;
     };
 }
