@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-10 15:11:21
+ * @Last Modified time: 2019-11-10 22:43:48
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -15,7 +15,7 @@ import Settings from './Settings';
 // import { RectNode } from './ContrastView';
 import TaskQueue from './tools/TaskQueue';
 // import TreeMap from './TreeMap';
-import PolylineChart from './PolylineChart';
+// import PolylineChart from './PolylineChart';
 import BBS from './BBS';
 import TreeBar, { TreeBarNode } from './TreeBar';
 
@@ -169,7 +169,7 @@ class App extends Component<{}, {}, {}> {
           </p>
         </div> */}
         <Settings id="ActiveSettings" ref="topics" />
-        <MapView id="MapView" ref="map" center={ [-98, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 6 } />
+        <MapView id="MapView" ref="map" center={ [-98, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 12 } />
         <div
         style={{
           position: 'absolute',
@@ -267,7 +267,7 @@ class App extends Component<{}, {}, {}> {
           info.forEach((d: {x: number, y: number, id: number, value: number, leaf_id: number}) => {
             box.push(d.leaf_id);
           });
-          (this.refs["map"] as MapView).importClass(box);
+          // (this.refs["map"] as MapView).importClass(box);
         });
       });
       (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode<Array<number>>) => {
