@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-06 17:47:49
+ * @Last Modified time: 2019-11-11 19:19:22
  */
 import React, { Component } from 'react';
 import ValueBar from './ValueBar';
@@ -68,8 +68,9 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
 
     private load(source: string): void {
         if (source === 'Tweet') {
-            // this.props.importSource('/data/93.csv', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
-            this.props.importSource('/data/9-17.json', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
+            this.props.importSource('/data/93.csv', '/data/visualization_tree_dict_0.2_0.1_0.02.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
+            // this.props.importSource('/data/9-17.json', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
+            // this.props.importSource('/data/917.json', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
         }
         else if (source === 'yelp') {
             this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');

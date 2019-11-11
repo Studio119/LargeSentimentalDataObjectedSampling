@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-10 20:41:06
+ * @Last Modified time: 2019-11-11 14:40:50
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -93,7 +93,8 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                         height={ height - 2 }
                                         style={{
                                             fill: 'rgb(248, 250, 254)',
-                                            stroke: Color.Nippon.Yamabuki
+                                            // stroke: Color.Nippon.Yamabuki
+                                            stroke: Color.Nippon.Aisumitya
                                         }} />
                                     ), (
                                         <rect id={ `coreBar_id${ node.id }` }

@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-10 22:43:48
+ * @Last Modified time: 2019-11-11 13:01:42
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -169,7 +169,8 @@ class App extends Component<{}, {}, {}> {
           </p>
         </div> */}
         <Settings id="ActiveSettings" ref="topics" />
-        <MapView id="MapView" ref="map" center={ [-98, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 12 } />
+        <MapView id="MapView" ref="map" center={ [-98, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 12 }
+        left={ [8, 740] } top={ [32, 328] } />
         <div
         style={{
           position: 'absolute',
@@ -267,7 +268,7 @@ class App extends Component<{}, {}, {}> {
           info.forEach((d: {x: number, y: number, id: number, value: number, leaf_id: number}) => {
             box.push(d.leaf_id);
           });
-          // (this.refs["map"] as MapView).importClass(box);
+          (this.refs["map"] as MapView).importClass(box);
         });
       });
       (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode<Array<number>>) => {

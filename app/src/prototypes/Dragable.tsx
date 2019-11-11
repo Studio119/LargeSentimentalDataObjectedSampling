@@ -2,11 +2,18 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-22 09:52:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-22 11:18:20
+ * @Last Modified time: 2019-11-11 13:57:35
  */
 
 import React, { Component } from 'react';
 import $ from 'jquery';
+
+
+
+export interface DraggerProps {
+    left?: [number, number];
+    top?: [number, number];
+}
 
 
 /**
@@ -28,7 +35,7 @@ import $ from 'jquery';
  * @template S
  * @template SS
  */
-abstract class Dragable<P = {}, S = {}, SS = any> extends Component<P, S, SS> {
+abstract class Dragable<P = {}, S = {}, SS = any> extends Component<P & DraggerProps, S, SS> {
     /**
      * This member is to check if function
      * 
@@ -44,9 +51,14 @@ abstract class Dragable<P = {}, S = {}, SS = any> extends Component<P, S, SS> {
     private static dragging: boolean;
     private static offsetX: number = 0;
     private static offsetY: number = 0;
+    
+    private left: [number, number];
+    private top: [number, number];
 
-    public constructor(props: P) {
+    public constructor(props: P & DraggerProps) {
         super(props);
+        this.left = this.props.left ? this.props.left as [number, number] : [0, 0];
+        this.top = this.props.top ? this.props.top as [number, number] : [0, 0];
         this.warning = setTimeout(() => {
             console.error("Your component extends class Dragable but might override function componentDidMount, which is not allowed.");
         }, 1000);
@@ -98,13 +110,23 @@ abstract class Dragable<P = {}, S = {}, SS = any> extends Component<P, S, SS> {
                     if (!Dragable.dragging) {
                         return;
                     }
+                    let left: number = event.clientX - Dragable.offsetX;
+                    left = left < this.left[0] ? this.left[0] : left > this.left[1] ? this.left[1] : left;
+                    let top: number = event.clientY - Dragable.offsetY;
+                    top = top < this.top[0] ? this.top[0] : top > this.top[1] ? this.top[1] : top;
                     $(this.refs['drag:target'] as any)
-                        .css('left', event.clientX - Dragable.offsetX + 'px')
-                        .css('top', event.clientY - Dragable.offsetY + 'px');
+                        .css('left', left + 'px')
+                        .css('top', top + 'px');
                 });
             $('*').on('mouseup', () => {
                 Dragable.dragging = false;
             });
+            if (this.left[1] === 0) {
+                this.left = [0, 1536 - $(this.refs['drag:target']).outerWidth(true)!];
+            }
+            if (this.top[1] === 0) {
+                this.top = [0, 863.6 - $(this.refs['drag:target']).outerHeight(true)!];
+            }
         }
         this.dragableComponentDidMount();
         clearTimeout(this.warning);
