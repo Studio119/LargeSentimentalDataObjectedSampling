@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-24 17:47:11 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-08 22:08:18
+ * @Last Modified time: 2019-11-12 20:37:15
  */
 
 
@@ -72,16 +72,16 @@ const toHsl: (color: string) => { code: string; h: number; s: number; l: number;
                 color = `rgba(${ r },${ g },${ b },${ alpha })`;
             }
             else if (color.length === 7) {
-                r = parseInt(color[1], 16);
-                g = parseInt(color[2], 16);
-                b = parseInt(color[3], 16);
+                r = parseInt(color.substr(1, 2), 16);
+                g = parseInt(color.substr(3, 2), 16);
+                b = parseInt(color.substr(5, 2), 16);
                 color = `rgb(${ r },${ g },${ b })`;
             }
             else if (color.length === 9) {
-                r = parseInt(color[1], 16);
-                g = parseInt(color[2], 16);
-                b = parseInt(color[3], 16);
-                let alpha = 255 * parseInt(color[4], 256);
+                r = parseInt(color.substr(1, 2), 16);
+                g = parseInt(color.substr(3, 2), 16);
+                b = parseInt(color.substr(5, 2), 16);
+                let alpha = 255 * parseInt(color[7], 256);
                 color = `rgba(${ r },${ g },${ b },${ alpha })`;
             }
         }
@@ -207,6 +207,27 @@ const setLightness: (color: string, degree: number) => string
     
 
 /**
+ * Returns a interpolation between two colors.
+ * @param {string} color1
+ * @param {string} color2
+ * @param {number} step a number between [0, 1]
+ * @returns
+ */
+const interpolate: (color1: string, color2: string, step?: number) => string
+    = (color1: string, color2: string, step: number = 0.5) => {
+        const hsl1: { code: string; h: number; s: number; l: number; a: number; } = toHsl(color1);
+        const hsl2: { code: string; h: number; s: number; l: number; a: number; } = toHsl(color2);
+        let h: number = hsl1.h * (1 - step) + hsl2.h * step;
+        let s: number = hsl1.s * (1 - step) + hsl2.s * step;
+        let l: number = hsl1.l * (1 - step) + hsl2.l * step;
+        let a: number = hsl1.a * (1 - step) + hsl2.a * step;
+        a = isNaN(a) ? 1 : a;
+        let hsl: string = a === 1 ? `hsl(${ h },${ s },${ l })` : `hsla(${ h },${ s },${ l },${ a })`;
+        return toRgb(hsl);
+    };
+
+
+/**
  * Color: namespace
  */
 const Color = {
@@ -221,6 +242,9 @@ const Color = {
 
     /**Sets lightness of a color.*/
     setLightness: setLightness,
+    
+    /**Returns a interpolation between two colors.*/
+    interpolate: interpolate,
 
     /**
      * Colorset Nippon

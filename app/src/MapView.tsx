@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-11 19:12:43
+ * @Last Modified time: 2019-11-12 23:37:01
  */
 import React from 'react';
 import $ from 'jquery';
@@ -50,6 +50,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     private area: [[number, number], [number, number]] = [[0, 0], [0, 0]];
     private active: boolean;
     private highLighted: Array<number> = [];
+    private rounds: Array<{ element: JQuery<HTMLElement>; data: Array<number>; count: number; }> = [];
 
     public constructor(props: MapViewProps) {
         super(props);
@@ -112,16 +113,30 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             : null
                     }
                 </div>
+                {/* 这个画布用于展现全部的点 */}
                 <canvas key="1" id="map_layer_canvas" ref="canvas" width="788px" height="462.4px" style={{
                     position: 'relative',
                     top: '-462px',
                     pointerEvents: 'none'
                 }} />
+                {/* 这个画布用于展现被高亮的点 */}
                 <canvas key="2" id="highlight_canvas" ref="canvas2" width="788px" height="462.4px" style={{
                     position: 'relative',
                     top: '-925.6px',
                     pointerEvents: 'none'
                 }} />
+                {/* 这个元素用于放置每一个框选的交互组件 */}
+                <svg ref="svg"
+                xmlns={`http://www.w3.org/2000/svg`}
+                style={{
+                    width: '788px',
+                    height: '462.2px',
+                    position: 'absolute',
+                    left: '0px',
+                    top: '24px',
+                    pointerEvents: 'none'
+                }} />
+                {/* 这个画布用于接受框选交互事件 */}
                 <canvas key="A" id="interaction" ref="table" width="788px" height="462.4px" style={{
                     position: 'relative',
                     top: '-1392px',
@@ -243,6 +258,8 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         onClick={
                             () => {
                                 this.behaviour = 'zoom';
+                                $(this.refs['svg']).html("");
+                                this.rounds = [];
                                 $(this.refs["area"]).hide();
                                 $(this.refs["table"]).hide();
                                 $(this.refs["button:move"])
@@ -335,6 +352,8 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                 $(this.refs["area"]).hide();
                                 this.highLighted = [];
                                 this.highLightClass(-1);
+                                $(this.refs['svg']).html("");
+                                this.rounds = [];
                             }
                         } />
                     </div>
@@ -353,6 +372,11 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         this.ctx_2!.globalAlpha = 0.8;
 
         (window as any)['update'] = this.sample.bind(this);
+        (window as any)['highlightClass'] = this.highLightClass.bind(this);
+        (window as any)['getPoint'] = (idx: number) => {
+            return this.state.data[idx];
+        };
+        (window as any)['highlight'] = this.highlight.bind(this);
     }
 
     private sample(result: {[index: string]: Array<number>}): void {
@@ -380,6 +404,8 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     public componentDidUpdate(): void {
+        $(this.refs['svg']).html("");
+        this.rounds = [];
         // this.behaviour = 'zoom';
         if (this.highLighted.length > 0 && this.behaviour !== 'zoom') {
             this.hightLightArea(this.behaviour);
@@ -408,7 +434,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
                                                     ? Color.Nippon.Syozyohi
                                                     : parseFloat(d.sentiment) > 0
-                                                        ? Color.Nippon.Tokiwa
+                                                        ? Color.Nippon.Ruri // Tokiwa
                                                         : Color.Nippon.Ukonn]);
             }
         });
@@ -433,7 +459,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             ready[idx % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
                 ? Color.Nippon.Syozyohi
                 : parseFloat(d.sentiment) > 0
-                    ? Color.Nippon.Tokiwa
+                    ? Color.Nippon.Ruri // Tokiwa
                     : Color.Nippon.Ukonn]);
         });
         ready.forEach((list: Array<[number, number, string]>, index: number) => {
@@ -448,8 +474,13 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     private hightLightArea(style: 'rect' | 'circle'): void {
-        this.ctx_2!.clearRect(-2, -2, 790, 464.4);
-        this.highLighted = [];
+        // this.ctx_2!.clearRect(-2, -2, 790, 464.4);
+        // this.highLighted = [];
+        let heap: Array<number> = [];
+        let count: number = 0;
+        for (let i: number = 0; i < 20; i++) {
+            heap.push(0);
+        }
         $("#map_layer_canvas").css('opacity', 0.2);
         let ready: Array<Array<[number, number, string]>> = [];
         for (let i: number = 0; i < 100; i++) {
@@ -471,19 +502,18 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                     ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
                                                         ? Color.Nippon.Syozyohi
                                                         : parseFloat(d.sentiment) > 0
-                                                            ? Color.Nippon.Tokiwa
+                                                            ? Color.Nippon.Ruri // Tokiwa
                                                             : Color.Nippon.Ukonn]);
                     this.highLighted.push(index);
+                    heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                    count++;
                 }
             });
         }
         else {
-            let r: number = Math.sqrt(
-                Math.pow(this.area[0][0] - this.area[1][0], 2)
-                + Math.pow(this.area[0][1] - this.area[1][1], 2)
-            );
             let r2: number = Math.pow(this.area[0][0] - this.area[1][0], 2)
                 + Math.pow(this.area[0][1] - this.area[1][1], 2);
+            let r: number = Math.sqrt(r2);
             this.state.data.forEach((d: {
                 id: string, lng: number, lat: number, words: string,
             day: string, city: string, sentiment: string, class: number}, index: number) => {
@@ -496,10 +526,173 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                     ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
                                                         ? Color.Nippon.Syozyohi
                                                         : parseFloat(d.sentiment) > 0
-                                                            ? Color.Nippon.Tokiwa
+                                                            ? Color.Nippon.Ruri // Tokiwa
                                                             : Color.Nippon.Ukonn]);
                     this.highLighted.push(index);
+                    heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                    count++;
                 }
+            });
+            let circle: JQuery<HTMLElement> = $($.parseXML(
+                `<circle xmlns="http://www.w3.org/2000/svg" `
+                + `cx="${ this.area[0][1] + 1 }px" cy="${ this.area[0][0] - 22 }px" r="${ r + 3 }px" `
+                + `style="`
+                    + `fill: none; `
+                    + `stroke: ${ Color.Nippon.Hasita + "C0" }; `
+                    + `stroke-width: 5px; `
+                    + `pointer-Events: none; `
+                + `" `
+                + `/>`
+            ).documentElement);
+            $(this.refs['svg']).append(circle);
+            this.rounds.push({ element: circle, data: heap, count: count });
+            this.rounds.forEach((e: { element: JQuery<HTMLElement>; data: Array<number>; count: number; }) => {
+                const round: JQuery<HTMLElement> = e.element;
+                let x1: number = this.area[0][1] + 1;
+                let y1: number = this.area[0][0] - 22;
+                let r1: number = r + 5.5;
+                let x2: number = parseFloat(round.attr('cx')!);
+                let y2: number = parseFloat(round.attr('cy')!);
+                let r2: number = parseFloat(round.attr('r')!) + 2.5;
+                let s: number = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                if (s <= r1 + r2) {
+                    return;
+                }
+                let tx: number = x1 + (x2 - x1) * r1 / s;
+                let ty: number = y1 + (y2 - y1) * r1 / s;
+                x2 += (x1 - x2) * r2 / s;
+                y2 += (y1 - y2) * r2 / s;
+                let strip: JQuery<HTMLElement> = $($.parseXML(
+                    `<line xmlns="http://www.w3.org/2000/svg" `
+                    + `x1="${ tx }px" y1="${ ty }px" x2="${ x2 }px" y2="${ y2 }px" `
+                    + `style="`
+                        + `fill: none; `
+                        + `stroke: ${ Color.Nippon.Hasita + "60" }; `
+                        + `stroke-width: 1px; `
+                        + `pointer-Events: none; `
+                    + `" `
+                    + `/>`
+                ).documentElement);
+                const stepX: number = (x2 - tx) / 21;
+                const stepY: number = (y2 - ty) / 21;
+                const width: number = Math.sqrt(Math.pow((s - r2 - r1) / 30, 1.5) + 16);
+                const height: number = Math.sqrt(Math.pow(width * 10, 1.5) + 900);
+                const offsetX: number = width / 2 * (tx - x2) / s;
+                const offsetY: number = offsetX / (tx - x2) * (ty - y2);
+                let d1: string = `M${ tx },${ ty }`;
+                let d2: string = `M${ tx },${ ty }`;
+                for (let i: number = 0; i < 20; i++) {
+                    let x: number = tx + (i + 1) * stepX;
+                    let y: number = ty + (i + 1) * stepY;
+                    let value1: number = Math.sqrt(2 * heap[i] / count + 1e-6);
+                    let rect1: JQuery<HTMLElement> = $($.parseXML(
+                        `<path xmlns="http://www.w3.org/2000/svg" `
+                        + `d="M${ x - offsetX },${ y - offsetY } `
+                            + `L${ x - offsetX - height * value1 * (y2 - ty) / s },`
+                                + `${ y - offsetY + height * value1 * (x2 - tx) / s } `
+                            + `L${ x + offsetX - height * value1 * (y2 - ty) / s },`
+                                + `${ y + offsetY + height * value1 * (x2 - tx) / s } `
+                            + `L${ x + offsetX },${ y + offsetY } `
+                            + `" `
+                        + `style="`
+                            + `fill: ${ Color.interpolate(
+                                Color.Nippon.Syozyohi + "C0",
+                                Color.Nippon.Ruri + "C0",
+                                i / 19
+                            ) }; `
+                            + `stroke: ${ Color.interpolate(
+                                Color.Nippon.Syozyohi + "C0",
+                                Color.Nippon.Ruri + "C0",
+                                i / 19
+                            ) }; `
+                            + `stroke-width: 2px; `
+                            + `pointer-Events: none; `
+                        + `" `
+                        + `/>`
+                    ).documentElement);
+                    $(this.refs['svg']).append(rect1);
+                    if (i === 0) {
+                        d1 += ` L${ x - (height + 3) * value1 * (y2 - ty) / s },`
+                            + `${ y + (height + 3) * value1 * (x2 - tx) / s }`;
+                    }
+                    else {
+                        let value0: number = Math.sqrt(2 * heap[i - 1] / count + 1e-6);
+                        // d1 += ` L${ x - height * value1 * (y2 - ty) / s },${ y + height * value1 * (x2 - tx) / s }`;
+                        d1 += ` C${ x - (height + 3) * value0 * (y2 - ty) / s - stepX * 2 / 3 },`
+                            + `${ y + (height + 3) * value0 * (x2 - tx) / s - stepY * 2 / 3 }`
+                            + ` ${ x - (height + 3) * value1 * (y2 - ty) / s - stepX / 3 },`
+                            + `${ y + (height + 3) * value1 * (x2 - tx) / s - stepY / 3 }`
+                            + ` ${ x - (height + 3) * value1 * (y2 - ty) / s },`
+                            + `${ y + (height + 3) * value1 * (x2 - tx) / s }`;
+                    }
+                    let value2: number = Math.sqrt(2 * e.data[i] / e.count + 1e-6);
+                    let rect2: JQuery<HTMLElement> = $($.parseXML(
+                        `<path xmlns="http://www.w3.org/2000/svg" `
+                        + `d="M${ x - offsetX },${ y - offsetY } `
+                            + `L${ x - offsetX + height * value2 * (y2 - ty) / s },`
+                                + `${ y - offsetY - height * value2 * (x2 - tx) / s } `
+                            + `L${ x + offsetX + height * value2 * (y2 - ty) / s },`
+                                + `${ y + offsetY - height * value2 * (x2 - tx) / s } `
+                            + `L${ x + offsetX },${ y + offsetY } `
+                            + `" `
+                        + `style="`
+                            + `fill: ${ Color.interpolate(
+                                Color.Nippon.Syozyohi + "C0",
+                                Color.Nippon.Ruri + "C0",
+                                i / 19
+                            ) }; `
+                            + `stroke: ${ Color.interpolate(
+                                Color.Nippon.Syozyohi + "C0",
+                                Color.Nippon.Ruri + "C0",
+                                i / 19
+                            ) }; `
+                            + `stroke-width: 2px; `
+                            + `pointer-Events: none; `
+                        + `" `
+                        + `/>`
+                    ).documentElement);
+                    $(this.refs['svg']).append(rect2);
+                    if (i === 0) {
+                        d2 += ` L${ x + (height + 3) * value2 * (y2 - ty) / s },`
+                            + `${ y - (height + 3) * value2 * (x2 - tx) / s }`;
+                    }
+                    else {
+                        let value0: number = Math.sqrt(2 * e.data[i - 1] / e.count + 1e-6);
+                        // d2 += ` L${ x + height * value2 * (y2 - ty) / s },${ y - height * value2 * (x2 - tx) / s }`;
+                        d2 += ` C${ x + (height + 3) * value0 * (y2 - ty) / s - stepX * 2 / 3 },`
+                            + `${ y - (height + 3) * value0 * (x2 - tx) / s - stepY * 2 / 3 }`
+                            + ` ${ x + (height + 3) * value2 * (y2 - ty) / s - stepX / 3 },`
+                            + `${ y - (height + 3) * value2 * (x2 - tx) / s - stepY / 3 }`
+                            + ` ${ x + (height + 3) * value2 * (y2 - ty) / s },${ y - (height + 3) * value2 * (x2 - tx) / s }`;
+                    }
+                }
+                d1 += ` L${ x2 },${ y2 }`;
+                d2 += ` L${ x2 },${ y2 }`;
+                $(this.refs['svg']).append(strip);
+                let wave1: JQuery<HTMLElement> = $($.parseXML(
+                    `<path xmlns="http://www.w3.org/2000/svg" `
+                    + `d="${ d1 }" `
+                    + `style="`
+                        + `fill: none; `
+                        + `stroke: ${ Color.Nippon.Ukonn }; `
+                        + `stroke-width: ${ Math.sqrt(Math.pow(width, 1.5) + 9) }px; `
+                        + `pointer-Events: none; `
+                    + `" `
+                    + `/>`
+                ).documentElement);
+                $(this.refs['svg']).append(wave1);
+                let wave2: JQuery<HTMLElement> = $($.parseXML(
+                    `<path xmlns="http://www.w3.org/2000/svg" `
+                    + `d="${ d2 }" `
+                    + `style="`
+                        + `fill: none; `
+                        + `stroke: ${ Color.Nippon.Ukonn }; `
+                        + `stroke-width: ${ Math.sqrt(Math.pow(width, 1.5) + 9) }px; `
+                        + `pointer-Events: none; `
+                    + `" `
+                    + `/>`
+                ).documentElement);
+                $(this.refs['svg']).append(wave2);
             });
         }
         ready.forEach((list: Array<[number, number, string]>, index: number) => {
@@ -511,16 +704,20 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 }, index * 10)
             );
         });
-        // $(this.refs["area"]).hide();
+        $(this.refs["area"]).hide();
     }
 
     private onDragEnd(bounds: [[number, number], [number, number]]): void {
         this.bounds = bounds;
+        $(this.refs['svg']).html("");
+        this.rounds = [];
         this.redraw();
     }
 
     private onZoomEnd(bounds: [[number, number], [number, number]]): void {
         this.bounds = bounds;
+        $(this.refs['svg']).html("");
+        this.rounds = [];
         this.redraw();
     }
 
@@ -556,6 +753,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     public importClass(data: Array<number>): void {
+        let max: number = 0;
         let box: Array<{
                 id: string;
                 lng: number;
@@ -568,6 +766,9 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             }> = this.state.data;
         for (let i: number = 0; i < data.length; i++) {
             box[i].class = data[i];
+            if (data[i] > max) {
+                max = data[i];
+            }
         }
         this.setState({
             data: box
@@ -592,7 +793,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                     ready.push([d.lng, d.lat, parseFloat(d.sentiment) < 0
                                                         ? Color.Nippon.Syozyohi
                                                         : parseFloat(d.sentiment) > 0
-                                                            ? Color.Nippon.Tokiwa
+                                                            ? Color.Nippon.Ruri // Tokiwa
                                                             : Color.Nippon.Ukonn]);
                 }
             });
@@ -619,7 +820,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 ready.push([d.lng, d.lat, parseFloat(d.sentiment) < 0
                                                         ? Color.Nippon.Syozyohi
                                                         : parseFloat(d.sentiment) > 0
-                                                            ? Color.Nippon.Tokiwa
+                                                            ? Color.Nippon.Ruri // Tokiwa
                                                             : Color.Nippon.Ukonn]);
             });
             ready.forEach((d: [number, number, string]) => {
