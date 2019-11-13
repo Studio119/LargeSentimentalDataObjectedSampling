@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-12 23:37:01
+ * @Last Modified time: 2019-11-13 20:53:09
  */
 import React from 'react';
 import $ from 'jquery';
@@ -535,25 +535,62 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             });
             let circle: JQuery<HTMLElement> = $($.parseXML(
                 `<circle xmlns="http://www.w3.org/2000/svg" `
-                + `cx="${ this.area[0][1] + 1 }px" cy="${ this.area[0][0] - 22 }px" r="${ r + 3 }px" `
+                + `class="chosen" `
+                + `cx="${ this.area[0][1] + 1 }px" cy="${ this.area[0][0] - 22 }px" r="${ r + 2.5 }px" `
                 + `style="`
                     + `fill: none; `
                     + `stroke: ${ Color.Nippon.Hasita + "C0" }; `
-                    + `stroke-width: 5px; `
+                    + `stroke-width: 2px; `
                     + `pointer-Events: none; `
                 + `" `
                 + `/>`
             ).documentElement);
             $(this.refs['svg']).append(circle);
             this.rounds.push({ element: circle, data: heap, count: count });
+            // if (this.rounds.length === 1) {
+                // circle.css("stroke", Color.Nippon.Kesizumi);
+                for (let i: number = 0; i < 20; i++) {
+                    const r2: number = r + Math.sqrt(r + 16) * Math.sqrt(Math.pow(heap[i] / count, 2) + 0.04);
+                    let arc: JQuery<HTMLElement> = $($.parseXML(
+                        `<path xmlns="http://www.w3.org/2000/svg" `
+                        + `class="arc" `
+                        + `d="M${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r + 3) }`
+                            + ` A${ r + 3 },${ r + 3 },0,0,1,`
+                            + `${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r + 3) }`
+                            + ` L${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) }`
+                            + ` A${ r + 3 },${ r + 3 },0,0,0,`
+                            + `${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r2 + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r2 + 3) }`
+                            + ` Z" `
+                        + `style="`
+                            + `fill: ${ Color.interpolate(
+                                Color.Nippon.Syozyohi + "C0",
+                                Color.Nippon.Ruri + "C0",
+                                i / 19
+                            ) }; `
+                            + `stroke: none; `
+                            + `pointer-Events: none; `
+                        + `" `
+                        + `/>`
+                    ).documentElement);
+                    $(this.refs['svg']).append(arc);
+                }
+            // }
+            // if (this.rounds.length === 2) {
+            //     $('.chosen').css("stroke", Color.Nippon.Hasita + "C0");
+            //     $('.arc').remove();
+            // }
             this.rounds.forEach((e: { element: JQuery<HTMLElement>; data: Array<number>; count: number; }) => {
                 const round: JQuery<HTMLElement> = e.element;
                 let x1: number = this.area[0][1] + 1;
                 let y1: number = this.area[0][0] - 22;
-                let r1: number = r + 5.5;
+                let r1: number = r + 4;
                 let x2: number = parseFloat(round.attr('cx')!);
                 let y2: number = parseFloat(round.attr('cy')!);
-                let r2: number = parseFloat(round.attr('r')!) + 2.5;
+                let r2: number = parseFloat(round.attr('r')!) + 1.5;
                 let s: number = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
                 if (s <= r1 + r2) {
                     return;
@@ -665,6 +702,14 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             + `${ y - (height + 3) * value2 * (x2 - tx) / s - stepY / 3 }`
                             + ` ${ x + (height + 3) * value2 * (y2 - ty) / s },${ y - (height + 3) * value2 * (x2 - tx) / s }`;
                     }
+                    if (value1 > value2) {
+                        rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.65));
+                        rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.35));
+                    }
+                    else if (value1 < value2) {
+                        rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.35));
+                        rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.65));
+                    }
                 }
                 d1 += ` L${ x2 },${ y2 }`;
                 d2 += ` L${ x2 },${ y2 }`;
@@ -674,8 +719,9 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                     + `d="${ d1 }" `
                     + `style="`
                         + `fill: none; `
+                        // + `stroke: ${ Color.Nippon.Ukonn }; `
                         + `stroke: ${ Color.Nippon.Ukonn }; `
-                        + `stroke-width: ${ Math.sqrt(Math.pow(width, 1.5) + 9) }px; `
+                        + `stroke-width: ${ Math.sqrt(width * 0.7 + 4) }px; `
                         + `pointer-Events: none; `
                     + `" `
                     + `/>`
@@ -686,8 +732,9 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                     + `d="${ d2 }" `
                     + `style="`
                         + `fill: none; `
+                        // + `stroke: ${ Color.Nippon.Ukonn }; `
                         + `stroke: ${ Color.Nippon.Ukonn }; `
-                        + `stroke-width: ${ Math.sqrt(Math.pow(width, 1.5) + 9) }px; `
+                        + `stroke-width: ${ Math.sqrt(width * 0.7 + 4) }px; `
                         + `pointer-Events: none; `
                     + `" `
                     + `/>`
