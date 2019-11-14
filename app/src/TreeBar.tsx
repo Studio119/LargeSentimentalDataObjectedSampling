@@ -2,12 +2,13 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-12 19:13:35
+ * @Last Modified time: 2019-11-14 20:56:29
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
 import { StyleReflection } from './TreeMap';
 import Color from './preference/Color';
+import { Globe } from './App';
 
 
 export interface TreeBarProps {
@@ -100,13 +101,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
-                                                    (window as any)['highlight'](node.data);
+                                                    Globe.highlightClass(-1);
+                                                    Globe.highlight((node.data as any) as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
+                                                    Globe.highlightClass(-1);
                                                 }
                                             } />
                                         ), (
@@ -127,13 +128,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
-                                                    (window as any)['highlight'](node.data);
+                                                    Globe.highlightClass(-1);
+                                                    Globe.highlight(node.data as any as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
+                                                    Globe.highlightClass(-1);
                                                 }
                                             } />
                                         )];
@@ -158,13 +159,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
-                                                    (window as any)['highlight'](node.data);
+                                                    Globe.highlightClass(-1);
+                                                    Globe.highlight(node.data as any as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
+                                                    Globe.highlightClass(-1);
                                                 }
                                             } />
                                         );
@@ -191,7 +192,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
         let count: number = 0;
         if (node.children.length === 0) {
             ((node.data as any) as Array<number>).forEach((idx: number) => {
-                value += parseFloat((window as any)['getPoint'](idx).sentiment);
+                value += parseFloat(Globe.getPoint(idx).sentiment);
             });
             count = ((node.data as any) as Array<number>).length;
         }

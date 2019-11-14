@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-02 15:53:12 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-27 21:10:54
+ * @Last Modified time: 2019-11-14 20:39:14
  */
 
 import React from 'react';
@@ -13,9 +13,11 @@ import Dragable from '../prototypes/Dragable';
 /**
  * Props of Component TaskQueue.
  * @export
- * @interface TaskQueueProps
+ * @interface TaskQueueProps<T>
  */
-export interface TaskQueueProps {}
+export interface TaskQueueProps<T> {
+    control: T;
+}
 
 /**
  * State of Component TaskQueue.
@@ -247,16 +249,13 @@ class GetRequest {
 }
 
 
-export const Window: any = window;
-
-
 /**
  * Provides a visible component as an abstract level beyond file reading requests.
  * Switch it on or off by typing key Q.
  * @class TaskQueue
- * @extends {Dragable<TaskQueueProps, TaskQueueState, {}>} This component is draggable.
+ * @extends {Dragable<TaskQueueProps<T>, TaskQueueState, {}>} This component is draggable.
  */
-class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
+class TaskQueue<T = {}> extends Dragable<TaskQueueProps<T>, TaskQueueState, {}> {
     /**
      * Avoids calling the switching too often.
      * @private
@@ -273,6 +272,9 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
      * @memberof TaskQueue
      */
     private static instance: boolean = false;
+
+
+    private readonly control: T;
 
 
     /**
@@ -306,7 +308,7 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
      * @param {TaskQueueProps} props
      * @memberof TaskQueue
      */
-    public constructor(props: TaskQueueProps) {
+    public constructor(props: TaskQueueProps<T>) {
         super(props);
         this.state = {
             log: []
@@ -316,6 +318,7 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
             console.error("TaskQueue is constructed more than once, which is not suggested.");
         }
         TaskQueue.instance = true;
+        this.control = props.control;
     }
 
     public render(): JSX.Element {
@@ -572,10 +575,21 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                             let request: string = params[0];
                             if (params.length > 0) {
                                 this.print(params.join(" "));
-                                let menu: any = { ...Window, ...this, ...TaskQueue };
+                                if (typeof this.control !== 'object') {
+                                    return;
+                                }
+                                const menu: T & {
+                                    open: (url: string, success?: ((jsondata: any) => void | null | undefined) | undefined)
+                                        => void;
+                                    out: (text: string) => void;
+                                } = {
+                                    ...this.control,
+                                    open: this.open.bind(this),
+                                    out: this.print.bind(this)
+                                };
                                 if (params.length > 1 && params[0] === "open") {
-                                    if (params.length > 2 && menu[params[2]] !== undefined) {
-                                        this.open(params[1], menu[params[2]] as ((jsondata: any) => void | null | undefined));
+                                    if (params.length > 2 && (menu as any).hasOwnProperty(params[2])) {
+                                        this.open(params[1], (menu as any)[params[2]] as ((jsondata: any) => void | null | undefined));
                                     }
                                     else {
                                         this.open(params[1], (data: any) => {
@@ -584,14 +598,8 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                                     }
                                 }
                                 else {
-                                    if (menu[request] !== undefined) {
-                                        if (params.length > 1) {
-                                            Window[params[1]] = menu[request];
-                                        }
-                                        else {
-                                            console.log(menu[request]);
-                                        }
-                                        this.print((menu[request] as any).toString() as string);
+                                    if ((menu as any).hasOwnProperty(request)) {
+                                        this.print(((menu as any)[request] as any).toString() as string);
                                     }
                                     else {
                                         this.print("undefined");
@@ -606,8 +614,6 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                 }
             }
         });
-        Window.open = this.open.bind(this);
-        Window.out = this.print.bind(this);
     }
 
     /**

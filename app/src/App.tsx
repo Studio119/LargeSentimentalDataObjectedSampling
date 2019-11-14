@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-13 20:01:24
+ * @Last Modified time: 2019-11-14 22:11:18
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -18,20 +18,14 @@ import TaskQueue from './tools/TaskQueue';
 // import PolylineChart from './PolylineChart';
 import BBS from './BBS';
 import TreeBar, { TreeBarNode } from './TreeBar';
+import { FileSet, DataForm } from './DataLib';
 
-
-export interface TreeNode<T = any> {
-  id: number;
-  parent: TreeNode | null;
-  children: Array<TreeNode>;
-  data: T;
-}
 
 class App extends Component<{}, {}, {}> {
   public render(): JSX.Element {
     return (
       <div className="App">
-        <TaskQueue ref="DataCenter"/>
+        <TaskQueue ref="DataCenter" control={ {} } />
         <ItemStrip id="ItemStrip" importSource={ this.loadSource } />
         <DataView id="MapSettings" ref="DataView" />
         {/* <div className="Chart"
@@ -223,8 +217,8 @@ class App extends Component<{}, {}, {}> {
   }
 
   public componentDidMount(): void {
-    this.loadSource = (url: string, json: string, topic: string/*, dis: string, sum: string*/) => {
-      (this.refs["DataCenter"] as TaskQueue).open(url, (data: Array<{ id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }>) => {
+    this.loadSource = (paths: FileSet) => {
+      (this.refs["DataCenter"] as TaskQueue).open(paths.origin, (data: DataForm.Origin) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
           day: string, city: string, sentiment: string, class: number}> = [];
@@ -234,7 +228,9 @@ class App extends Component<{}, {}, {}> {
         let A_active: number = 0;
         let A_positive: number = 0;
         let A_neutre: number = 0;
-        data.forEach((d: { id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string }) => {
+        data.forEach((d: {
+              id: string, lng: string, lat: string, words: string, day: string, city: string, sentiment: string
+            }) => {
           if (parseFloat(d.sentiment) > 0) {
             active++;
             A_active += parseFloat(d.sentiment);
@@ -249,7 +245,9 @@ class App extends Component<{}, {}, {}> {
           }
           dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng), class: 1 });
         });
-        (this.refs["DataView"] as DataView).load(dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre);
+        (this.refs["DataView"] as DataView).load(
+          dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre
+        );
         let list: Array<{ text: string; city: string; sentiment: number; }> = [];
         let start: number = 985;    //parseInt((Math.random() * (data.length - 50)).toString());
         for (let i: number = 0; i < 20; i++) {
@@ -263,7 +261,7 @@ class App extends Component<{}, {}, {}> {
         (this.refs["map"] as MapView).setState({
           data: dataset
         });
-        (this.refs["DataCenter"] as TaskQueue).open('./solution/test_presentation.json', (info: Array<{x: number, y: number, id: number, value: number, leaf_id: number}>) => {
+        (this.refs["DataCenter"] as TaskQueue).open(paths.gathering, (info: DataForm.Gathering) => {
           let box: Array<number> = [];
           info.forEach((d: {x: number, y: number, id: number, value: number, leaf_id: number}) => {
             box.push(d.leaf_id);
@@ -271,15 +269,18 @@ class App extends Component<{}, {}, {}> {
           (this.refs["map"] as MapView).importClass(box);
         });
       });
-      (this.refs["DataCenter"] as TaskQueue).open(json, (data: TreeNode<Array<number>>) => {
+      (this.refs["DataCenter"] as TaskQueue).open(paths.tree, (data: DataForm.Tree) => {
         let dataset: TreeBarNode<Array<number>> = this.loadTree(data, null, 'root');
         // (this.refs["RectTree"] as ContrastView).import(dataset);
         // (this.refs["TreeMap"] as TreeMap).import(dataset);
         (this.refs["TreeBar"] as TreeBar<Array<number>>).import(dataset);
       });
-      (this.refs["DataCenter"] as TaskQueue).open(topic, (data: Array<{ text: string, count: number }>) => {
+      (this.refs["DataCenter"] as TaskQueue).open(paths.cloud, (data: DataForm.Cloud) => {
         (this.refs["topics"] as Settings).import(data);
       });
+      setTimeout(() => {
+        Globe.sample();
+      }, 1000);
       // (this.refs["DataCenter"] as TaskQueue).open(dis, (data: Array<[[number, number], [number, number]]>) => {
       //   (this.refs["dis"] as PolylineChart).import(data);
       // });
@@ -294,9 +295,20 @@ class App extends Component<{}, {}, {}> {
       //   (this.refs["TreeMap"] as TreeMap).importPruning(data);
       // });
     }
+    Globe.sample = () => {
+      (this.refs["DataCenter"] as TaskQueue).open("./data/huisu_sampled.json", (data: DataForm.Sampled) => {
+        let set: Array<number> = [];
+        Object.values(data).forEach((innode: Array<number>) => {
+          set.push(...innode);
+        });
+        (this.refs["map"] as MapView).setState({
+          sampled: set
+        });
+      });
+    };
   }
 
-  private loadTree(data: TreeNode<Array<number>>, parent: TreeBarNode<Array<number>> | null, pos: 'root' | number): TreeBarNode<Array<number>> {
+  private loadTree(data: DataForm.Tree, parent: TreeBarNode<Array<number>> | null, pos: 'root' | number): TreeBarNode<Array<number>> {
     let node: TreeBarNode<Array<number>> = {
       id: data.id,
       name: data.id,
@@ -304,10 +316,10 @@ class App extends Component<{}, {}, {}> {
       parent: parent,
       children: [],
       ref: $("NULL"),
-      data: (data as any)["containedpoint"]
+      data: data.containedpoint
     };
     if (data.children.length > 0) {
-      node.children = data.children.map((child: TreeNode<Array<number>>) => {
+      node.children = data.children.map((child: DataForm.Tree) => {
         return this.loadTree(child, node, child.id);
       });
     }
@@ -315,12 +327,38 @@ class App extends Component<{}, {}, {}> {
     return node;
   }
 
-  private loadSource: (url: string, json: string, topic: string/*, dis: string, sum: string, prun: string*/) => void
-    = (url: string, json: string, topic: string/*, dis: string, sum: string, prun: string*/) => {
-      setTimeout(() => this.loadSource(url, json, topic/*, dis, sum, prun*/), 1000);
+  private loadSource: (paths: FileSet) => void
+    = (paths: FileSet) => {
+      setTimeout(() => this.loadSource(paths), 1000);
       return;
     };
 }
+
+
+interface Global {
+  getPoint: (index: number) => {
+      id: string;
+      lng: number;
+      lat: number;
+      words: string;
+      day: string;
+      city: string;
+      sentiment: string;
+      class: number;
+  };
+  highlight: (points: Array<number> | "all") => void;
+  highlightClass: (index: number) => void;
+  sample: () => void;
+}
+
+export var Globe: Global = {
+  getPoint: () => {
+    return { id: "", lng: 0, lat: 0, words: "", day: "", city: "", sentiment: "", class: -1 };
+  },
+  highlight: () => {},
+  highlightClass: () => {},
+  sample: () => {}
+};
 
 
 export default App;
