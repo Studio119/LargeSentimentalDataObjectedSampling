@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-14 22:11:18
+ * @Last Modified time: 2019-11-15 00:43:39
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -304,6 +304,12 @@ class App extends Component<{}, {}, {}> {
         (this.refs["map"] as MapView).setState({
           sampled: set
         });
+        let nodes: Array<number> = [];
+        Object.keys(data).forEach((str: string) => {
+          nodes.push(parseInt(str));
+        });
+        console.log(data);
+        Globe.moveBars(nodes);
       });
     };
   }
@@ -348,6 +354,7 @@ interface Global {
   };
   highlight: (points: Array<number> | "all") => void;
   highlightClass: (index: number) => void;
+  moveBars: (nodes: Array<number>) => void;
   sample: () => void;
 }
 
@@ -357,6 +364,7 @@ export var Globe: Global = {
   },
   highlight: () => {},
   highlightClass: () => {},
+  moveBars: () => {},
   sample: () => {}
 };
 

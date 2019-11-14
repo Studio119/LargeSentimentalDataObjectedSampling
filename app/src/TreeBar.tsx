@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-14 20:56:29
+ * @Last Modified time: 2019-11-15 00:41:58
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -179,6 +179,10 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
         );
     }
 
+    public componentDidMount(): void {
+        Globe.moveBars = this.moveTo.bind(this);
+    }
+
     public UNSAFE_componentWillUpdate(nextProps: Readonly<TreeBarProps>, nextState: Readonly<TreeBarState<T>>): void {
         this.layers = [];
         this.walk(nextState);
@@ -206,10 +210,47 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
         return [value, count];
     }
 
-    private random(): number {
-        return Math.random() >= 0.73
-                ?   0.5
-                :   Math.round(Math.random()) / 2 + 0.25 + (Math.round(Math.random()) - 0.5) / 2 * Math.sqrt(Math.random());
+    // private random(): number {
+    //     return Math.random() >= 0.73
+    //             ?   0.5
+    //             :   Math.round(Math.random()) / 2 + 0.25 + (Math.round(Math.random()) - 0.5) / 2 * Math.sqrt(Math.random());
+    // }
+
+    private moveTo(nodes: Array<number>): void {
+        nodes.forEach((id: number) => {
+            $(`#Bar_id${ id }`).css("stroke", Color.Nippon.Ginnsyu).css("stroke-width", 3);
+            this.moveBars("search", this.state, id, 0);
+        });
+    }
+
+    private moveBars(act: "search" | "move", parent: TreeBarNode<T>, id: number, level: number): TreeBarNode<T> | null {
+        if (act === "move") {
+            if (parent.children.length === 0) {
+                $(`#coreBar_id${ parent.id }`).css("transform", `translateY(-${
+                    level * this.props.height / this.layers.length - 1.5
+                }px)`);
+            }
+            else {
+                parent.children.forEach((child: TreeBarNode<T>) => {
+                    this.moveBars("move", child, id, level + 1);
+                });
+            }
+            return null;
+        }
+        if (parent.id === id) {
+            parent.children.forEach((child: TreeBarNode<T>) => {
+                this.moveBars("move", child, id, 1);
+            });
+            return parent;
+        }
+        let res: TreeBarNode<T> | null = null;
+        for (let i: number = 0; i < parent.children.length; i++) {
+            res = this.moveBars("search", parent.children[i], id, 0);
+            if (res) {
+                return res;
+            }
+        }
+        return res;
     }
 
     private walk(node: TreeBarNode<T>): number {

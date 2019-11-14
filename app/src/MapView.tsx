@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-14 23:58:40
+ * @Last Modified time: 2019-11-15 00:02:39
  */
 import React from 'react';
 import $ from 'jquery';
@@ -632,7 +632,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             count_sp: count_sp
         });
         for (let i: number = 0; i < 20; i++) {
-            const r2: number = r + Math.sqrt(r + 16) * Math.sqrt(Math.pow(heap[i] / count, 2) + 1);
+            const r2: number = r + Math.sqrt(r * 2 + 36) * (0.2 + heap[i] / count);
             let arc: JQuery<HTMLElement> = $($.parseXML(
                 `<path xmlns="http://www.w3.org/2000/svg" `
                 + `class="arc" `
