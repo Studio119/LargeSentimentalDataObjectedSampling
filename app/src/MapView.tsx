@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-15 18:36:53
+ * @Last Modified time: 2019-11-15 19:23:50
  */
 import React from 'react';
 import $ from 'jquery';
@@ -470,6 +470,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         for (let i: number = 0; i < 100; i++) {
             ready.push([]);
         }
+        let set: Array<number> = [];
         if (style === 'rect') {
             let x: [number, number] = [
                 Math.min(this.area[0][1], this.area[1][1]),
@@ -502,6 +503,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                                                 : Color.Nippon.Ukonn]);
                         this.highLighted.push(index);
                         heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        set.push(index);
                         count++;
                     }
                 });
@@ -518,10 +520,12 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                                                 : Color.Nippon.Ukonn]);
                         this.highLighted.push(index);
                         heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        set.push(index);
                         count++;
                     }
                 });
             }
+            Globe.update(set);
         }
         else {
             let heap_origin: Array<number> = [];
@@ -557,20 +561,8 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                                                 : Color.Nippon.Ukonn]);
                         this.highLighted.push(index);
                         heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        set.push(index);
                         count++;
-                    }
-                });
-                this.state.data.forEach((d: {
-                    id: string, lng: number, lat: number, words: string,
-                day: string, city: string, sentiment: string, class: number}) => {
-                    if (this.fx(d.lng) < this.area[0][1] - r || this.fx(d.lng) > this.area[0][1] + r
-                        || this.fy(d.lat) < this.area[0][0] - r - 24 || this.fy(d.lat) > this.area[0][0] + r + 24) {
-                        return;
-                    }
-                    if (Math.pow(this.area[0][0] - this.fy(d.lat) - 24, 2)
-                            + Math.pow(this.area[0][1] - this.fx(d.lng), 2) <= r2) {
-                        heap_origin[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
-                        count_origin++;
                     }
                 });
             }
@@ -591,17 +583,13 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                                                 : Color.Nippon.Ukonn]);
                         this.highLighted.push(index);
                         heap_origin[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        set.push(index);
                         count_origin++;
                     }
                 });
             }
             this.analyze(heap_origin, count_origin, heap, count, r);
-            if (count > 0) {
-                Globe.update(heap);
-            }
-            else {
-                Globe.update(heap_origin);
-            }
+            Globe.update(set);
         }
         ready.forEach((list: Array<[number, number, string]>, index: number) => {
             this.timers.push(

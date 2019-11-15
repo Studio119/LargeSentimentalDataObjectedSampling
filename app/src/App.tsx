@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-15 18:36:02
+ * @Last Modified time: 2019-11-15 23:19:45
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -22,6 +22,8 @@ import { FileSet, DataForm } from './DataLib';
 
 
 class App extends Component<{}, {}, {}> {
+  private view: [number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0];
+
   public render(): JSX.Element {
     return (
       <div className="App">
@@ -245,8 +247,9 @@ class App extends Component<{}, {}, {}> {
           }
           dataset.push({ ...d, lat: parseFloat(d.lat), lng: parseFloat(d.lng), class: 1 });
         });
+        this.view = [dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre];
         (this.refs["DataView"] as DataView).load(
-          dataset.length, active, positive, neutre, A_active / active, A_positive / positive, A_neutre / neutre
+          ...this.view
         );
         let list: Array<{ text: string; city: string; sentiment: number; }> = [];
         let start: number = 985;    //parseInt((Math.random() * (data.length - 50)).toString());
@@ -331,9 +334,17 @@ class App extends Component<{}, {}, {}> {
             sentiment: parseFloat(data.sentiment)
           });
         }
+        (this.refs["DataView"] as DataView).load(
+          ...this.view
+        );
       }
       else {
-        for (let i: number = 0; i < 20 && i < list.length; i++) {
+        let active: number = 0;
+        let positive: number = 0;
+        let neutre: number = 0;
+        let A_active: number = 0;
+        let A_positive: number = 0;
+        for (let i: number = 0; i < list.length; i++) {
           const data: {
             id: string;
             lng: number;
@@ -344,12 +355,29 @@ class App extends Component<{}, {}, {}> {
             sentiment: string;
             class: number;
           } = Globe.getPoint(list[i]);
-          box.push({
-            text: data.words,
-            city: data.city,
-            sentiment: parseFloat(data.sentiment)
-          });
+          const s: number = parseFloat(data.sentiment);
+          if (i < 20) {
+            box.push({
+              text: data.words,
+              city: data.city,
+              sentiment: s
+            });
+          }
+          if (s === 0) {
+            neutre++;
+          }
+          else if (s > 0) {
+            active++;
+            A_active += s;
+          }
+          else {
+            positive++;
+            A_positive += s;
+          }
         }
+        (this.refs["DataView"] as DataView).load(
+          list.length, active, positive, neutre, A_active / active, A_positive / positive, 0
+        );
       }
       (this.refs["bbs"] as BBS).import(box);
     };
