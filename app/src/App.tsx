@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-15 00:43:39
+ * @Last Modified time: 2019-11-15 18:36:02
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -308,9 +308,50 @@ class App extends Component<{}, {}, {}> {
         Object.keys(data).forEach((str: string) => {
           nodes.push(parseInt(str));
         });
-        console.log(data);
         Globe.moveBars(nodes);
       });
+    };
+    Globe.update = (list: Array<number> | "all") => {
+      let box: Array<{ text: string; city: string; sentiment: number; }> = [];
+      if (list === "all") {
+        for (let i: number = 0; i < 20; i++) {
+          const data: {
+            id: string;
+            lng: number;
+            lat: number;
+            words: string;
+            day: string;
+            city: string;
+            sentiment: string;
+            class: number;
+          } = Globe.getPoint(i);
+          box.push({
+            text: data.words,
+            city: data.city,
+            sentiment: parseFloat(data.sentiment)
+          });
+        }
+      }
+      else {
+        for (let i: number = 0; i < 20 && i < list.length; i++) {
+          const data: {
+            id: string;
+            lng: number;
+            lat: number;
+            words: string;
+            day: string;
+            city: string;
+            sentiment: string;
+            class: number;
+          } = Globe.getPoint(list[i]);
+          box.push({
+            text: data.words,
+            city: data.city,
+            sentiment: parseFloat(data.sentiment)
+          });
+        }
+      }
+      (this.refs["bbs"] as BBS).import(box);
     };
   }
 
@@ -356,6 +397,7 @@ interface Global {
   highlightClass: (index: number) => void;
   moveBars: (nodes: Array<number>) => void;
   sample: () => void;
+  update: (list: Array<number> | "all") => void;
 }
 
 export var Globe: Global = {
@@ -365,7 +407,8 @@ export var Globe: Global = {
   highlight: () => {},
   highlightClass: () => {},
   moveBars: () => {},
-  sample: () => {}
+  sample: () => {},
+  update: () => {}
 };
 
 

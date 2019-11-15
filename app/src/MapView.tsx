@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-15 00:02:39
+ * @Last Modified time: 2019-11-15 18:36:53
  */
 import React from 'react';
 import $ from 'jquery';
@@ -362,6 +362,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                 this.highLightClass(-1);
                                 $(this.refs['svg']).html("");
                                 this.rounds = [];
+                                Globe.update("all");
                             }
                         } />
                     </div>
@@ -561,7 +562,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 });
                 this.state.data.forEach((d: {
                     id: string, lng: number, lat: number, words: string,
-                day: string, city: string, sentiment: string, class: number}, index: number) => {
+                day: string, city: string, sentiment: string, class: number}) => {
                     if (this.fx(d.lng) < this.area[0][1] - r || this.fx(d.lng) > this.area[0][1] + r
                         || this.fy(d.lat) < this.area[0][0] - r - 24 || this.fy(d.lat) > this.area[0][0] + r + 24) {
                         return;
@@ -595,6 +596,12 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 });
             }
             this.analyze(heap_origin, count_origin, heap, count, r);
+            if (count > 0) {
+                Globe.update(heap);
+            }
+            else {
+                Globe.update(heap_origin);
+            }
         }
         ready.forEach((list: Array<[number, number, string]>, index: number) => {
             this.timers.push(
@@ -648,11 +655,12 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                     + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r2 + 3) }`
                     + ` Z" `
                 + `style="`
-                    + `fill: ${ Color.interpolate(
-                        Color.Nippon.Syozyohi + "C0",
-                        Color.Nippon.Ruri + "C0",
-                        i / 19
-                    ) }; `
+                    // + `fill: ${ Color.interpolate(
+                    //     Color.Nippon.Syozyohi + "C0",
+                    //     Color.Nippon.Ruri + "C0",
+                    //     i / 19
+                    // ) }; `
+                    + `fill: ${ this.getColor(i) }; `
                     + `stroke: none; `
                     + `pointer-Events: none; `
                 + `" `
@@ -660,11 +668,12 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             ).documentElement);
             $(this.refs['svg']).append(arc);
             if (count_sp > 0) {
-                const color: string = Color.interpolate(
-                    Color.Nippon.Syozyohi + "C0",
-                    Color.Nippon.Ruri + "C0",
-                    i / 19
-                );
+                // const color: string = Color.interpolate(
+                //     Color.Nippon.Syozyohi + "C0",
+                //     Color.Nippon.Ruri + "C0",
+                //     i / 19
+                // );
+                const color: string = this.getColor(i);
                 const lightness: number = Color.toHsl(color).l;
                 let arc_sp: JQuery<HTMLElement> = $($.parseXML(
                     `<path xmlns="http://www.w3.org/2000/svg" `
@@ -681,7 +690,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         + `${ this.area[0][0] - 22 - Math.cos((i + 0.35) / 20 * 2 * Math.PI) * (r2 + 3) }`
                         + ` Z" `
                     + `style="`
-                        + `fill: ${ Color.setLightness(color, 0.4 + lightness * 0.6) }; `
+                        + `fill: ${ Color.setLightness(color, 0.75 + lightness * 0.25) }; `
                         + `stroke: none; `
                         + `pointer-Events: none; `
                     + `" `
@@ -747,16 +756,18 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         + `L${ x + offsetX },${ y + offsetY } `
                         + `" `
                     + `style="`
-                        + `fill: ${ Color.interpolate(
-                            Color.Nippon.Syozyohi + "C0",
-                            Color.Nippon.Ruri + "C0",
-                            i / 19
-                        ) }; `
-                        + `stroke: ${ Color.interpolate(
-                            Color.Nippon.Syozyohi + "C0",
-                            Color.Nippon.Ruri + "C0",
-                            i / 19
-                        ) }; `
+                        // + `fill: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        // + `stroke: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        + `fill: ${ this.getColor(i) }; `
+                        + `stroke: ${ this.getColor(i) }; `
                         + `stroke-width: 2px; `
                         + `pointer-Events: none; `
                     + `" `
@@ -788,16 +799,18 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         + `L${ x + offsetX },${ y + offsetY } `
                         + `" `
                     + `style="`
-                        + `fill: ${ Color.interpolate(
-                            Color.Nippon.Syozyohi + "C0",
-                            Color.Nippon.Ruri + "C0",
-                            i / 19
-                        ) }; `
-                        + `stroke: ${ Color.interpolate(
-                            Color.Nippon.Syozyohi + "C0",
-                            Color.Nippon.Ruri + "C0",
-                            i / 19
-                        ) }; `
+                        // + `fill: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        // + `stroke: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        + `fill: ${ this.getColor(i) }; `
+                        + `stroke: ${ this.getColor(i) }; `
                         + `stroke-width: 2px; `
                         + `pointer-Events: none; `
                     + `" `
@@ -818,12 +831,12 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         + ` ${ x + (height + 3) * value2 * (y2 - ty) / s },${ y - (height + 3) * value2 * (x2 - tx) / s }`;
                 }
                 if (value1 > value2) {
-                    rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.65));
-                    rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.35));
+                    rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.7));
+                    rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.25));
                 }
                 else if (value1 < value2) {
-                    rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.35));
-                    rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.65));
+                    rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.25));
+                    rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.7));
                 }
             }
             d1 += ` L${ x2 },${ y2 }`;
@@ -856,6 +869,26 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             ).documentElement);
             $(this.refs['svg']).append(wave2);
         });
+    }
+
+    private getColor(index: number): string {
+        if (index === 10) {
+            return Color.Nippon.Ukonn;
+        }
+        else if (index < 10) {
+            return Color.interpolate(
+                Color.Nippon.Syozyohi,
+                Color.Nippon.Ukonn,
+                index / 10
+            );
+        }
+        else {
+            return Color.interpolate(
+                Color.Nippon.Ukonn,
+                Color.Nippon.Ruri,
+                (index - 10) / 10
+            );
+        }
     }
 
     private onDragEnd(bounds: [[number, number], [number, number]]): void {
