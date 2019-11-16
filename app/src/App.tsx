@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-15 23:19:45
+ * @Last Modified time: 2019-11-16 16:22:09
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -19,6 +19,8 @@ import TaskQueue from './tools/TaskQueue';
 import BBS from './BBS';
 import TreeBar, { TreeBarNode } from './TreeBar';
 import { FileSet, DataForm } from './DataLib';
+
+import axios, { AxiosResponse } from 'axios';
 
 
 class App extends Component<{}, {}, {}> {
@@ -438,6 +440,28 @@ export var Globe: Global = {
   sample: () => {},
   update: () => {}
 };
+
+
+// setInterval(() => {
+setTimeout(() => {
+  (async () => {
+    await axios.get(
+      "/", {
+        headers: {
+          'Content-type': 'application/json;charset=utf-8'
+      }}
+    )
+  	.then((value: AxiosResponse<any>) => {
+      const data: any = value.data;
+  	  console.log(data);
+  	}, (reason: any) => {
+  	  console.warn(reason);
+  	})
+  	.catch((reason: any) => {
+  	  console.warn(reason);
+    });
+  })();
+}, 2000);
 
 
 export default App;
