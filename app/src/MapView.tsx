@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-15 19:23:50
+ * @Last Modified time: 2019-11-16 22:02:21
  */
 import React from 'react';
 import $ from 'jquery';
@@ -956,20 +956,23 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         else {
             $("#map_layer_canvas").css('opacity', 0.2);
             let ready: Array<[number, number, string]> = [];
+            let set: Array<number> = [];
             this.state.data.forEach((d: {
                 id: string, lng: number, lat: number, words: string,
-            day: string, city: string, sentiment: string, class: number}) => {
+            day: string, city: string, sentiment: string, class: number}, idx: number) => {
                 if (d.class === index && (d.lat >= 0 || d.lat < 0 || d.lng >= 0 || d.lng < 0)) {
                     ready.push([d.lng, d.lat, parseFloat(d.sentiment) < 0
                                                         ? Color.Nippon.Syozyohi
                                                         : parseFloat(d.sentiment) > 0
                                                             ? Color.Nippon.Ruri // Tokiwa
                                                             : Color.Nippon.Ukonn]);
+                    set.push(idx);
                 }
             });
             ready.forEach((d: [number, number, string]) => {
                 this.highLightPoint(d[0], d[1], d[2]);
             });
+            Globe.update(set);
         }
     }
 

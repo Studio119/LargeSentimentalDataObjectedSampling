@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-16 16:22:09
+ * @Last Modified time: 2019-11-16 20:35:04
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -29,7 +29,7 @@ class App extends Component<{}, {}, {}> {
   public render(): JSX.Element {
     return (
       <div className="App">
-        <TaskQueue ref="DataCenter" control={ {} } />
+        <TaskQueue<Global> ref="DataCenter" control={ Globe } />
         <ItemStrip id="ItemStrip" importSource={ this.loadSource } />
         <DataView id="MapSettings" ref="DataView" />
         {/* <div className="Chart"
@@ -414,20 +414,21 @@ class App extends Component<{}, {}, {}> {
 
 interface Global {
   getPoint: (index: number) => {
-      id: string;
-      lng: number;
-      lat: number;
-      words: string;
-      day: string;
-      city: string;
-      sentiment: string;
-      class: number;
+    id: string;
+    lng: number;
+    lat: number;
+    words: string;
+    day: string;
+    city: string;
+    sentiment: string;
+    class: number;
   };
   highlight: (points: Array<number> | "all") => void;
   highlightClass: (index: number) => void;
   moveBars: (nodes: Array<number>) => void;
   sample: () => void;
   update: (list: Array<number> | "all") => void;
+  run: () => void;
 }
 
 export var Globe: Global = {
@@ -438,12 +439,12 @@ export var Globe: Global = {
   highlightClass: () => {},
   moveBars: () => {},
   sample: () => {},
-  update: () => {}
+  update: () => {},
+  run: () => {}
 };
 
 
-// setInterval(() => {
-setTimeout(() => {
+var checkIfBackEndServerAvailable: () => void = () => {
   (async () => {
     await axios.get(
       "/", {
@@ -451,17 +452,35 @@ setTimeout(() => {
           'Content-type': 'application/json;charset=utf-8'
       }}
     )
-  	.then((value: AxiosResponse<any>) => {
-      const data: any = value.data;
-  	  console.log(data);
-  	}, (reason: any) => {
-  	  console.warn(reason);
-  	})
-  	.catch((reason: any) => {
-  	  console.warn(reason);
+    .then(() => {
+      Globe.run = async () => {
+        await axios.get(
+          "/run", {
+            headers: {
+              'Content-type': 'application/json;charset=utf-8'
+            }
+          }
+        )
+        .then((value: AxiosResponse<any>) => {
+          // TODO: display
+        }, (reason: any) => {
+          console.error(reason);
+        })
+        .catch((reason: any) => {
+          console.error(reason);
+        })
+      };
+      console.info("Back-end server is ready.");
+    }, () => {
+      console.warn("Falied to build connection with back-end server.");
+    })
+    .catch(() => {
+      console.warn("Falied to build connection with back-end server.");
     });
   })();
-}, 2000);
+};
+
+setTimeout(checkIfBackEndServerAvailable, 2000);
 
 
 export default App;

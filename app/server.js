@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-11-15 21:47:38 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-16 16:22:10
+ * @Last Modified time: 2019-11-16 19:44:51
  */
 
 const express = require('express');
@@ -26,11 +26,17 @@ app.get("/", (req, res) => {
 app.get("/open/:url", (req, res) => {
     console.dir(req.params);
     fs.readFile(path.static + req.params["url"], { encoding: 'UTF-8' }, (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
         res.send({
             data: data
         });
     });
 });
+
+app.get("/", (req, res) => {});
 
 
 const server = app.listen(2369, () => {

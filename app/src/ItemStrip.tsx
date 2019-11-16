@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-14 19:51:53
+ * @Last Modified time: 2019-11-16 22:20:46
  */
 import React, { Component } from 'react';
 import ValueBar from './ValueBar';
@@ -73,7 +73,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                 origin: '/data/93.csv',
                 tree: '/data/visualization_tree_dict_0.2_0.1_0.02.json',
                 cloud: '/data/93-wordcount.json',
-                gathering: './solution/test_presentation.json'
+                gathering: './data/new_9.17.json'
             };
             this.props.importSource(src);
             // this.props.importSource('/data/93.csv', '/data/visualization_tree_dict_0.2_0.1_0.02.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
