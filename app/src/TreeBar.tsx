@@ -173,6 +173,35 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                 });
                             })
                         }
+                        {
+                            this.layers.length > 0 &&
+                                <path xmlns="http://www.w3.org/2000/svg" key="origin"
+                                d={
+                                    [0].map(() => {
+                                        let set: Array<number> = [];
+                                        let max: number = 0;
+                                        this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
+                                            const count = this.tot(node)[1];
+                                            set.push(count);
+                                            max = count > max ? count : max;
+                                        });
+                                        return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
+                                            const value: number = set[index] / max * 0.8;
+                                            return (index === 0 ? "M" : "L")
+                                                + `${ (index + 0.5) * this.props.width
+                                                    / this.layers[this.layers.length - 1].length },${ 
+                                                        (this.layers.length - value) * this.props.height / this.layers.length
+                                                    }`
+                                        }).join(' ')
+                                    })[0]
+                                }
+                                style={{
+                                    fill: 'none',
+                                    stroke: Color.Nippon.Ukonn,
+                                    strokeWidth: 3,
+                                    pointerEvents: 'none'
+                                }} />
+                        }
                     </g>
                 </svg>
             </div>
@@ -221,10 +250,35 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
             $(`#Bar_id${ id }`).css("stroke", Color.Nippon.Ginnsyu).css("stroke-width", 3);
             this.moveBars("search", this.state, id, 0);
         });
-        // const path: JQuery<HTMLElement> = $($.parseXML(
-        //     `<path xmlns="http://www.w3.org/2000/svg" d="" />`
-        // ).documentElement);
-        // $(this.refs['svg']).append(path);
+        const path: JQuery<HTMLElement> = $($.parseXML(
+            `<path xmlns="http://www.w3.org/2000/svg" key="sampled" `
+            + `d="${
+                [0].map(() => {
+                    let set: Array<number> = [];
+                    let max: number = 0;
+                    this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
+                        let count: number = 0;
+                        (node.data as any as Array<number>).forEach((id: number) => {
+                            if (Globe.checkIfPointIsSampled(id)) {
+                                count++;
+                            }
+                        });
+                        set.push(count);
+                        max = count > max ? count : max;
+                    });
+                    return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
+                        const value: number = set[index] / max * 0.8;
+                        return (index === 0 ? "M" : "L")
+                            + `${ (index + 0.5) * this.props.width
+                                / this.layers[this.layers.length - 1].length },${ 
+                                    (this.layers.length - value) * this.props.height / this.layers.length
+                                }`
+                    }).join(' ')
+                })[0]
+            }" `
+            + `style="fill: none; stroke: ${ Color.Nippon.Nae }C0; stroke-width: 3; pointer-events: none;" />`
+        ).documentElement);
+        $(this.refs['svg']).append(path);
     }
 
     private moveBars(act: "search" | "move", parent: TreeBarNode<T>, id: number, level: number): TreeBarNode<T> | null {

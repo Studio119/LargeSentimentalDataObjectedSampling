@@ -70,9 +70,9 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
         let src: FileSet;
         if (source === 'Tweet') {
             src = {
-                origin: '/data/93.csv',
-                tree: '/data/visualization_tree_dict_0.2_0.1_0.02.json',
-                cloud: '/data/93-wordcount.json',
+                origin: './data/93.json',
+                tree: './data/visualization_tree_dict_0.2_0.1_0.02.json',
+                cloud: './data/93-wordcount.json',
                 gathering: './data/new_9.17.json'
             };
             this.props.importSource(src);

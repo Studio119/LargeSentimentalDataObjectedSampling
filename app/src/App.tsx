@@ -413,6 +413,7 @@ class App extends Component<{}, {}, {}> {
 
 
 interface Global {
+  checkIfPointIsSampled: (index: number) => boolean;
   getPoint: (index: number) => {
     id: string;
     lng: number;
@@ -432,6 +433,7 @@ interface Global {
 }
 
 export var Globe: Global = {
+  checkIfPointIsSampled: () => false,
   getPoint: () => {
     return { id: "", lng: 0, lat: 0, words: "", day: "", city: "", sentiment: "", class: -1 };
   },

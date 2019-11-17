@@ -385,6 +385,15 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             return this.state.data[idx];
         };
         Globe.highlight = this.highlight.bind(this);
+
+        Globe.checkIfPointIsSampled = (index: number) => {
+            for (let i: number = 0; i < this.state.sampled.length; i++) {
+                if (index === this.state.sampled[i]) {
+                    return true;
+                }
+            }
+            return false;
+        };
     }
 
     public componentDidUpdate(): void {
