@@ -2,12 +2,13 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-12 19:13:35
+ * @Last Modified time: 2019-11-16 22:11:56
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
 import { StyleReflection } from './TreeMap';
 import Color from './preference/Color';
+import { Globe } from './App';
 
 
 export interface TreeBarProps {
@@ -100,13 +101,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
-                                                    (window as any)['highlight'](node.data);
+                                                    Globe.highlightClass(-1);
+                                                    Globe.highlight((node.data as any) as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
+                                                    Globe.highlightClass(-1);
                                                 }
                                             } />
                                         ), (
@@ -127,13 +128,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
-                                                    (window as any)['highlight'](node.data);
+                                                    Globe.highlightClass(-1);
+                                                    Globe.highlight(node.data as any as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
+                                                    Globe.highlightClass(-1);
                                                 }
                                             } />
                                         )];
@@ -158,13 +159,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
-                                                    (window as any)['highlight'](node.data);
+                                                    Globe.highlightClass(-1);
+                                                    Globe.highlight(node.data as any as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    (window as any)['highlightClass'](-1);
+                                                    Globe.highlightClass(-1);
                                                 }
                                             } />
                                         );
@@ -172,10 +173,43 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                 });
                             })
                         }
+                        {
+                            this.layers.length > 0 &&
+                                <path xmlns="http://www.w3.org/2000/svg" key="origin"
+                                d={
+                                    [0].map(() => {
+                                        let set: Array<number> = [];
+                                        let max: number = 0;
+                                        this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
+                                            const count = this.tot(node)[1];
+                                            set.push(count);
+                                            max = count > max ? count : max;
+                                        });
+                                        return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
+                                            const value: number = set[index] / max * 0.8;
+                                            return (index === 0 ? "M" : "L")
+                                                + `${ (index + 0.5) * this.props.width
+                                                    / this.layers[this.layers.length - 1].length },${ 
+                                                        (this.layers.length - value) * this.props.height / this.layers.length
+                                                    }`
+                                        }).join(' ')
+                                    })[0]
+                                }
+                                style={{
+                                    fill: 'none',
+                                    stroke: Color.Nippon.Ukonn,
+                                    strokeWidth: 3,
+                                    pointerEvents: 'none'
+                                }} />
+                        }
                     </g>
                 </svg>
             </div>
         );
+    }
+
+    public componentDidMount(): void {
+        Globe.moveBars = this.moveTo.bind(this);
     }
 
     public UNSAFE_componentWillUpdate(nextProps: Readonly<TreeBarProps>, nextState: Readonly<TreeBarState<T>>): void {
@@ -191,7 +225,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
         let count: number = 0;
         if (node.children.length === 0) {
             ((node.data as any) as Array<number>).forEach((idx: number) => {
-                value += parseFloat((window as any)['getPoint'](idx).sentiment);
+                value += parseFloat(Globe.getPoint(idx).sentiment);
             });
             count = ((node.data as any) as Array<number>).length;
         }
@@ -205,10 +239,76 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
         return [value, count];
     }
 
-    private random(): number {
-        return Math.random() >= 0.73
-                ?   0.5
-                :   Math.round(Math.random()) / 2 + 0.25 + (Math.round(Math.random()) - 0.5) / 2 * Math.sqrt(Math.random());
+    // private random(): number {
+    //     return Math.random() >= 0.73
+    //             ?   0.5
+    //             :   Math.round(Math.random()) / 2 + 0.25 + (Math.round(Math.random()) - 0.5) / 2 * Math.sqrt(Math.random());
+    // }
+
+    private moveTo(nodes: Array<number>): void {
+        nodes.forEach((id: number) => {
+            $(`#Bar_id${ id }`).css("stroke", Color.Nippon.Ginnsyu).css("stroke-width", 3);
+            this.moveBars("search", this.state, id, 0);
+        });
+        const path: JQuery<HTMLElement> = $($.parseXML(
+            `<path xmlns="http://www.w3.org/2000/svg" key="sampled" `
+            + `d="${
+                [0].map(() => {
+                    let set: Array<number> = [];
+                    let max: number = 0;
+                    this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
+                        let count: number = 0;
+                        (node.data as any as Array<number>).forEach((id: number) => {
+                            if (Globe.checkIfPointIsSampled(id)) {
+                                count++;
+                            }
+                        });
+                        set.push(count);
+                        max = count > max ? count : max;
+                    });
+                    return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
+                        const value: number = set[index] / max * 0.8;
+                        return (index === 0 ? "M" : "L")
+                            + `${ (index + 0.5) * this.props.width
+                                / this.layers[this.layers.length - 1].length },${ 
+                                    (this.layers.length - value) * this.props.height / this.layers.length
+                                }`
+                    }).join(' ')
+                })[0]
+            }" `
+            + `style="fill: none; stroke: ${ Color.Nippon.Nae }C0; stroke-width: 3; pointer-events: none;" />`
+        ).documentElement);
+        $(this.refs['svg']).append(path);
+    }
+
+    private moveBars(act: "search" | "move", parent: TreeBarNode<T>, id: number, level: number): TreeBarNode<T> | null {
+        if (act === "move") {
+            if (parent.children.length === 0) {
+                $(`#coreBar_id${ parent.id }`).css("transform", `translateY(-${
+                    level * this.props.height / this.layers.length - 1.5
+                }px)`);
+            }
+            else {
+                parent.children.forEach((child: TreeBarNode<T>) => {
+                    this.moveBars("move", child, id, level + 1);
+                });
+            }
+            return null;
+        }
+        if (parent.id === id) {
+            parent.children.forEach((child: TreeBarNode<T>) => {
+                this.moveBars("move", child, id, 1);
+            });
+            return parent;
+        }
+        let res: TreeBarNode<T> | null = null;
+        for (let i: number = 0; i < parent.children.length; i++) {
+            res = this.moveBars("search", parent.children[i], id, 0);
+            if (res) {
+                return res;
+            }
+        }
+        return res;
     }
 
     private walk(node: TreeBarNode<T>): number {

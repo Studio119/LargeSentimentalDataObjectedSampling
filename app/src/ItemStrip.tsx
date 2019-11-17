@@ -2,21 +2,21 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-12 19:13:36
+ * @Last Modified time: 2019-11-16 22:20:46
  */
 import React, { Component } from 'react';
 import ValueBar from './ValueBar';
 import ColorPicker from './ColorPicker';
 import Dropdown from './Dropdown';
+import { FileSet } from './DataLib';
+
 
 export interface ItemStripProps {
     id: string,
-    importSource: (url: string, json: string, topic: string, dis: string, sum: string, prun: string) => void;
+    importSource: (paths: FileSet) => void;
 }
 
-export interface ItemStripState {
-
-}
+export interface ItemStripState {}
 
 class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
     public constructor(props: ItemStripProps) {
@@ -67,13 +67,22 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
     }
 
     private load(source: string): void {
+        let src: FileSet;
         if (source === 'Tweet') {
-            this.props.importSource('/data/93.csv', '/data/visualization_tree_dict_0.2_0.1_0.02.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
+            src = {
+                origin: './data/93.json',
+                tree: './data/visualization_tree_dict_0.2_0.1_0.02.json',
+                cloud: './data/93-wordcount.json',
+                gathering: './data/new_9.17.json'
+            };
+            this.props.importSource(src);
+            // this.props.importSource('/data/93.csv', '/data/visualization_tree_dict_0.2_0.1_0.02.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
             // this.props.importSource('/data/9-17.json', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
             // this.props.importSource('/data/917-51K.json', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
         }
         else if (source === 'yelp') {
-            this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');
+            return;
+            // this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');
         }
     }
 }

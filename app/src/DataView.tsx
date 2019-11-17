@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-26 17:48:41
+ * @Last Modified time: 2019-11-15 23:19:54
  */
 import React, { Component } from 'react';
 import Color from './preference/Color';
@@ -80,6 +80,9 @@ class DataView extends Component<DataViewProps, DataViewState, {}> {
     }
 
     private static format(num: number, float: boolean): string {
+        if (isNaN(num)) {
+            return "NaN";
+        }
         if (float) {
             let left: string = num.toString().includes(".") ? num.toString().split(".")[0] : num.toString();
             let right: string = num.toString().includes(".") ? num.toString().split(".")[1] : "";

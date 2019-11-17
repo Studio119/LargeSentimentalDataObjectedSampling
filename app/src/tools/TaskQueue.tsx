@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-02 15:53:12 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-10-27 21:10:54
+ * @Last Modified time: 2019-11-16 22:02:20
  */
 
 import React from 'react';
@@ -13,9 +13,11 @@ import Dragable from '../prototypes/Dragable';
 /**
  * Props of Component TaskQueue.
  * @export
- * @interface TaskQueueProps
+ * @interface TaskQueueProps<T>
  */
-export interface TaskQueueProps {}
+export interface TaskQueueProps<T> {
+    control: T;
+}
 
 /**
  * State of Component TaskQueue.
@@ -247,16 +249,13 @@ class GetRequest {
 }
 
 
-export const Window: any = window;
-
-
 /**
  * Provides a visible component as an abstract level beyond file reading requests.
  * Switch it on or off by typing key Q.
  * @class TaskQueue
- * @extends {Dragable<TaskQueueProps, TaskQueueState, {}>} This component is draggable.
+ * @extends {Dragable<TaskQueueProps<T>, TaskQueueState, {}>} This component is draggable.
  */
-class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
+class TaskQueue<T = {}> extends Dragable<TaskQueueProps<T>, TaskQueueState, {}> {
     /**
      * Avoids calling the switching too often.
      * @private
@@ -273,6 +272,9 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
      * @memberof TaskQueue
      */
     private static instance: boolean = false;
+
+
+    private readonly control: T;
 
 
     /**
@@ -306,7 +308,7 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
      * @param {TaskQueueProps} props
      * @memberof TaskQueue
      */
-    public constructor(props: TaskQueueProps) {
+    public constructor(props: TaskQueueProps<T>) {
         super(props);
         this.state = {
             log: []
@@ -316,6 +318,7 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
             console.error("TaskQueue is constructed more than once, which is not suggested.");
         }
         TaskQueue.instance = true;
+        this.control = props.control;
     }
 
     public render(): JSX.Element {
@@ -572,10 +575,21 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                             let request: string = params[0];
                             if (params.length > 0) {
                                 this.print(params.join(" "));
-                                let menu: any = { ...Window, ...this, ...TaskQueue };
+                                if (typeof this.control !== 'object') {
+                                    return;
+                                }
+                                const menu: T & {
+                                    open: (url: string, success?: ((jsondata: any) => void | null | undefined) | undefined)
+                                        => void;
+                                    out: (text: string) => void;
+                                } = {
+                                    ...this.control,
+                                    open: this.open.bind(this),
+                                    out: this.print.bind(this)
+                                };
                                 if (params.length > 1 && params[0] === "open") {
-                                    if (params.length > 2 && menu[params[2]] !== undefined) {
-                                        this.open(params[1], menu[params[2]] as ((jsondata: any) => void | null | undefined));
+                                    if (params.length > 2 && (menu as any).hasOwnProperty(params[2])) {
+                                        this.open(params[1], (menu as any)[params[2]] as ((jsondata: any) => void | null | undefined));
                                     }
                                     else {
                                         this.open(params[1], (data: any) => {
@@ -583,15 +597,30 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                                         });
                                     }
                                 }
+                                if (params.length === 1 && params[0] === "clear") {
+                                    this.setState({
+                                        log: []
+                                    });
+                                }
                                 else {
-                                    if (menu[request] !== undefined) {
-                                        if (params.length > 1) {
-                                            Window[params[1]] = menu[request];
+                                    if ((menu as any).hasOwnProperty(request)) {
+                                        let func: any = (menu as any)[request];
+                                        if (typeof func === "function") {
+                                            let args: Array<any> = [];
+                                            for (let i: number = 1; i < params.length; i++) {
+                                                args.push(params[i]);
+                                            }
+                                            try {
+                                                this.print(func(...args));
+                                            } catch(error) {
+                                                // const op: string = "@errRunTimeError: Exception occured when calling "
+                                                //     + request + "(" + args.join(",") + "):;";
+                                                // this.print(op);
+                                            }
                                         }
                                         else {
-                                            console.log(menu[request]);
+                                            this.print(func);
                                         }
-                                        this.print((menu[request] as any).toString() as string);
                                     }
                                     else {
                                         this.print("undefined");
@@ -606,22 +635,73 @@ class TaskQueue extends Dragable<TaskQueueProps, TaskQueueState, {}> {
                 }
             }
         });
-        Window.open = this.open.bind(this);
-        Window.out = this.print.bind(this);
     }
 
     /**
-     * Adds a log as a new line.
+     * Parse an object to string.
      * @private
-     * @param {string} text Content of the log.
+     * @param {any} obj
+     * @param {number} left
+     * @returns {string}
      * @memberof TaskQueue
      */
-    private print(text: string): void {
+    private parse(obj: any, left: number = 0): string {
+        let res: string = "";
+        if (typeof obj === 'function') {
+            res += obj.toString() + "()";
+        }
+        else if (obj === null) {
+            res += "null";
+        }
+        else if (typeof obj === 'object') {
+            res += "{\n" + Object.keys(obj).map((key: any) => {
+                let e: string = "";
+                for (let i: number = 0; i < left + 1; i++) {
+                    e += "&nbsp;&nbsp;";
+                }
+                e += `${ key }: ` + this.parse(obj[key], 0);
+                return e;
+            }).join(",\n");
+            res += "\n}";
+        }
+        else if (typeof obj === 'number') {
+            res += obj.toString();
+        }
+        else {
+            res += '"' + obj.toString().replace('"', '\\"') + '"';
+        }
+
+        return res;
+    }
+
+    /**
+     * Adds a log.
+     * @private
+     * @param {any} obj Content of the log.
+     * @memberof TaskQueue
+     */
+    private print(obj: any): void {
+        let text: string = typeof obj === 'object' ? this.parse(obj) : obj;
         if (text.length === 0) {
             return;
         }
         let log: Array<string> = this.state.log;
-        log.push(text);
+        if (text.includes('\n')) {
+            let box: Array<string> = text.split('\n');
+            if (box.length > 20) {
+                log.push(`Too many lines (${ box.length })`,
+                    box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7], box[8], box[9],
+                    "...",
+                    box[box.length - 8], box[box.length - 7], box[box.length - 6], box[box.length - 5],
+                    box[box.length - 4], box[box.length - 3], box[box.length - 2], box[box.length - 1]);
+            }
+            else {
+                log.push(...box);
+            }
+        }
+        else {
+            log.push(text);
+        }
         this.setState({
             log: log
         });

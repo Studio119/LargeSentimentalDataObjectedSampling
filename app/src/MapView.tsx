@@ -2,13 +2,14 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-13 20:53:09
+ * @Last Modified time: 2019-11-16 22:02:21
  */
 import React from 'react';
 import $ from 'jquery';
 import MapBox from './react-mapbox/MapBox';
 import Color from './preference/Color';
 import Dragable from './prototypes/Dragable';
+import { Globe } from './App';
 
 
 export interface MapViewProps {
@@ -31,6 +32,7 @@ export interface MapViewState {
         sentiment: string;
         class: number;
     }>;
+    sampled: Array<number>;
 }
 
 class MapView extends Dragable<MapViewProps, MapViewState, {}> {
@@ -50,12 +52,18 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     private area: [[number, number], [number, number]] = [[0, 0], [0, 0]];
     private active: boolean;
     private highLighted: Array<number> = [];
-    private rounds: Array<{ element: JQuery<HTMLElement>; data: Array<number>; count: number; }> = [];
+    private rounds: Array<{
+        element: JQuery<HTMLElement>;
+        data: Array<number>;
+        count: number;
+        data_sp: Array<number>;
+        count_sp: number;
+    }> = [];
 
     public constructor(props: MapViewProps) {
         super(props);
         this.mounted = false;
-        this.state = { data: [] };
+        this.state = { data: [], sampled: [] };
         this.canvas = null;
         this.ctx = null;
         this.lastStyle = '#FF0000';
@@ -354,6 +362,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                 this.highLightClass(-1);
                                 $(this.refs['svg']).html("");
                                 this.rounds = [];
+                                Globe.update("all");
                             }
                         } />
                     </div>
@@ -371,36 +380,20 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         this.ctx_2 = this.canvas_2!.getContext("2d");
         this.ctx_2!.globalAlpha = 0.8;
 
-        (window as any)['update'] = this.sample.bind(this);
-        (window as any)['highlightClass'] = this.highLightClass.bind(this);
-        (window as any)['getPoint'] = (idx: number) => {
+        Globe.highlightClass = this.highLightClass.bind(this);
+        Globe.getPoint = (idx: number) => {
             return this.state.data[idx];
         };
-        (window as any)['highlight'] = this.highlight.bind(this);
-    }
+        Globe.highlight = this.highlight.bind(this);
 
-    private sample(result: {[index: string]: Array<number>}): void {
-        let set: Array<{
-            id: string;
-            lng: number;
-            lat: number;
-            words: string;
-            day: string;
-            city: string;
-            sentiment: string;
-            class: number;
-        }> = [];
-        for (const key in result) {
-            if (result.hasOwnProperty(key)) {
-                const element: Array<number> = result[key];
-                element.forEach((idx: number) => {
-                    set.push(this.state.data[idx]);
-                });
+        Globe.checkIfPointIsSampled = (index: number) => {
+            for (let i: number = 0; i < this.state.sampled.length; i++) {
+                if (index === this.state.sampled[i]) {
+                    return true;
+                }
             }
-        }
-        this.setState({
-            data: set
-        });
+            return false;
+        };
     }
 
     public componentDidUpdate(): void {
@@ -486,6 +479,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         for (let i: number = 0; i < 100; i++) {
             ready.push([]);
         }
+        let set: Array<number> = [];
         if (style === 'rect') {
             let x: [number, number] = [
                 Math.min(this.area[0][1], this.area[1][1]),
@@ -495,252 +489,116 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 Math.min(this.area[0][0] - 24, this.area[1][0] - 24),
                 Math.max(this.area[0][0] - 24, this.area[1][0] - 24)
             ];
-            this.state.data.forEach((d: {
-                id: string, lng: number, lat: number, words: string,
-            day: string, city: string, sentiment: string, class: number}, index: number) => {
-                if (this.fx(d.lng) >= x[0] && this.fx(d.lng) <= x[1] && this.fy(d.lat) >= y[0] && this.fy(d.lat) <= y[1]) {
-                    ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
-                                                        ? Color.Nippon.Syozyohi
-                                                        : parseFloat(d.sentiment) > 0
-                                                            ? Color.Nippon.Ruri // Tokiwa
-                                                            : Color.Nippon.Ukonn]);
-                    this.highLighted.push(index);
-                    heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
-                    count++;
-                }
-            });
+            if (this.state.sampled.length > 0) {
+                this.state.sampled.forEach((index: number) => {
+                    if (index >= this.state.data.length) {
+                        return;
+                    }
+                    const d: {
+                        id: string;
+                        lng: number;
+                        lat: number;
+                        words: string;
+                        day: string;
+                        city: string;
+                        sentiment: string;
+                        class: number;
+                    } = this.state.data[index];
+                    if (this.fx(d.lng) >= x[0] && this.fx(d.lng) <= x[1] && this.fy(d.lat) >= y[0] && this.fy(d.lat) <= y[1]) {
+                        ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
+                                                            ? Color.Nippon.Syozyohi
+                                                            : parseFloat(d.sentiment) > 0
+                                                                ? Color.Nippon.Ruri // Tokiwa
+                                                                : Color.Nippon.Ukonn]);
+                        this.highLighted.push(index);
+                        heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        set.push(index);
+                        count++;
+                    }
+                });
+            }
+            else {
+                this.state.data.forEach((d: {
+                    id: string, lng: number, lat: number, words: string,
+                day: string, city: string, sentiment: string, class: number}, index: number) => {
+                    if (this.fx(d.lng) >= x[0] && this.fx(d.lng) <= x[1] && this.fy(d.lat) >= y[0] && this.fy(d.lat) <= y[1]) {
+                        ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
+                                                            ? Color.Nippon.Syozyohi
+                                                            : parseFloat(d.sentiment) > 0
+                                                                ? Color.Nippon.Ruri // Tokiwa
+                                                                : Color.Nippon.Ukonn]);
+                        this.highLighted.push(index);
+                        heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        set.push(index);
+                        count++;
+                    }
+                });
+            }
+            Globe.update(set);
         }
         else {
+            let heap_origin: Array<number> = [];
+            let count_origin: number = 0;
             let r2: number = Math.pow(this.area[0][0] - this.area[1][0], 2)
                 + Math.pow(this.area[0][1] - this.area[1][1], 2);
             let r: number = Math.sqrt(r2);
-            this.state.data.forEach((d: {
-                id: string, lng: number, lat: number, words: string,
-            day: string, city: string, sentiment: string, class: number}, index: number) => {
-                if (this.fx(d.lng) < this.area[0][1] - r || this.fx(d.lng) > this.area[0][1] + r
-                    || this.fy(d.lat) < this.area[0][0] - r - 24 || this.fy(d.lat) > this.area[0][0] + r + 24) {
-                    return;
-                }
-                if (Math.pow(this.area[0][0] - this.fy(d.lat) - 24, 2)
-                        + Math.pow(this.area[0][1] - this.fx(d.lng), 2) <= r2) {
-                    ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
-                                                        ? Color.Nippon.Syozyohi
-                                                        : parseFloat(d.sentiment) > 0
-                                                            ? Color.Nippon.Ruri // Tokiwa
-                                                            : Color.Nippon.Ukonn]);
-                    this.highLighted.push(index);
-                    heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
-                    count++;
-                }
-            });
-            let circle: JQuery<HTMLElement> = $($.parseXML(
-                `<circle xmlns="http://www.w3.org/2000/svg" `
-                + `class="chosen" `
-                + `cx="${ this.area[0][1] + 1 }px" cy="${ this.area[0][0] - 22 }px" r="${ r + 2.5 }px" `
-                + `style="`
-                    + `fill: none; `
-                    + `stroke: ${ Color.Nippon.Hasita + "C0" }; `
-                    + `stroke-width: 2px; `
-                    + `pointer-Events: none; `
-                + `" `
-                + `/>`
-            ).documentElement);
-            $(this.refs['svg']).append(circle);
-            this.rounds.push({ element: circle, data: heap, count: count });
-            // if (this.rounds.length === 1) {
-                // circle.css("stroke", Color.Nippon.Kesizumi);
-                for (let i: number = 0; i < 20; i++) {
-                    const r2: number = r + Math.sqrt(r + 16) * Math.sqrt(Math.pow(heap[i] / count, 2) + 0.04);
-                    let arc: JQuery<HTMLElement> = $($.parseXML(
-                        `<path xmlns="http://www.w3.org/2000/svg" `
-                        + `class="arc" `
-                        + `d="M${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r + 3) },`
-                            + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r + 3) }`
-                            + ` A${ r + 3 },${ r + 3 },0,0,1,`
-                            + `${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r + 3) },`
-                            + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r + 3) }`
-                            + ` L${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) },`
-                            + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) }`
-                            + ` A${ r + 3 },${ r + 3 },0,0,0,`
-                            + `${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r2 + 3) },`
-                            + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r2 + 3) }`
-                            + ` Z" `
-                        + `style="`
-                            + `fill: ${ Color.interpolate(
-                                Color.Nippon.Syozyohi + "C0",
-                                Color.Nippon.Ruri + "C0",
-                                i / 19
-                            ) }; `
-                            + `stroke: none; `
-                            + `pointer-Events: none; `
-                        + `" `
-                        + `/>`
-                    ).documentElement);
-                    $(this.refs['svg']).append(arc);
-                }
-            // }
-            // if (this.rounds.length === 2) {
-            //     $('.chosen').css("stroke", Color.Nippon.Hasita + "C0");
-            //     $('.arc').remove();
-            // }
-            this.rounds.forEach((e: { element: JQuery<HTMLElement>; data: Array<number>; count: number; }) => {
-                const round: JQuery<HTMLElement> = e.element;
-                let x1: number = this.area[0][1] + 1;
-                let y1: number = this.area[0][0] - 22;
-                let r1: number = r + 4;
-                let x2: number = parseFloat(round.attr('cx')!);
-                let y2: number = parseFloat(round.attr('cy')!);
-                let r2: number = parseFloat(round.attr('r')!) + 1.5;
-                let s: number = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-                if (s <= r1 + r2) {
-                    return;
-                }
-                let tx: number = x1 + (x2 - x1) * r1 / s;
-                let ty: number = y1 + (y2 - y1) * r1 / s;
-                x2 += (x1 - x2) * r2 / s;
-                y2 += (y1 - y2) * r2 / s;
-                let strip: JQuery<HTMLElement> = $($.parseXML(
-                    `<line xmlns="http://www.w3.org/2000/svg" `
-                    + `x1="${ tx }px" y1="${ ty }px" x2="${ x2 }px" y2="${ y2 }px" `
-                    + `style="`
-                        + `fill: none; `
-                        + `stroke: ${ Color.Nippon.Hasita + "60" }; `
-                        + `stroke-width: 1px; `
-                        + `pointer-Events: none; `
-                    + `" `
-                    + `/>`
-                ).documentElement);
-                const stepX: number = (x2 - tx) / 21;
-                const stepY: number = (y2 - ty) / 21;
-                const width: number = Math.sqrt(Math.pow((s - r2 - r1) / 30, 1.5) + 16);
-                const height: number = Math.sqrt(Math.pow(width * 10, 1.5) + 900);
-                const offsetX: number = width / 2 * (tx - x2) / s;
-                const offsetY: number = offsetX / (tx - x2) * (ty - y2);
-                let d1: string = `M${ tx },${ ty }`;
-                let d2: string = `M${ tx },${ ty }`;
-                for (let i: number = 0; i < 20; i++) {
-                    let x: number = tx + (i + 1) * stepX;
-                    let y: number = ty + (i + 1) * stepY;
-                    let value1: number = Math.sqrt(2 * heap[i] / count + 1e-6);
-                    let rect1: JQuery<HTMLElement> = $($.parseXML(
-                        `<path xmlns="http://www.w3.org/2000/svg" `
-                        + `d="M${ x - offsetX },${ y - offsetY } `
-                            + `L${ x - offsetX - height * value1 * (y2 - ty) / s },`
-                                + `${ y - offsetY + height * value1 * (x2 - tx) / s } `
-                            + `L${ x + offsetX - height * value1 * (y2 - ty) / s },`
-                                + `${ y + offsetY + height * value1 * (x2 - tx) / s } `
-                            + `L${ x + offsetX },${ y + offsetY } `
-                            + `" `
-                        + `style="`
-                            + `fill: ${ Color.interpolate(
-                                Color.Nippon.Syozyohi + "C0",
-                                Color.Nippon.Ruri + "C0",
-                                i / 19
-                            ) }; `
-                            + `stroke: ${ Color.interpolate(
-                                Color.Nippon.Syozyohi + "C0",
-                                Color.Nippon.Ruri + "C0",
-                                i / 19
-                            ) }; `
-                            + `stroke-width: 2px; `
-                            + `pointer-Events: none; `
-                        + `" `
-                        + `/>`
-                    ).documentElement);
-                    $(this.refs['svg']).append(rect1);
-                    if (i === 0) {
-                        d1 += ` L${ x - (height + 3) * value1 * (y2 - ty) / s },`
-                            + `${ y + (height + 3) * value1 * (x2 - tx) / s }`;
+            if (this.state.sampled.length > 0) {
+                this.state.sampled.forEach((index: number) => {
+                    if (index >= this.state.data.length) {
+                        return;
                     }
-                    else {
-                        let value0: number = Math.sqrt(2 * heap[i - 1] / count + 1e-6);
-                        // d1 += ` L${ x - height * value1 * (y2 - ty) / s },${ y + height * value1 * (x2 - tx) / s }`;
-                        d1 += ` C${ x - (height + 3) * value0 * (y2 - ty) / s - stepX * 2 / 3 },`
-                            + `${ y + (height + 3) * value0 * (x2 - tx) / s - stepY * 2 / 3 }`
-                            + ` ${ x - (height + 3) * value1 * (y2 - ty) / s - stepX / 3 },`
-                            + `${ y + (height + 3) * value1 * (x2 - tx) / s - stepY / 3 }`
-                            + ` ${ x - (height + 3) * value1 * (y2 - ty) / s },`
-                            + `${ y + (height + 3) * value1 * (x2 - tx) / s }`;
+                    const d: {
+                        id: string;
+                        lng: number;
+                        lat: number;
+                        words: string;
+                        day: string;
+                        city: string;
+                        sentiment: string;
+                        class: number;
+                    } = this.state.data[index];
+                    if (this.fx(d.lng) < this.area[0][1] - r || this.fx(d.lng) > this.area[0][1] + r
+                        || this.fy(d.lat) < this.area[0][0] - r - 24 || this.fy(d.lat) > this.area[0][0] + r + 24) {
+                        return;
                     }
-                    let value2: number = Math.sqrt(2 * e.data[i] / e.count + 1e-6);
-                    let rect2: JQuery<HTMLElement> = $($.parseXML(
-                        `<path xmlns="http://www.w3.org/2000/svg" `
-                        + `d="M${ x - offsetX },${ y - offsetY } `
-                            + `L${ x - offsetX + height * value2 * (y2 - ty) / s },`
-                                + `${ y - offsetY - height * value2 * (x2 - tx) / s } `
-                            + `L${ x + offsetX + height * value2 * (y2 - ty) / s },`
-                                + `${ y + offsetY - height * value2 * (x2 - tx) / s } `
-                            + `L${ x + offsetX },${ y + offsetY } `
-                            + `" `
-                        + `style="`
-                            + `fill: ${ Color.interpolate(
-                                Color.Nippon.Syozyohi + "C0",
-                                Color.Nippon.Ruri + "C0",
-                                i / 19
-                            ) }; `
-                            + `stroke: ${ Color.interpolate(
-                                Color.Nippon.Syozyohi + "C0",
-                                Color.Nippon.Ruri + "C0",
-                                i / 19
-                            ) }; `
-                            + `stroke-width: 2px; `
-                            + `pointer-Events: none; `
-                        + `" `
-                        + `/>`
-                    ).documentElement);
-                    $(this.refs['svg']).append(rect2);
-                    if (i === 0) {
-                        d2 += ` L${ x + (height + 3) * value2 * (y2 - ty) / s },`
-                            + `${ y - (height + 3) * value2 * (x2 - tx) / s }`;
+                    if (Math.pow(this.area[0][0] - this.fy(d.lat) - 24, 2)
+                            + Math.pow(this.area[0][1] - this.fx(d.lng), 2) <= r2) {
+                        ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
+                                                            ? Color.Nippon.Syozyohi
+                                                            : parseFloat(d.sentiment) > 0
+                                                                ? Color.Nippon.Ruri // Tokiwa
+                                                                : Color.Nippon.Ukonn]);
+                        this.highLighted.push(index);
+                        heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        set.push(index);
+                        count++;
                     }
-                    else {
-                        let value0: number = Math.sqrt(2 * e.data[i - 1] / e.count + 1e-6);
-                        // d2 += ` L${ x + height * value2 * (y2 - ty) / s },${ y - height * value2 * (x2 - tx) / s }`;
-                        d2 += ` C${ x + (height + 3) * value0 * (y2 - ty) / s - stepX * 2 / 3 },`
-                            + `${ y - (height + 3) * value0 * (x2 - tx) / s - stepY * 2 / 3 }`
-                            + ` ${ x + (height + 3) * value2 * (y2 - ty) / s - stepX / 3 },`
-                            + `${ y - (height + 3) * value2 * (x2 - tx) / s - stepY / 3 }`
-                            + ` ${ x + (height + 3) * value2 * (y2 - ty) / s },${ y - (height + 3) * value2 * (x2 - tx) / s }`;
+                });
+            }
+            else {
+                this.state.data.forEach((d: {
+                    id: string, lng: number, lat: number, words: string,
+                day: string, city: string, sentiment: string, class: number}, index: number) => {
+                    if (this.fx(d.lng) < this.area[0][1] - r || this.fx(d.lng) > this.area[0][1] + r
+                        || this.fy(d.lat) < this.area[0][0] - r - 24 || this.fy(d.lat) > this.area[0][0] + r + 24) {
+                        return;
                     }
-                    if (value1 > value2) {
-                        rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.65));
-                        rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.35));
+                    if (Math.pow(this.area[0][0] - this.fy(d.lat) - 24, 2)
+                            + Math.pow(this.area[0][1] - this.fx(d.lng), 2) <= r2) {
+                        ready[index % 100].push([d.lng, d.lat, parseFloat(d.sentiment) < 0
+                                                            ? Color.Nippon.Syozyohi
+                                                            : parseFloat(d.sentiment) > 0
+                                                                ? Color.Nippon.Ruri // Tokiwa
+                                                                : Color.Nippon.Ukonn]);
+                        this.highLighted.push(index);
+                        heap_origin[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        set.push(index);
+                        count_origin++;
                     }
-                    else if (value1 < value2) {
-                        rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.35));
-                        rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.65));
-                    }
-                }
-                d1 += ` L${ x2 },${ y2 }`;
-                d2 += ` L${ x2 },${ y2 }`;
-                $(this.refs['svg']).append(strip);
-                let wave1: JQuery<HTMLElement> = $($.parseXML(
-                    `<path xmlns="http://www.w3.org/2000/svg" `
-                    + `d="${ d1 }" `
-                    + `style="`
-                        + `fill: none; `
-                        // + `stroke: ${ Color.Nippon.Ukonn }; `
-                        + `stroke: ${ Color.Nippon.Ukonn }; `
-                        + `stroke-width: ${ Math.sqrt(width * 0.7 + 4) }px; `
-                        + `pointer-Events: none; `
-                    + `" `
-                    + `/>`
-                ).documentElement);
-                $(this.refs['svg']).append(wave1);
-                let wave2: JQuery<HTMLElement> = $($.parseXML(
-                    `<path xmlns="http://www.w3.org/2000/svg" `
-                    + `d="${ d2 }" `
-                    + `style="`
-                        + `fill: none; `
-                        // + `stroke: ${ Color.Nippon.Ukonn }; `
-                        + `stroke: ${ Color.Nippon.Ukonn }; `
-                        + `stroke-width: ${ Math.sqrt(width * 0.7 + 4) }px; `
-                        + `pointer-Events: none; `
-                    + `" `
-                    + `/>`
-                ).documentElement);
-                $(this.refs['svg']).append(wave2);
-            });
+                });
+            }
+            this.analyze(heap_origin, count_origin, heap, count, r);
+            Globe.update(set);
         }
         ready.forEach((list: Array<[number, number, string]>, index: number) => {
             this.timers.push(
@@ -752,6 +610,282 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             );
         });
         $(this.refs["area"]).hide();
+    }
+
+    private analyze(heap_ori: Array<number>, count_ori: number, heap_sp: Array<number>, count_sp: number, r: number): void {
+        const heap: Array<number> = count_sp === 0 ? heap_ori : heap_sp;
+        const count: number = count_sp === 0 ? count_ori : count_sp;
+        let circle: JQuery<HTMLElement> = $($.parseXML(
+            `<circle xmlns="http://www.w3.org/2000/svg" `
+            + `class="chosen" `
+            + `cx="${ this.area[0][1] + 1 }px" cy="${ this.area[0][0] - 22 }px" r="${ r + 2.5 }px" `
+            + `style="`
+                + `fill: none; `
+                + `stroke: ${ Color.Nippon.Hasita + "C0" }; `
+                + `stroke-width: 2px; `
+                + `pointer-Events: none; `
+            + `" `
+            + `/>`
+        ).documentElement);
+        $(this.refs['svg']).append(circle);
+        this.rounds.push({
+            element: circle,
+            data: heap,
+            count: count,
+            data_sp: heap_sp,
+            count_sp: count_sp
+        });
+        for (let i: number = 0; i < 20; i++) {
+            const r2: number = r + Math.sqrt(r * 2 + 36) * (0.2 + heap[i] / count);
+            let arc: JQuery<HTMLElement> = $($.parseXML(
+                `<path xmlns="http://www.w3.org/2000/svg" `
+                + `class="arc" `
+                + `d="M${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r + 3) },`
+                    + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r + 3) }`
+                    + ` A${ r + 3 },${ r + 3 },0,0,1,`
+                    + `${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r + 3) },`
+                    + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r + 3) }`
+                    + ` L${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) },`
+                    + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) }`
+                    + ` A${ r + 3 },${ r + 3 },0,0,0,`
+                    + `${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r2 + 3) },`
+                    + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r2 + 3) }`
+                    + ` Z" `
+                + `style="`
+                    // + `fill: ${ Color.interpolate(
+                    //     Color.Nippon.Syozyohi + "C0",
+                    //     Color.Nippon.Ruri + "C0",
+                    //     i / 19
+                    // ) }; `
+                    + `fill: ${ this.getColor(i) }; `
+                    + `stroke: none; `
+                    + `pointer-Events: none; `
+                + `" `
+                + `/>`
+            ).documentElement);
+            $(this.refs['svg']).append(arc);
+            if (count_sp > 0) {
+                // const color: string = Color.interpolate(
+                //     Color.Nippon.Syozyohi + "C0",
+                //     Color.Nippon.Ruri + "C0",
+                //     i / 19
+                // );
+                const color: string = this.getColor(i);
+                const lightness: number = Color.toHsl(color).l;
+                let arc_sp: JQuery<HTMLElement> = $($.parseXML(
+                    `<path xmlns="http://www.w3.org/2000/svg" `
+                    + `class="arc" `
+                    + `d="M${ this.area[0][1] + 1 + Math.sin((i + 0.35) / 20 * 2 * Math.PI) * (r + 3) },`
+                        + `${ this.area[0][0] - 22 - Math.cos((i + 0.35) / 20 * 2 * Math.PI) * (r + 3) }`
+                        + ` A${ r + 3 },${ r + 3 },0,0,1,`
+                        + `${ this.area[0][1] + 1 + Math.sin((i + 0.65) / 20 * 2 * Math.PI) * (r + 3) },`
+                        + `${ this.area[0][0] - 22 - Math.cos((i + 0.65) / 20 * 2 * Math.PI) * (r + 3) }`
+                        + ` L${ this.area[0][1] + 1 + Math.sin((i + 0.65) / 20 * 2 * Math.PI) * (r2 + 3) },`
+                        + `${ this.area[0][0] - 22 - Math.cos((i + 0.65) / 20 * 2 * Math.PI) * (r2 + 3) }`
+                        + ` A${ r + 3 },${ r + 3 },0,0,0,`
+                        + `${ this.area[0][1] + 1 + Math.sin((i + 0.35) / 20 * 2 * Math.PI) * (r2 + 3) },`
+                        + `${ this.area[0][0] - 22 - Math.cos((i + 0.35) / 20 * 2 * Math.PI) * (r2 + 3) }`
+                        + ` Z" `
+                    + `style="`
+                        + `fill: ${ Color.setLightness(color, 0.75 + lightness * 0.25) }; `
+                        + `stroke: none; `
+                        + `pointer-Events: none; `
+                    + `" `
+                    + `/>`
+                ).documentElement);
+                $(this.refs['svg']).append(arc_sp);
+            }
+        }
+        this.rounds.forEach((e: {
+                    element: JQuery<HTMLElement>;
+                    data: Array<number>;
+                    count: number;
+                    data_sp: Array<number>;
+                    count_sp: number;
+                }) => {
+            const _data: Array<number> = e.count_sp === 0 ? e.data : e.data_sp;
+            const _count: number = e.count_sp === 0 ? e.count : e.count_sp;
+            const round: JQuery<HTMLElement> = e.element;
+            let x1: number = this.area[0][1] + 1;
+            let y1: number = this.area[0][0] - 22;
+            let r1: number = r + 4;
+            let x2: number = parseFloat(round.attr('cx')!);
+            let y2: number = parseFloat(round.attr('cy')!);
+            let r2: number = parseFloat(round.attr('r')!) + 1.5;
+            let s: number = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            if (s <= r1 + r2) {
+                return;
+            }
+            let tx: number = x1 + (x2 - x1) * r1 / s;
+            let ty: number = y1 + (y2 - y1) * r1 / s;
+            x2 += (x1 - x2) * r2 / s;
+            y2 += (y1 - y2) * r2 / s;
+            let strip: JQuery<HTMLElement> = $($.parseXML(
+                `<line xmlns="http://www.w3.org/2000/svg" `
+                + `x1="${ tx }px" y1="${ ty }px" x2="${ x2 }px" y2="${ y2 }px" `
+                + `style="`
+                    + `fill: none; `
+                    + `stroke: ${ Color.Nippon.Hasita + "60" }; `
+                    + `stroke-width: 1px; `
+                    + `pointer-Events: none; `
+                + `" `
+                + `/>`
+            ).documentElement);
+            const stepX: number = (x2 - tx) / 21;
+            const stepY: number = (y2 - ty) / 21;
+            const width: number = Math.sqrt(Math.pow((s - r2 - r1) / 30, 1.5) + 16);
+            const height: number = Math.sqrt(Math.pow(width * 10, 1.5) + 900);
+            const offsetX: number = width / 2 * (tx - x2) / s;
+            const offsetY: number = offsetX / (tx - x2) * (ty - y2);
+            let d1: string = `M${ tx },${ ty }`;
+            let d2: string = `M${ tx },${ ty }`;
+            for (let i: number = 0; i < 20; i++) {
+                let x: number = tx + (i + 1) * stepX;
+                let y: number = ty + (i + 1) * stepY;
+                let value1: number = Math.sqrt(2 * heap[i] / count + 1e-6);
+                let rect1: JQuery<HTMLElement> = $($.parseXML(
+                    `<path xmlns="http://www.w3.org/2000/svg" `
+                    + `d="M${ x - offsetX },${ y - offsetY } `
+                        + `L${ x - offsetX - height * value1 * (y2 - ty) / s },`
+                            + `${ y - offsetY + height * value1 * (x2 - tx) / s } `
+                        + `L${ x + offsetX - height * value1 * (y2 - ty) / s },`
+                            + `${ y + offsetY + height * value1 * (x2 - tx) / s } `
+                        + `L${ x + offsetX },${ y + offsetY } `
+                        + `" `
+                    + `style="`
+                        // + `fill: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        // + `stroke: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        + `fill: ${ this.getColor(i) }; `
+                        + `stroke: ${ this.getColor(i) }; `
+                        + `stroke-width: 2px; `
+                        + `pointer-Events: none; `
+                    + `" `
+                    + `/>`
+                ).documentElement);
+                $(this.refs['svg']).append(rect1);
+                if (i === 0) {
+                    d1 += ` L${ x - (height + 3) * value1 * (y2 - ty) / s },`
+                        + `${ y + (height + 3) * value1 * (x2 - tx) / s }`;
+                }
+                else {
+                    let value0: number = Math.sqrt(2 * heap[i - 1] / count + 1e-6);
+                    // d1 += ` L${ x - height * value1 * (y2 - ty) / s },${ y + height * value1 * (x2 - tx) / s }`;
+                    d1 += ` C${ x - (height + 3) * value0 * (y2 - ty) / s - stepX * 2 / 3 },`
+                        + `${ y + (height + 3) * value0 * (x2 - tx) / s - stepY * 2 / 3 }`
+                        + ` ${ x - (height + 3) * value1 * (y2 - ty) / s - stepX / 3 },`
+                        + `${ y + (height + 3) * value1 * (x2 - tx) / s - stepY / 3 }`
+                        + ` ${ x - (height + 3) * value1 * (y2 - ty) / s },`
+                        + `${ y + (height + 3) * value1 * (x2 - tx) / s }`;
+                }
+                let value2: number = Math.sqrt(2 * _data[i] / _count + 1e-6);
+                let rect2: JQuery<HTMLElement> = $($.parseXML(
+                    `<path xmlns="http://www.w3.org/2000/svg" `
+                    + `d="M${ x - offsetX },${ y - offsetY } `
+                        + `L${ x - offsetX + height * value2 * (y2 - ty) / s },`
+                            + `${ y - offsetY - height * value2 * (x2 - tx) / s } `
+                        + `L${ x + offsetX + height * value2 * (y2 - ty) / s },`
+                            + `${ y + offsetY - height * value2 * (x2 - tx) / s } `
+                        + `L${ x + offsetX },${ y + offsetY } `
+                        + `" `
+                    + `style="`
+                        // + `fill: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        // + `stroke: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        + `fill: ${ this.getColor(i) }; `
+                        + `stroke: ${ this.getColor(i) }; `
+                        + `stroke-width: 2px; `
+                        + `pointer-Events: none; `
+                    + `" `
+                    + `/>`
+                ).documentElement);
+                $(this.refs['svg']).append(rect2);
+                if (i === 0) {
+                    d2 += ` L${ x + (height + 3) * value2 * (y2 - ty) / s },`
+                        + `${ y - (height + 3) * value2 * (x2 - tx) / s }`;
+                }
+                else {
+                    let value0: number = Math.sqrt(2 * _data[i - 1] / _count + 1e-6);
+                    // d2 += ` L${ x + height * value2 * (y2 - ty) / s },${ y - height * value2 * (x2 - tx) / s }`;
+                    d2 += ` C${ x + (height + 3) * value0 * (y2 - ty) / s - stepX * 2 / 3 },`
+                        + `${ y - (height + 3) * value0 * (x2 - tx) / s - stepY * 2 / 3 }`
+                        + ` ${ x + (height + 3) * value2 * (y2 - ty) / s - stepX / 3 },`
+                        + `${ y - (height + 3) * value2 * (x2 - tx) / s - stepY / 3 }`
+                        + ` ${ x + (height + 3) * value2 * (y2 - ty) / s },${ y - (height + 3) * value2 * (x2 - tx) / s }`;
+                }
+                if (value1 > value2) {
+                    rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.7));
+                    rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.25));
+                }
+                else if (value1 < value2) {
+                    rect1.css("fill", Color.setLightness(rect1.css("fill")! as string, 0.25));
+                    rect2.css("fill", Color.setLightness(rect2.css("fill")! as string, 0.7));
+                }
+            }
+            d1 += ` L${ x2 },${ y2 }`;
+            d2 += ` L${ x2 },${ y2 }`;
+            $(this.refs['svg']).append(strip);
+            let wave1: JQuery<HTMLElement> = $($.parseXML(
+                `<path xmlns="http://www.w3.org/2000/svg" `
+                + `d="${ d1 }" `
+                + `style="`
+                    + `fill: none; `
+                    // + `stroke: ${ Color.Nippon.Ukonn }; `
+                    + `stroke: ${ Color.Nippon.Ukonn }; `
+                    + `stroke-width: ${ Math.sqrt(width * 0.7 + 4) }px; `
+                    + `pointer-Events: none; `
+                + `" `
+                + `/>`
+            ).documentElement);
+            $(this.refs['svg']).append(wave1);
+            let wave2: JQuery<HTMLElement> = $($.parseXML(
+                `<path xmlns="http://www.w3.org/2000/svg" `
+                + `d="${ d2 }" `
+                + `style="`
+                    + `fill: none; `
+                    // + `stroke: ${ Color.Nippon.Ukonn }; `
+                    + `stroke: ${ Color.Nippon.Ukonn }; `
+                    + `stroke-width: ${ Math.sqrt(width * 0.7 + 4) }px; `
+                    + `pointer-Events: none; `
+                + `" `
+                + `/>`
+            ).documentElement);
+            $(this.refs['svg']).append(wave2);
+        });
+    }
+
+    private getColor(index: number): string {
+        if (index === 10) {
+            return Color.Nippon.Ukonn;
+        }
+        else if (index < 10) {
+            return Color.interpolate(
+                Color.Nippon.Syozyohi,
+                Color.Nippon.Ukonn,
+                index / 10
+            );
+        }
+        else {
+            return Color.interpolate(
+                Color.Nippon.Ukonn,
+                Color.Nippon.Ruri,
+                (index - 10) / 10
+            );
+        }
     }
 
     private onDragEnd(bounds: [[number, number], [number, number]]): void {
@@ -820,8 +954,6 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         this.setState({
             data: box
         });
-        (window as any)['show'] = this.highLightClass.bind(this);
-        (window as any)['highlight'] = this.highlight.bind(this);
     }
 
     private highLightClass(index: number): void {
@@ -833,20 +965,23 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         else {
             $("#map_layer_canvas").css('opacity', 0.2);
             let ready: Array<[number, number, string]> = [];
+            let set: Array<number> = [];
             this.state.data.forEach((d: {
                 id: string, lng: number, lat: number, words: string,
-            day: string, city: string, sentiment: string, class: number}) => {
+            day: string, city: string, sentiment: string, class: number}, idx: number) => {
                 if (d.class === index && (d.lat >= 0 || d.lat < 0 || d.lng >= 0 || d.lng < 0)) {
                     ready.push([d.lng, d.lat, parseFloat(d.sentiment) < 0
                                                         ? Color.Nippon.Syozyohi
                                                         : parseFloat(d.sentiment) > 0
                                                             ? Color.Nippon.Ruri // Tokiwa
                                                             : Color.Nippon.Ukonn]);
+                    set.push(idx);
                 }
             });
             ready.forEach((d: [number, number, string]) => {
                 this.highLightPoint(d[0], d[1], d[2]);
             });
+            Globe.update(set);
         }
     }
 
