@@ -35,6 +35,7 @@ export interface TreeBarState<T = any> extends TreeBarNode<T> {}
 
 class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
     private layers: Array<Array<TreeBarNode<T>>>;
+    private maxOfPointsContained: number = 0;
 
     public constructor(props: TreeBarProps) {
         super(props);
@@ -185,12 +186,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             set.push(count);
                                             max = count > max ? count : max;
                                         });
+                                        this.maxOfPointsContained = max;
                                         return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
                                             const value: number = set[index] / max * 0.8;
                                             return (index === 0 ? "M" : "L")
                                                 + `${ (index + 0.5) * this.props.width
                                                     / this.layers[this.layers.length - 1].length },${ 
-                                                        (this.layers.length - value) * this.props.height / this.layers.length
+                                                        (1/*this.layers.length*/ - value) * this.props.height// / this.layers.length
                                                     }`
                                         }).join(' ')
                                     })[0]
@@ -255,6 +257,36 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
             + `d="${
                 [0].map(() => {
                     let set: Array<number> = [];
+                    // let max: number = 0;
+                    this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
+                        let count: number = 0;
+                        (node.data as any as Array<number>).forEach((id: number) => {
+                            if (Globe.checkIfPointIsSampled(id)) {
+                                count++;
+                            }
+                        });
+                        set.push(count);
+                        // max = count > max ? count : max;
+                    });
+                    return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
+                        const value: number = set[index] / this.maxOfPointsContained * 0.8;
+                        return (index === 0 ? "M" : "L")
+                            + `${ (index + 0.5) * this.props.width
+                                / this.layers[this.layers.length - 1].length },${ 
+                                    (1/*this.layers.length*/ - value) * this.props.height// / this.layers.length
+                                }`
+                    }).join(' ');
+                })[0]
+            }" `
+            + `style="fill: none; stroke: ${ Color.Nippon.Gohunn }C0; stroke-width: 3; pointer-events: none;" />`
+        ).documentElement);
+        $(this.refs['svg']).append(path);
+        
+        const path2: JQuery<HTMLElement> = $($.parseXML(
+            `<path xmlns="http://www.w3.org/2000/svg" key="sampled2" `
+            + `d="${
+                [0].map(() => {
+                    let set: Array<number> = [];
                     let max: number = 0;
                     this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
                         let count: number = 0;
@@ -271,14 +303,14 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                         return (index === 0 ? "M" : "L")
                             + `${ (index + 0.5) * this.props.width
                                 / this.layers[this.layers.length - 1].length },${ 
-                                    (this.layers.length - value) * this.props.height / this.layers.length
+                                    (1/*this.layers.length*/ - value) * this.props.height// / this.layers.length
                                 }`
-                    }).join(' ')
+                    }).join(' ');
                 })[0]
             }" `
-            + `style="fill: none; stroke: ${ Color.Nippon.Nae }C0; stroke-width: 3; pointer-events: none;" />`
+            + `style="fill: none; stroke: ${ Color.Nippon.Gohunn }C0; stroke-dasharray: 5; stroke-width: 3; pointer-events: none;" />`
         ).documentElement);
-        $(this.refs['svg']).append(path);
+        $(this.refs['svg']).append(path2);
     }
 
     private moveBars(act: "search" | "move", parent: TreeBarNode<T>, id: number, level: number): TreeBarNode<T> | null {
