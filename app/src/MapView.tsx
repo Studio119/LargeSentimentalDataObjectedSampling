@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-16 22:02:21
+ * @Last Modified time: 2019-11-18 21:52:08
  */
 import React from 'react';
 import $ from 'jquery';
@@ -59,6 +59,8 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         data_sp: Array<number>;
         count_sp: number;
     }> = [];
+    private ticking: number = 0;
+    private timer: NodeJS.Timeout;
 
     public constructor(props: MapViewProps) {
         super(props);
@@ -73,6 +75,17 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         this.timers = [];
         this.behaviour = 'zoom';
         this.active = false;
+        this.timer = setInterval(() => {
+            this.ticking += 5;
+            if (this.ticking >= 1000) {
+                this.ticking = 0;
+            }
+            $('.chosen').css('fill-opacity', 0.1 + (Math.abs(this.ticking - 500) / 2400));
+        }, 10);
+    }
+
+    public componentWillUnmount(): void {
+        clearInterval(this.timer);
     }
 
     public render(): JSX.Element {
@@ -612,15 +625,25 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         $(this.refs["area"]).hide();
     }
 
+    private paint(index: number): string {
+        const set: Array<string> = [
+            Color.Nippon.Akabeni, Color.Nippon.Nae, Color.Nippon.Rokusyou, Color.Nippon.Ruri, Color.Nippon.Hasita
+        ];
+        return set[index * 2 % set.length];
+    }
+
     private analyze(heap_ori: Array<number>, count_ori: number, heap_sp: Array<number>, count_sp: number, r: number): void {
         const heap: Array<number> = count_sp === 0 ? heap_ori : heap_sp;
         const count: number = count_sp === 0 ? count_ori : count_sp;
+        const color: string = this.paint(this.rounds.length);
         let circle: JQuery<HTMLElement> = $($.parseXML(
             `<circle xmlns="http://www.w3.org/2000/svg" `
             + `class="chosen" `
+            + `color="${ color }" `
             + `cx="${ this.area[0][1] + 1 }px" cy="${ this.area[0][0] - 22 }px" r="${ r + 2.5 }px" `
             + `style="`
-                + `fill: none; `
+                // + `fill: none; `
+                + `fill: ${ color }; `
                 + `stroke: ${ Color.Nippon.Hasita + "C0" }; `
                 + `stroke-width: 2px; `
                 + `pointer-Events: none; `
@@ -845,7 +868,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 + `style="`
                     + `fill: none; `
                     // + `stroke: ${ Color.Nippon.Ukonn }; `
-                    + `stroke: ${ Color.Nippon.Ukonn }; `
+                    + `stroke: ${ color }; `
                     + `stroke-width: ${ Math.sqrt(width * 0.7 + 4) }px; `
                     + `pointer-Events: none; `
                 + `" `
@@ -858,7 +881,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 + `style="`
                     + `fill: none; `
                     // + `stroke: ${ Color.Nippon.Ukonn }; `
-                    + `stroke: ${ Color.Nippon.Ukonn }; `
+                    + `stroke: ${ e.element.attr("color")! }; `
                     + `stroke-width: ${ Math.sqrt(width * 0.7 + 4) }px; `
                     + `pointer-Events: none; `
                 + `" `

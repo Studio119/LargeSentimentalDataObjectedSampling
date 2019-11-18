@@ -85,8 +85,14 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                         offsetX += layer[index - 1].width!;
                                     }
                                     const res: [number, number] = this.tot(node);
-                                    const value: number = ((res[0] / 2 + 0.5) / res[1]) / 2 + 0.5;
+                                    const value: number = ((res[0] / 2 + 0.5) / res[1]);// / 2 + 0.5;
                                     if (level === this.layers.length - 1) {
+                                        const y: number = value > -5e-4 && value < 5e-4
+                                            ? (level + 0.8) * height + 1.5
+                                            : (level + 0.8 - Math.abs(value) * 0.8) * height + 1.5;
+                                        const top: number = value > -5e-4 && value < 5e-4
+                                            ? 0.2 * height - 3
+                                            : (Math.abs(value) * 0.8 + 0.2) * height - 3;
                                         return [(
                                             <rect id={ `Bar_id${ node.id }` }
                                             key={ node.id }
@@ -117,15 +123,19 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             xmlns={`http://www.w3.org/2000/svg`}
                                             x={ offsetX * this.props.width / this.layers[this.layers.length - 1].length + 1.5 }
                                             // y={ (level + 1) * this.props.height / this.layers.length }
-                                            y={ (level + 1 - value) * height + 1.5 }
+                                            // y={ (level + 1 - value) * height + 1.5 }
+                                            y={ y }
                                             width={ node.width! * this.props.width / this.layers[this.layers.length - 1].length - 3 }
-                                            height={ value * height - 3 }
+                                            // height={ Math.abs(value) * height - 3 }
+                                            height={ top }
                                             style={{
-                                                fill: value < 0.5
+                                                fill: value < -5e-4//0.5 - 5e-4
                                                         ?   Color.Nippon.Syozyohi
-                                                        :   value === 0.5
+                                                        :   value < 5e-4//0.5 + 5e-4
                                                                     ?   Color.Nippon.Ukonn
-                                                                    :   Color.Nippon.Ruri
+                                                                    :   Color.Nippon.Ruri,
+                                                stroke: Color.Nippon.Aisumitya,
+                                                strokeWidth: 1
                                             }}
                                             onClick={
                                                 () => {
@@ -150,12 +160,15 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             width={ node.width! * this.props.width / this.layers[this.layers.length - 1].length - 2 }
                                             height={ height - 2 }
                                             style={{
-                                                fill: value < 0.5
-                                                        ?   Color.Nippon.Syozyohi + Math.floor(128 + (value - 0.5) * 256).toString(16).padStart(2, '0').toUpperCase()
-                                                        :   value === 0.5
+                                                fill: value < -5e-4//0.5 - 5e-4
+                                                        // ?   Color.Nippon.Syozyohi + Math.floor(128 + (Math.abs(value) - 0.5) * 256).toString(16).padStart(2, '0').toUpperCase()
+                                                        ?   Color.Nippon.Syozyohi + Math.floor(128 + Math.abs(value) * 256).toString(16).padStart(2, '0').toUpperCase()
+                                                        :   value < 5e-4//0.5 + 5e-4
                                                                     ?   Color.Nippon.Ukonn
-                                                                    :   Color.Nippon.Ruri + Math.floor(128 + (0.5 - value) * 256).toString(16).padStart(2, '0').toUpperCase(),
+                                                                    // :   Color.Nippon.Ruri + Math.floor(128 + (0.5 - Math.abs(value)) * 256).toString(16).padStart(2, '0').toUpperCase(),
+                                                                    :   Color.Nippon.Ruri + Math.floor(128 + Math.abs(value) * 256).toString(16).padStart(2, '0').toUpperCase(),
                                                 // stroke: Color.Nippon.Yamabuki
+                                                fillOpacity: 0.67,
                                                 stroke: Color.Nippon.Aisumitya
                                             }}
                                             onClick={
@@ -178,7 +191,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                             this.layers.length > 0 &&
                                 <path xmlns="http://www.w3.org/2000/svg" key="origin"
                                 d={
-                                    [0].map(() => {
+                                    `M${ 0 },${ this.props.height }` + [0].map(() => {
                                         let set: Array<number> = [];
                                         let max: number = 0;
                                         this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
@@ -189,16 +202,15 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                         this.maxOfPointsContained = max;
                                         return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
                                             const value: number = set[index] / max * 0.8;
-                                            return (index === 0 ? "M" : "L")
-                                                + `${ (index + 0.5) * this.props.width
+                                            return `L${ (index + 0.5) * this.props.width
                                                     / this.layers[this.layers.length - 1].length },${ 
                                                         (1/*this.layers.length*/ - value) * this.props.height// / this.layers.length
                                                     }`
                                         }).join(' ')
-                                    })[0]
+                                    })[0] + ` L${ this.props.width },${ this.props.height }`
                                 }
                                 style={{
-                                    fill: 'none',
+                                    fill: Color.Nippon.Ukonn + '80',
                                     stroke: Color.Nippon.Ukonn,
                                     strokeWidth: 3,
                                     pointerEvents: 'none'
@@ -249,13 +261,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
 
     private moveTo(nodes: Array<number>): void {
         nodes.forEach((id: number) => {
-            $(`#Bar_id${ id }`).css("stroke", Color.Nippon.Ginnsyu).css("stroke-width", 3);
+            $(`#Bar_id${ id }`).css("stroke", Color.Nippon.Sionn).css("stroke-width", 2).css('fill-opacity', 0.35);
             this.moveBars("search", this.state, id, 0);
         });
         const path: JQuery<HTMLElement> = $($.parseXML(
             `<path xmlns="http://www.w3.org/2000/svg" key="sampled" `
             + `d="${
-                [0].map(() => {
+                `M${ 0 },${ this.props.height }` + [0].map(() => {
                     let set: Array<number> = [];
                     // let max: number = 0;
                     this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
@@ -270,22 +282,21 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                     });
                     return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
                         const value: number = set[index] / this.maxOfPointsContained * 0.8;
-                        return (index === 0 ? "M" : "L")
-                            + `${ (index + 0.5) * this.props.width
+                        return `L${ (index + 0.5) * this.props.width
                                 / this.layers[this.layers.length - 1].length },${ 
                                     (1/*this.layers.length*/ - value) * this.props.height// / this.layers.length
                                 }`
                     }).join(' ');
-                })[0]
+                })[0] + ` L${ this.props.width },${ this.props.height }`
             }" `
-            + `style="fill: none; stroke: ${ Color.Nippon.Gohunn }C0; stroke-width: 3; pointer-events: none;" />`
+            + `style="fill: ${ Color.Nippon.Rokusyou }60; stroke: ${ Color.Nippon.Rokusyou }C0; stroke-width: 3; pointer-events: none;" />`
         ).documentElement);
         $(this.refs['svg']).append(path);
         
         const path2: JQuery<HTMLElement> = $($.parseXML(
             `<path xmlns="http://www.w3.org/2000/svg" key="sampled2" `
             + `d="${
-                [0].map(() => {
+                ` M${ 0 },${ this.props.height }` + [0].map(() => {
                     let set: Array<number> = [];
                     let max: number = 0;
                     this.layers[this.layers.length - 1].forEach((node: TreeBarNode<T>) => {
@@ -300,15 +311,14 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                     });
                     return this.layers[this.layers.length - 1].map((node: TreeBarNode<T>, index: number) => {
                         const value: number = set[index] / max * 0.8;
-                        return (index === 0 ? "M" : "L")
-                            + `${ (index + 0.5) * this.props.width
+                        return `L${ (index + 0.5) * this.props.width
                                 / this.layers[this.layers.length - 1].length },${ 
                                     (1/*this.layers.length*/ - value) * this.props.height// / this.layers.length
                                 }`
                     }).join(' ');
-                })[0]
+                })[0] + ` L${ this.props.width },${ this.props.height }`
             }" `
-            + `style="fill: none; stroke: ${ Color.Nippon.Gohunn }C0; stroke-dasharray: 5; stroke-width: 3; pointer-events: none;" />`
+            + `style="fill: ${ Color.Nippon.Rokusyou }20; stroke: ${ Color.Nippon.Rokusyou }C0; stroke-dasharray: 5; stroke-width: 3; pointer-events: none;" />`
         ).documentElement);
         $(this.refs['svg']).append(path2);
     }

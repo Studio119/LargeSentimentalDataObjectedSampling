@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-16 20:35:04
+ * @Last Modified time: 2019-11-18 22:04:51
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -283,9 +283,11 @@ class App extends Component<{}, {}, {}> {
       (this.refs["DataCenter"] as TaskQueue).open(paths.cloud, (data: DataForm.Cloud) => {
         (this.refs["topics"] as Settings).import(data);
       });
-      setTimeout(() => {
-        Globe.sample();
-      }, 1000);
+
+      // setTimeout(() => {
+      //   Globe.sample();
+      // }, 1000);
+
       // (this.refs["DataCenter"] as TaskQueue).open(dis, (data: Array<[[number, number], [number, number]]>) => {
       //   (this.refs["dis"] as PolylineChart).import(data);
       // });
@@ -301,11 +303,43 @@ class App extends Component<{}, {}, {}> {
       // });
     }
     Globe.sample = () => {
-      (this.refs["DataCenter"] as TaskQueue).open("./data/huisu_sampled.json", (data: DataForm.Sampled) => {
+      (this.refs["DataCenter"] as TaskQueue).open("./data/huisu_sampled_9.17_34_0.1_0.05_0.002.json", (data: DataForm.Sampled) => {
         let set: Array<number> = [];
         Object.values(data).forEach((innode: Array<number>) => {
-          set.push(...innode);
+          innode.forEach((id: number) => {
+            for (let i: number = 0; i < set.length; i++) {
+              if (id === set[i]) {
+                return;
+              }
+            }
+            set.push(id);
+          });
+          // set.push(...innode);
         });
+        console.log(set.length);
+        // var dict: {[key: string]: number} = {};
+        // var over: Array<[number, number]> = [];
+        // for (let s: number = 0; s < set.length; s++) {
+        //   dict["id" + s] = 0;
+        // }
+        // for (let s: number = 0; s < set.length; s++) {
+        //   dict["id" + set[s]]++;
+        // }
+        // set = [];
+        // for (const key in dict) {
+        //   if (dict.hasOwnProperty(key)) {
+        //     const element = dict[key];
+        //     const id: number = parseInt((key as string).replace("id", ""));
+        //     if (element === 1) {
+        //       set.push(id);
+        //     }
+        //     else if (element > 1) {
+        //       set.push(id);
+        //       over.push([id, element]);
+        //     }
+        //   }
+        // }
+        // console.log(over);
         (this.refs["map"] as MapView).setState({
           sampled: set
         });

@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-10 14:57:59
+ * @Last Modified time: 2019-11-18 21:59:07
  */
 import React, { Component } from 'react';
 import ReactWordCloud, { Scale, Spiral } from 'react-wordcloud';
@@ -106,18 +106,18 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                     marginTop: '-30px'
                 }} >
                     <ReactWordCloud
-                    size={[240, 240]}
+                    size={[300, 240]}
                     options={{
                         colors: this.color,
                         enableTooltip: true,
                         deterministic: false,
                         fontFamily: 'impact',
-                        fontSizes: [10, 24],
+                        fontSizes: [13, 24],
                         fontStyle: 'normal',
                         fontWeight: 'normal',
                         padding: 1,
                         rotations: 3,
-                        rotationAngles: [0, 90],
+                        rotationAngles: [0, 0],//[0, 90],
                         scale: Scale.Sqrt,
                         spiral: Spiral.Archimedean,
                         transitionDuration: 100
