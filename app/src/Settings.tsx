@@ -2,9 +2,10 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-18 21:59:07
+ * @Last Modified time: 2019-11-21 21:34:23
  */
 import React, { Component } from 'react';
+import $ from 'jquery';
 import ReactWordCloud, { Scale, Spiral } from 'react-wordcloud';
 
 export interface SettingsProps {
@@ -36,8 +37,8 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             <div id={ this.props.id }
             style={{
                 display: 'inline-block',
-                height: '263.2px',
-                width: '318px',
+                height: '308.8px',
+                width: '288px',
                 background: 'white',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
@@ -47,7 +48,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                 <div
                 style={{
                     height: '24px',
-                    width: '302px',
+                    width: '272px',
                     borderBottom: '1px solid rgb(149,188,239)',
                     background: 'rgb(120,151,213)',
                     color: 'white',
@@ -101,21 +102,18 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                     </table>
                 </div> */}
                 {/* <WordCloud width={ 318 } height={ 291 } ref="WordCloud" /> */}
-                <div
-                style={{
-                    marginTop: '-30px'
-                }} >
+                <div id="cloud">
                     <ReactWordCloud
-                    size={[300, 240]}
+                    size={[300, 300]}
                     options={{
                         colors: this.color,
                         enableTooltip: true,
                         deterministic: false,
                         fontFamily: 'impact',
-                        fontSizes: [13, 24],
+                        fontSizes: [14, 28],
                         fontStyle: 'normal',
                         fontWeight: 'normal',
-                        padding: 1,
+                        padding: 1.6,
                         rotations: 3,
                         rotationAngles: [0, 0],//[0, 90],
                         scale: Scale.Sqrt,
@@ -138,6 +136,13 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
     //     temp = part + "," + temp;
     //     return temp.substr(0, temp.length - 1);
     // }
+
+    public componentDidUpdate(): void {
+        setTimeout(() => {
+            $('#cloud svg').attr('width', '288px').attr('height', '285px');
+            $('#cloud g:first').attr('transform', 'translate(144,142.5)');
+        }, 100);
+    }
 
     public import(topics: Array<{ text: string, count: number }>): void {
         let box: Array<{ text: string, count: number }>

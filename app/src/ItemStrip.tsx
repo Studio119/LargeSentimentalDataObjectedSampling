@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-16 22:20:46
+ * @Last Modified time: 2019-11-21 21:29:16
  */
 import React, { Component } from 'react';
 import ValueBar from './ValueBar';
@@ -30,7 +30,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                 <div id={ this.props.id } key="container"
                     style={{
                         height: '40px',
-                        padding: '5px 40px 9px 40px',
+                        padding: '5px 40px 8px 40px',
                         background: 'rgb(224, 232, 240)',
                         border: '1px solid rgb(149,188,239)',
                         textAlign: 'left'
@@ -71,7 +71,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
         if (source === 'Tweet') {
             src = {
                 origin: './data/93_new.json',
-                tree: './data/visualization_tree_dict_0.05_0.1_0.002.json',
+                tree: './data/visualization_tree_dict_0.1_0.3_0.002.json',
                 cloud: './data/93-wordcount.json',
                 gathering: './data/new_93.json'
             };

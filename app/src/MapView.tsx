@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-18 21:52:08
+ * @Last Modified time: 2019-11-21 21:46:50
  */
 import React from 'react';
 import $ from 'jquery';
@@ -93,18 +93,19 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             <div id={ this.props.id }
             style={{
                 position: 'absolute',
-                left: '322px',
+                left: '294px',
                 top: '59px',
-                height: '486px',
-                width: '788px',
+                height: '531px',
+                width: '863.6px',
                 background: 'white',
                 border: '1px solid rgb(149,188,239)',
-                fontSize: '12.4px'
+                fontSize: '12.4px',
+                overflow: 'hidden'
             }} >
                 <div
                 style={{
                     height: '22px',
-                    width: '772px',
+                    width: '848px',
                     borderBottom: '1px solid rgb(149,188,239)',
                     background: 'rgb(120,151,213)',
                     color: 'white',
@@ -119,8 +120,8 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 <div
                 id={ this.props.id + ">>" }
                 style={{
-                    height: '461px',
-                    width: '788px'
+                    height: '506.6px',
+                    width: '865px'
                 }} >
                     {
                         this.mounted
@@ -135,32 +136,32 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                     }
                 </div>
                 {/* 这个画布用于展现全部的点 */}
-                <canvas key="1" id="map_layer_canvas" ref="canvas" width="788px" height="462.4px" style={{
+                <canvas key="1" id="map_layer_canvas" ref="canvas" width="867px" height="508.64px" style={{
                     position: 'relative',
-                    top: '-462px',
+                    top: '-506px',
                     pointerEvents: 'none'
                 }} />
                 {/* 这个画布用于展现被高亮的点 */}
-                <canvas key="2" id="highlight_canvas" ref="canvas2" width="788px" height="462.4px" style={{
+                <canvas key="2" id="highlight_canvas" ref="canvas2" width="867px" height="508.64px" style={{
                     position: 'relative',
-                    top: '-925.6px',
+                    top: '-1018.6px',
                     pointerEvents: 'none'
                 }} />
                 {/* 这个元素用于放置每一个框选的交互组件 */}
                 <svg ref="svg"
                 xmlns={`http://www.w3.org/2000/svg`}
                 style={{
-                    width: '788px',
-                    height: '462.2px',
+                    width: '867px',
+                    height: '508.64px',
                     position: 'absolute',
                     left: '0px',
                     top: '24px',
                     pointerEvents: 'none'
                 }} />
                 {/* 这个画布用于接受框选交互事件 */}
-                <canvas key="A" id="interaction" ref="table" width="788px" height="462.4px" style={{
+                <canvas key="A" id="interaction" ref="table" width="867px" height="508.64px" style={{
                     position: 'relative',
-                    top: '-1392px',
+                    top: '-1530px',
                     display: 'none'
                 }}
                 onMouseDown={
@@ -169,11 +170,11 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             return;
                         }
                         this.active = true;
-                        this.area[0] = [event.clientY - 62, event.clientX - 325];
+                        this.area[0] = [event.clientY - 62, event.clientX - 296.7];
                         $(this.refs["area"])
                             .show()
                             .css('top', event.clientY - 62)
-                            .css('left', event.clientX - 325)
+                            .css('left', event.clientX - 296.7)
                             .css('width', 0)
                             .css('height', 0);
                     }
@@ -183,7 +184,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         if (this.behaviour === 'zoom' || !this.active) {
                             return;
                         }
-                        this.area[1] = [event.clientY - 62, event.clientX - 325];
+                        this.area[1] = [event.clientY - 62, event.clientX - 296.7];
                         if (this.behaviour === 'rect') {
                             $(this.refs["area"])
                                 .css('border-radius', 0)
@@ -212,7 +213,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             return;
                         }
                         this.active = false;
-                        this.area[1] = [event.clientY - 62, event.clientX - 325];
+                        this.area[1] = [event.clientY - 62, event.clientX - 296.7];
                         if (this.behaviour === 'rect') {
                             $(this.refs["area"])
                                 .css('border-radius', 0)
@@ -323,6 +324,13 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                     .css('border', `1px solid ${ Color.Nippon.Kuroturubami }`)
                                     .css('background', Color.Nippon.Kesizumi);
                             }
+                        }
+                        onDoubleClick={
+                            () => {
+                                this.area[0] = [ Infinity, Infinity ];
+                                this.area[1] = [ -Infinity, -Infinity ];
+                                this.hightLightArea('rect');
+                            }
                         } />
                     </div>
                     <div key="button:circle" ref="button:circle"
@@ -413,8 +421,13 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         $(this.refs['svg']).html("");
         this.rounds = [];
         // this.behaviour = 'zoom';
-        if (this.highLighted.length > 0 && this.behaviour !== 'zoom') {
-            this.hightLightArea(this.behaviour);
+        // if (this.highLighted.length > 0 && this.behaviour !== 'zoom') {
+        //     this.hightLightArea(this.behaviour);
+        // }
+        if (this.state.sampled.length > 0) {
+            this.area[0] = [ Infinity, Infinity ];
+            this.area[1] = [ -Infinity, -Infinity ];
+            this.hightLightArea('rect');
         }
         else {
             this.redraw();
@@ -423,8 +436,8 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     private redraw(): void {
-        this.ctx!.clearRect(-2, -2, 790, 464.4);
-        this.ctx_2!.clearRect(-2, -2, 790, 464.4);
+        this.ctx!.clearRect(-2, -2, 869, 510.64);
+        this.ctx_2!.clearRect(-2, -2, 869, 510.64);
         this.timers.forEach((timer: NodeJS.Timeout) => {
             clearTimeout(timer);
         });
@@ -926,14 +939,14 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     private fx(d: number): number {
-        return (d - this.bounds[1][0]) / (this.bounds[1][1] - this.bounds[1][0]) * 788;
+        return (d - this.bounds[1][0]) / (this.bounds[1][1] - this.bounds[1][0]) * 867;
     }
 
     private fy(d: number): number {
         d = (d - this.bounds[0][0]) / (this.bounds[0][1] - this.bounds[0][0])
             * (this.originBounds[0][1] - this.originBounds[0][0]) + this.originBounds[0][0]
             + 2 * (1 - (this.bounds[0][1] - this.bounds[0][0]) / (this.originBounds[0][1] - this.originBounds[0][0]));
-        return 462.4 * (d * d * (-0.00025304519602050573) - d * 0.01760550015218513 + 1.5344062688366468);
+        return 508.6 * (d * d * (-0.00025304519602050573) - d * 0.01760550015218513 + 1.5344062688366468);
     }
 
     private addPoint(x: number, y: number, style: string): void {
@@ -980,7 +993,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     private highLightClass(index: number): void {
-        this.ctx_2!.clearRect(-2, -2, 790, 464.4);
+        this.ctx_2!.clearRect(-2, -2, 869, 510.64);
         if (index === -1) {
             $("#map_layer_canvas").css('opacity', 1);
             return;
@@ -1009,7 +1022,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     private highlight(points: Array<number> | 'all'): void {
-        this.ctx_2!.clearRect(-2, -2, 790, 464.4);
+        this.ctx_2!.clearRect(-2, -2, 869, 510.64);
         if (points === 'all') {
             $("#map_layer_canvas").css('opacity', 1);
             return;

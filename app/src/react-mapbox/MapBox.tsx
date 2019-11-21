@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-29 21:36:42 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-11 20:35:06
+ * @Last Modified time: 2019-11-21 21:11:09
  */
 
 import React, {Component} from 'react';
@@ -85,6 +85,11 @@ class MapBox extends Component<MapProps, {}, {}> {
             // });
             // this.layerData = { 'default': [] };
             // this.status = true;
+
+            this.props.onDragEnd([
+                [this.map!.getBounds().getNorth(), this.map!.getBounds().getSouth()],
+                [this.map!.getBounds().getWest(), this.map!.getBounds().getEast()]
+            ]);
             
             this.map!.on('zoomend', () => {
                 this.props.onZoomEnd([

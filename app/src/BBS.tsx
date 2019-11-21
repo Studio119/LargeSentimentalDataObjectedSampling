@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-10 13:26:24 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-15 18:36:04
+ * @Last Modified time: 2019-11-21 21:49:48
  */
 import React, { Component } from "react";
 import $ from "jquery";
@@ -100,7 +100,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                 <div
                 style={{
                     height: '24px',
-                    width: '100%',
+                    width: this.props.width - 16,
                     borderBottom: '1px solid rgb(149,188,239)',
                     background: 'rgb(120,151,213)',
                     color: 'white',
@@ -124,25 +124,27 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                             return (
                                 <li key={ `row${ index }` }
                                 style={{
-                                    width: '100%',
+                                    width: '96%',
                                     marginRight: '4%',
                                     marginLeft: '-4%'
                                 }} >
                                     <div key={`irow${ index }`}
                                     style={{
-                                        margin: '6px 0px -22px 37px'
+                                        margin: '6px 0px -34px 24px'
                                     }} >
                                         <p>
-                                            <b>
+                                            <span style={{
+                                                fontSize: '13px'
+                                            }} >
                                                 { this.hide(idset[index]) }
-                                            </b>
+                                            </span>
                                             <span key={ `city${ index }` }
                                             style={{
                                                 display: 'block',
                                                 color: '#668',
-                                                marginTop: '-21px',
                                                 marginRight: '8px',
-                                                textAlign: 'right'
+                                                textAlign: 'right',
+                                                fontSize: '12.6px'
                                             }}>
                                                 { b.city }
                                             </span>
@@ -151,18 +153,18 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                                     <div key={`idDIV${ index }`}
                                     style={{
                                         display: 'inline-block',
-                                        height: '40px',
-                                        width: '40px',
+                                        height: '32px',
+                                        width: '32px',
                                         verticalAlign: 'top',
-                                        margin: '-20px 18px 0px -12px'
+                                        margin: '-12px 18px 0px -18px'
                                     }} >
                                         <img src={ `./images/icon${ iconset[index] }.jpg` }
                                         alt={ idset[index].split(' ').map((p: string) => {
                                             return p[0] + ".";
                                         }).join('') }
-                                        width="40px" height="40px"
+                                        width="32px" height="32px"
                                         style={{
-                                            borderRadius: '20px'
+                                            borderRadius: '16px'
                                         }} />
                                     </div>
                                     <div key={`textDIV${ index }`}
@@ -176,11 +178,13 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                                             textAlign: 'left',
                                             border: '1px solid rgb(223,235,250)',
                                             borderRadius: '0px 12px 12px 12px',
-                                            padding: '8px 14px',
+                                            padding: '4px 10px 5px',
                                             background: 'white',
-                                            marginBottom: '4px',
-                                            marginTop: '14px'
-                                        }}>
+                                            marginBottom: '-6px',
+                                            marginTop: '2px',
+                                            marginLeft: '10px',
+                                            fontSize: '13px'
+                                        }} >
                                             <span ref={ `bbs_text${ index }`} >
                                                 { b.text }
                                             </span>
@@ -262,7 +266,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
 
     private hide(name: string): string {
         let paras: Array<string> = name.split(' ');
-        let hidden: string = paras[0][0] + "?";
+        let hidden: string = paras[0][0] + "x";
         for (let i: number = 0; i < 6; i++) {
             hidden += (parseInt("" + (Math.random() * 16).toString())).toString(16);
         }

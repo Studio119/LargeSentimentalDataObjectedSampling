@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-18 22:04:51
+ * @Last Modified time: 2019-11-21 22:06:46
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -168,17 +168,16 @@ class App extends Component<{}, {}, {}> {
         </div> */}
         <Settings id="ActiveSettings" ref="topics" />
         <MapView id="MapView" ref="map" center={ [-98, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 12 }
-        left={ [8, 740] } top={ [32, 328] } />
+        left={ [8, 817] } top={ [32, 372] } />
         <div
         style={{
           position: 'absolute',
-          width: '422px',
+          width: '375px',
           top: '59px',
-          left: '1114px',
-          height: '488px',
+          left: '1163.2px',
           background: 'white'
         }} >
-          <BBS width={ 422 } height={ 805 } ref="bbs" />
+          <BBS width={ 373 } height={ 802.8 } ref="bbs" />
         </div>
         {/* <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } /> */}
         {/* <div className="Line"
@@ -202,19 +201,11 @@ class App extends Component<{}, {}, {}> {
           }} />
         </div> */}
         <TreeBar<Array<number>> id="TreeBar" ref="TreeBar"
-          width={1109.8} height={289}
+          width={1156.8} height={242.2}
           style={{
             background: 'white',
             position: 'relative',
-            top: '492.2px'
-          }}
-          circleStyle={{
-            stroke: 'rgb(134,44,59)',
-            strokeWidth: '0.6px',
-            fill: 'rgb(230,28,65)'
-          }}
-          pathStyle={{
-            stroke: 'rgb(71,23,120)'
+            top: '539.8px'
           }} />
       </div>
     );
@@ -303,7 +294,7 @@ class App extends Component<{}, {}, {}> {
       // });
     }
     Globe.sample = () => {
-      (this.refs["DataCenter"] as TaskQueue).open("./data/huisu_sampled_9.17_34_0.1_0.05_0.002.json", (data: DataForm.Sampled) => {
+      (this.refs["DataCenter"] as TaskQueue).open("./data/huisu_sampled_9.17_29_0.3_0.1_0.002.json", (data: DataForm.Sampled) => {
         let set: Array<number> = [];
         Object.values(data).forEach((innode: Array<number>) => {
           innode.forEach((id: number) => {
