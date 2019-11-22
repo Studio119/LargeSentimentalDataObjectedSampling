@@ -196,7 +196,7 @@ class ValueBar extends Component<ValueBarProps, ValueBarState, {}> {
 
     public render(): JSX.Element {
         return (
-            <div className="ValueBar" style={{ display: 'inline-block', alignItems: 'center', transform: 'translateY(50%)',
+            <div className="ValueBar" style={{ display: 'inline-block', alignItems: 'center', transform: 'translateY(45%)',
             padding: "0px 10px 0px 6px", ...this.props.style }} ref="container" >
                 {
                     this.props.label
@@ -204,7 +204,7 @@ class ValueBar extends Component<ValueBarProps, ValueBarState, {}> {
                             { display: 'inline-block',
                                 verticalAlign: 'top',
                                 margin: '0px 4px 0px 0px',
-                                transform: 'translateY(-8%)',
+                                transform: 'translateY(-6%)',
                                 fontSize: this.props.height * 0.8 + 'px' }}>
                                 { this.props.label }
                             </p>
@@ -214,11 +214,10 @@ class ValueBar extends Component<ValueBarProps, ValueBarState, {}> {
                     this.showValue
                         ? <p key="value" ref="value" style={
                             { display: 'inline-block',
-                                minWidth: `${ this.placeLength * 10 + 4 }px`,
-                                maxWidth: `${ this.placeLength * 10 + 4 }px`,
+                                width: `${ this.placeLength * this.props.height * 0.4 + 2 }px`,
                                 verticalAlign: 'top',
-                                margin: '0px 4px 0px 0px',
-                                transform: 'translateY(-8%)',
+                                margin: '0px',
+                                transform: 'translateY(-6%)',
                                 fontSize: this.props.height * 0.8 + 'px' }}>
                                 { this.valueFormatter(this.state.value) }
                             </p>

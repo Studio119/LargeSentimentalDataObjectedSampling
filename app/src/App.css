@@ -10,3 +10,19 @@ body {
   width: 1536px;
   height: 862px;
 }
+
+.rotating {
+	animation: rotateanimation 3s linear infinite;
+	-webkit-animation: rotateanimation 3s linear infinite;
+}
+@keyframes rotateanimation {
+	0% {
+    transform:rotate(0deg);
+  }
+  50% {
+    transform:rotate(180deg);
+  }
+  100% {
+    transform:rotate(360deg);
+  }
+}

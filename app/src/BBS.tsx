@@ -113,7 +113,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                 <ul
                 style={{
                     margin: '0px',
-                    height: this.props.height - 24,
+                    height: this.props.height - 24.8,
                     listStyle: 'none',
                     overflowX: 'hidden',
                     overflowY: 'scroll',
@@ -125,8 +125,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                                 <li key={ `row${ index }` }
                                 style={{
                                     width: '96%',
-                                    marginRight: '4%',
-                                    marginLeft: '-4%'
+                                    margin: '-10px 4% 28px -4%'
                                 }} >
                                     <div key={`irow${ index }`}
                                     style={{

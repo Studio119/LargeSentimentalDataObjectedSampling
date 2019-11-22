@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-21 22:06:46
+ * @Last Modified time: 2019-11-22 21:56:07
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -20,7 +20,8 @@ import BBS from './BBS';
 import TreeBar, { TreeBarNode } from './TreeBar';
 import { FileSet, DataForm } from './DataLib';
 
-import axios, { AxiosResponse } from 'axios';
+// import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
 
 class App extends Component<{}, {}, {}> {
@@ -177,7 +178,7 @@ class App extends Component<{}, {}, {}> {
           left: '1163.2px',
           background: 'white'
         }} >
-          <BBS width={ 373 } height={ 802.8 } ref="bbs" />
+          <BBS width={ 373 } height={ 531 } ref="bbs" />
         </div>
         {/* <ContrastView id="ContrastView" ref="RectTree" displayLevels={ 5 } /> */}
         {/* <div className="Line"
@@ -201,11 +202,11 @@ class App extends Component<{}, {}, {}> {
           }} />
         </div> */}
         <TreeBar<Array<number>> id="TreeBar" ref="TreeBar"
-          width={1156.8} height={242.2}
+          width={1157} height={242.2}
           style={{
             background: 'white',
             position: 'relative',
-            top: '539.8px'
+            top: '539.6px'
           }} />
       </div>
     );
@@ -339,6 +340,7 @@ class App extends Component<{}, {}, {}> {
           nodes.push(parseInt(str));
         });
         Globe.moveBars(nodes);
+        $("#run").attr("src", "./images/run.png").removeClass("rotating");
       });
     };
     Globe.update = (list: Array<number> | "all") => {
@@ -481,21 +483,23 @@ var checkIfBackEndServerAvailable: () => void = () => {
     )
     .then(() => {
       Globe.run = async () => {
-        await axios.get(
-          "/run", {
-            headers: {
-              'Content-type': 'application/json;charset=utf-8'
-            }
-          }
-        )
-        .then((value: AxiosResponse<any>) => {
-          // TODO: display
-        }, (reason: any) => {
-          console.error(reason);
-        })
-        .catch((reason: any) => {
-          console.error(reason);
-        })
+        // TODO: connect with the back-end server
+        // await axios.get(
+        //   "/run", {
+        //     headers: {
+        //       'Content-type': 'application/json;charset=utf-8'
+        //     }
+        //   }
+        // )
+        // .then((value: AxiosResponse<any>) => {
+        //   // TODO: display
+        // }, (reason: any) => {
+        //   console.error(reason);
+        // })
+        // .catch((reason: any) => {
+        //   console.error(reason);
+        // });
+        Globe.sample();
       };
       console.info("Back-end server is ready.");
     }, () => {

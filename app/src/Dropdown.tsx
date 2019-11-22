@@ -83,7 +83,8 @@ class Dropdown<T = any> extends Component<DropdownProps<T>, DropdownState<T>, {}
                                     userSelect: 'none',
                                     color: 'black',
                                     background: index % 2 === 0 ? 'rgb(219, 227, 236)' : 'rgb(149,188,239)',
-                                    fontSize: 'smaller'
+                                    fontSize: 'smaller',
+                                    textAlign: 'center'
                                 }}
                                 onDragStart={
                                     () => void 0

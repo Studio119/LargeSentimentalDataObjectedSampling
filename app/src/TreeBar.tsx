@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-21 21:42:35
+ * @Last Modified time: 2019-11-22 22:09:53
  */
 
 import React, { Component } from 'react';
@@ -289,6 +289,12 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                             //         pointerEvents: 'none'
                             //     }} />
                         }
+                        <text key="text1" x={10} y={20} >
+                            Success rate on the whole: <tspan id="text1">?</tspan>
+                        </text>
+                        <text key="text2" x={10} y={40} >
+                            Success rate in local areas: <tspan id="text2">?</tspan>
+                        </text>
                     </g>
                 </svg>
             </div>
