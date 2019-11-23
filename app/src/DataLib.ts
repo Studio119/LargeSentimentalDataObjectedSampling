@@ -9,7 +9,6 @@
 export interface FileSet {
     origin: string;
     tree: string;
-    cloud: string;
     gathering: string;
 }
 
@@ -30,11 +29,6 @@ export declare namespace DataForm {
         children: Array<Tree>;
         containedpoint: Array<number>;
     };
-
-    export type Cloud = Array<{
-        text: string;
-        count: number;
-    }>;
 
     export type Gathering = Array<{
         x: number;

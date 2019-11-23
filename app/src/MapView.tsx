@@ -507,6 +507,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         }
         let set: Array<number> = [];
         if (style === 'rect') {
+            this.ctx_2!.clearRect(-2, -2, 869, 510.64);
             let x: [number, number] = [
                 Math.min(this.area[0][1], this.area[1][1]),
                 Math.max(this.area[0][1], this.area[1][1])
@@ -564,6 +565,9 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         }
         else {
             let heap_origin: Array<number> = [];
+            for (let i: number = 0; i < 20; i++) {
+                heap_origin.push(0);
+            }
             let count_origin: number = 0;
             let r2: number = Math.pow(this.area[0][0] - this.area[1][0], 2)
                 + Math.pow(this.area[0][1] - this.area[1][1], 2);

@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-22 21:56:07
+ * @Last Modified time: 2019-11-23 22:11:27
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -26,6 +26,15 @@ import axios from 'axios';
 
 class App extends Component<{}, {}, {}> {
   private view: [number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0];
+  private stopWords: Array<string> = [
+    "don't", "wh", "this", "tha", "not", "for", "this", "her", "his", "the", "you", "our", "not", "watch",
+    "but", "will", "today", "about", "much", "call", "won't", "well", "just", "can", "get", "i'm", "tonight",
+    "too", "all", "tak", "go", "man", "also", "eve", "did", "over", "other", "was", "are", "like", "way",
+    "and", "false", "true", "now", "year", "day", "want", "you", "feel", "she", "tell", "one", "it's", "said",
+    "out", "should", "would", "see", "hav", "has", "time", "know", "people", "look", "him", "person", "told",
+    "from", "think", "via", "because", "with", "any", "let", "need", "show", "only", "big", "wld", "more",
+    "more", "he's", "after", "must", "how", "wow", "keep", "say", "does"
+  ];
 
   public render(): JSX.Element {
     return (
@@ -265,15 +274,57 @@ class App extends Component<{}, {}, {}> {
           });
           (this.refs["map"] as MapView).importClass(box);
         });
+
+        (this.refs["topics"] as Settings).import([]);
+        setTimeout(() => {
+          let topics: Array<{ text: string; count: number; }> = [];
+          let dict: {[word: string]: number} = {};
+          dataset.forEach((d: { words: string; }) => {
+            d.words.split(/[ |,|.|;|:|(|)|[|\]|?|!|“]/).forEach((word: string) => {
+              if (word.length < 3 || word.includes("@") || word.includes("/")
+              || word.includes("\"") || word.includes("#") || word.includes("http") || parseInt(word).toString() === word) {
+                return;
+              }
+              const w: string = word.toLowerCase();
+              for (let m: number = 0; m < this.stopWords.length; m++) {
+                if (w.startsWith(this.stopWords[m])) {
+                  return;
+                }
+              }
+              if (dict.hasOwnProperty(w)) {
+                dict[w] ++;
+              }
+              else if (w.endsWith("es") && dict.hasOwnProperty(w.substring(0, w.length - 2))) {
+                dict[w.substring(0, w.length - 2)] ++;
+              }
+              else if (w.endsWith("s") && dict.hasOwnProperty(w.substring(0, w.length - 1))) {
+                dict[w.substring(0, w.length - 1)] ++;
+              }
+              else {
+                dict[w] = 1;
+              }
+            });
+          });
+          for (const word in dict) {
+            if (dict.hasOwnProperty(word)) {
+              const count: number = dict[word];
+              if (count < dataset.length / 1e5) {
+                continue;
+              }
+              topics.push({
+                text: word,
+                count: count
+              });
+            }
+          }
+          (this.refs["topics"] as Settings).import(topics);
+        });
       });
       (this.refs["DataCenter"] as TaskQueue).open(paths.tree, (data: DataForm.Tree) => {
         let dataset: TreeBarNode<Array<number>> = this.loadTree(data, null, 'root');
         // (this.refs["RectTree"] as ContrastView).import(dataset);
         // (this.refs["TreeMap"] as TreeMap).import(dataset);
         (this.refs["TreeBar"] as TreeBar<Array<number>>).import(dataset);
-      });
-      (this.refs["DataCenter"] as TaskQueue).open(paths.cloud, (data: DataForm.Cloud) => {
-        (this.refs["topics"] as Settings).import(data);
       });
 
       // setTimeout(() => {
@@ -345,7 +396,26 @@ class App extends Component<{}, {}, {}> {
     };
     Globe.update = (list: Array<number> | "all") => {
       let box: Array<{ text: string; city: string; sentiment: number; }> = [];
+      let texts: Array<{ text: string; }> = [];
       if (list === "all") {
+        for (let i: number = 0; true; i++) {
+          const data: {
+            id: string;
+            lng: number;
+            lat: number;
+            words: string;
+            day: string;
+            city: string;
+            sentiment: string;
+            class: number;
+          } = Globe.getPoint(i);
+          if (!data) {
+            break;
+          }
+          texts.push({
+            text: data.words
+          });
+        }
         for (let i: number = 0; i < 20; i++) {
           const data: {
             id: string;
@@ -392,6 +462,9 @@ class App extends Component<{}, {}, {}> {
               sentiment: s
             });
           }
+          texts.push({
+            text: data.words
+          });
           if (s === 0) {
             neutre++;
           }
@@ -409,6 +482,47 @@ class App extends Component<{}, {}, {}> {
         );
       }
       (this.refs["bbs"] as BBS).import(box);
+      Globe.countWords(texts);
+    };
+    Globe.countWords = (list: Array<{ text: string; }>) => {
+      (this.refs["topics"] as Settings).import([]);
+      setTimeout(() => {
+        let topics: Array<{ text: string; count: number; }> = [];
+        let dict: {[word: string]: number} = {};
+        list.forEach((d: { text: string; }) => {
+          d.text.split(/[ |,|.|;|:|(|)|[|\]|?|!|“]/).forEach((word: string) => {
+            if (word.length < 3 || word.includes("@") || word.includes("/")
+            || word.includes("\"") || word.includes("#") || word.includes("http") || parseInt(word).toString() === word) {
+              return;
+            }
+            const w: string = word.toLowerCase();
+            for (let m: number = 0; m < this.stopWords.length; m++) {
+              if (w.startsWith(this.stopWords[m])) {
+                return;
+              }
+            }
+            if (dict.hasOwnProperty(w)) {
+              dict[w] ++;
+            }
+            else {
+              dict[w] = 1;
+            }
+          });
+        });
+        for (const word in dict) {
+          if (dict.hasOwnProperty(word)) {
+            const count: number = dict[word];
+            if (count < list.length / 1e5) {
+              continue;
+            }
+            topics.push({
+              text: word,
+              count: count
+            });
+          }
+        }
+        (this.refs["topics"] as Settings).import(topics);
+      });
     };
   }
 
@@ -441,6 +555,7 @@ class App extends Component<{}, {}, {}> {
 
 interface Global {
   checkIfPointIsSampled: (index: number) => boolean;
+  countWords: (list: Array<{ text: string; }>) => void;
   getPoint: (index: number) => {
     id: string;
     lng: number;
@@ -461,6 +576,7 @@ interface Global {
 
 export var Globe: Global = {
   checkIfPointIsSampled: () => false,
+  countWords: () => {},
   getPoint: () => {
     return { id: "", lng: 0, lat: 0, words: "", day: "", city: "", sentiment: "", class: -1 };
   },

@@ -120,6 +120,16 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                     textAlign: 'left'
                 }}>
                     {
+                        this.state.list.length < 20 ||
+                        <p style={{
+                            color: "#888",
+                            margin: "6px -29px 22px",
+                            fontSize: '12px'
+                        }} >
+                            Too many to display, showing 20 results only.
+                        </p>
+                    }
+                    {
                         this.state.list.map((b: { text: string; city: string; sentiment: number; }, index: number) => {
                             return (
                                 <li key={ `row${ index }` }

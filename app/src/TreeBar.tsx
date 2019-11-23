@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-22 22:09:53
+ * @Last Modified time: 2019-11-23 22:11:25
  */
 
 import React, { Component } from 'react';
@@ -110,7 +110,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                                 //                 ?   Color.Nippon.Ukonn
                                                 //                 :   Color.Nippon.Ruri, 0.1),
                                                 fillOpacity: 0.8,
-                                                stroke: Color.Nippon.Aisumitya
+                                                stroke: Color.setLightness(Color.Nippon.Aisumitya, 0.7)
                                             }}
                                             onClick={
                                                 () => {
@@ -249,7 +249,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             style={{
                                                 fill: "none",
                                                 stroke: "none",
-                                                strokeWidth: 2,
+                                                strokeWidth: 1,
                                                 pointerEvents: "none"
                                             }} />
                                         );
@@ -289,12 +289,12 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                             //         pointerEvents: 'none'
                             //     }} />
                         }
-                        <text key="text1" x={10} y={20} >
-                            Success rate on the whole: <tspan id="text1">?</tspan>
+                        {/* <text key="text1" x={10} y={20} >
+                            Success rate on the whole: <tspan id="text1" dx={4} >?</tspan>
                         </text>
                         <text key="text2" x={10} y={40} >
-                            Success rate in local areas: <tspan id="text2">?</tspan>
-                        </text>
+                            Success rate in local areas: <tspan id="text2" dx={4} >?</tspan>
+                        </text> */}
                     </g>
                 </svg>
             </div>
@@ -362,7 +362,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                 sampled++;
             }
         });
-
+        
         return sampled / (node.data as any as Array<number>).length;
     }
 
@@ -389,6 +389,175 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
             $(this.refs['layer']).append(path);
             setTimeout(() => this.relink(child), 40);
         });
+    }
+
+    // private rewalk(node: TreeBarNode<T>): { valueBefore: number; countBefore: number; valueAfter: number; countAfter: number; } {
+    //     let valueBefore: number = 0;
+    //     let countBefore: number = 0;
+    //     let valueAfter: number = 0;
+    //     let countAfter: number = 0;
+    //     if (node.children.length === 0) {
+    //         for (let i: number = 0; true; i++) {
+    //             const point: { sentiment: string; class: number; } = Globe.getPoint(i);
+    //             if (!point) {
+    //                 break;
+    //             }
+    //             if (point.class !== node.id) {
+    //                 continue;
+    //             }
+    //             valueBefore += parseFloat(point.sentiment);
+    //             countBefore++;
+    //             if (Globe.checkIfPointIsSampled(i)) {
+    //                 valueAfter += parseFloat(point.sentiment);
+    //                 countAfter++;
+    //             }
+    //         }
+    //         return { valueBefore: valueBefore, countBefore: countBefore, valueAfter: valueAfter, countAfter: countAfter };
+    //     }
+    //     node.children.forEach((child: TreeBarNode<T>) => {
+    //         let result: {
+    //             valueBefore: number;
+    //             countBefore: number;
+    //             valueAfter: number;
+    //             countAfter: number;
+    //         } = this.rewalk(child);
+    //         valueBefore += result.valueBefore;
+    //         countBefore += result.countBefore;
+    //         valueAfter += result.valueAfter;
+    //         countAfter += result.countAfter;
+    //     });
+    //     if ($(`#Bar_id${ node.id }`).hasClass("node")) {
+    //         const element: JQuery<HTMLElement> = $(`#Bar_id${ node.id }`);
+    //         const height: number = parseFloat(element.attr('__height')!);
+    //         const x: number = parseFloat(element.css('x'));
+    //         const y: number = parseFloat(element.css('y'));
+    //         element.animate({
+    //             width: height / 1.6,
+    //             height: height / 1.6,
+    //             rx: height / 1.6,
+    //             ry: height / 1.6,
+    //             x: x - height / 3.2 + height / 10,
+    //             y: y - height / 3.2 + height / 10
+    //         }, 20);
+
+    //         // const sampledRate: number = countAfter / countBefore;
+    //         const successRate: number = Math.abs(valueAfter / countAfter - valueBefore / countBefore)
+    //             / Math.max(valueAfter / countAfter + 1, valueAfter / countAfter - 1);
+    //         // const labelSampledRate: JQuery<HTMLElement> = $($.parseXML(
+    //         //     `<text xmlns="http://www.w3.org/2000/svg" `
+    //         //     + `x="${ x - height / 3.2 + height / 10 }" y="${ y - height / 3.2 + height * 3 / 5 }" `
+    //         //     + `dy="-4.8" `
+    //         //     + `style="fill: ${ Color.Nippon.Aisumitya }; font-size: 10px; pointer-events: none;" >`
+    //         //         + (sampledRate * 100).toFixed(1) + "%"
+    //         //     + `</text>`
+    //         // ).documentElement);
+    //         // $(this.refs['svg']).append(labelSampledRate);
+    //         const labelSuccessRate: JQuery<HTMLElement> = $($.parseXML(
+    //             `<text xmlns="http://www.w3.org/2000/svg" `
+    //             + `x="${ x - height / 3.2 + height / 10 }" y="${ y - height / 3.2 + height * 3 / 5 }" `
+    //             + `dy="-4.3" `
+    //             + `style="fill: ${ Color.Nippon.Aisumitya }; font-size: 10px; pointer-events: none;" >`
+    //                 + (successRate * 100).toFixed(1) + "%"
+    //             + `</text>`
+    //         ).documentElement);
+    //         $(this.refs['svg']).append(labelSuccessRate);
+    //     }
+
+    //     return { valueBefore: valueBefore, countBefore: countBefore, valueAfter: valueAfter, countAfter: countAfter };
+    // }
+
+    private rewalk(node: TreeBarNode<T>): { columns: Array<{ averBefore: number; averAfter: number; }> } {
+        if (node.children.length === 0) {
+            let valueBefore: number = 0;
+            let countBefore: number = 0;
+            let valueAfter: number = 0;
+            let countAfter: number = 0;
+            (node.data as any as Array<number>).forEach((i: number) => {
+                const point: { sentiment: string; class: number; } = Globe.getPoint(i);
+                const value: number = parseFloat(point.sentiment);
+                if (value === 0) {
+                    return;
+                }
+                valueBefore += parseFloat(point.sentiment);
+                countBefore++;
+                if (Globe.checkIfPointIsSampled(i)) {
+                    valueAfter += parseFloat(point.sentiment);
+                    countAfter++;
+                }
+            });
+            // for (let i: number = 0; true; i++) {
+            //     const point: { sentiment: string; class: number; } = Globe.getPoint(i);
+            //     if (!point) {
+            //         break;
+            //     }
+            //     if (point.class !== node.id) {
+            //         continue;
+            //     }
+            //     const value: number = parseFloat(point.sentiment);
+            //     if (value === 0) {
+            //         continue;
+            //     }
+            //     valueBefore += parseFloat(point.sentiment);
+            //     countBefore++;
+            //     if (Globe.checkIfPointIsSampled(i)) {
+            //         valueAfter += parseFloat(point.sentiment);
+            //         countAfter++;
+            //     }
+            // }
+            if (countBefore !== 0 && isNaN(Math.abs(valueAfter / countAfter))) {
+                console.log($(`#Bar_id${ node.id }`), node.id, valueBefore, countBefore, valueAfter, countAfter);
+            }
+            return { columns:
+                countBefore === 0
+                    ? []
+                    : [{
+                        averBefore: Math.abs(valueBefore / countBefore),
+                        averAfter: Math.abs(valueAfter / countAfter)
+                    }]
+            };
+        }
+        let columns: Array<{ averBefore: number; averAfter: number; }> = [];
+        node.children.forEach((child: TreeBarNode<T>) => {
+            columns.push(...this.rewalk(child).columns);
+        });
+        if ($(`#Bar_id${ node.id }`).hasClass("node")) {
+            const element: JQuery<HTMLElement> = $(`#Bar_id${ node.id }`);
+            const height: number = parseFloat(element.attr('__height')!);
+            const x: number = parseFloat(element.css('x'));
+            const y: number = parseFloat(element.css('y'));
+            element.animate({
+                width: height / 1.4,
+                height: height / 1.4,
+                rx: height / 1.4,
+                ry: height / 1.4,
+                x: x - height / 2.8 + height / 10,
+                y: y - height / 2.8 + height / 10
+            }, 20);
+
+            const total: number = columns.length * (columns.length - 1);
+            let mistake: number = 0;
+            for (let a: number = 0; a < columns.length - 1; a++) {
+                for (let b: number = a + 1; b < columns.length; b++) {
+                    if (Math.sign(columns[a].averBefore - columns[b].averBefore)
+                    !== Math.sign(columns[a].averAfter - columns[b].averAfter)) {
+                        mistake++;
+                    }
+                }
+            }
+
+            const successRate: number = 1 - mistake / total;
+            const labelSuccessRate: JQuery<HTMLElement> = $($.parseXML(
+                `<text xmlns="http://www.w3.org/2000/svg" `
+                + `x="${ x - height / 3.2 + height / 10 }" y="${ y - height / 3.2 + height * 3 / 5 }" `
+                + `dy="-4.3" `
+                + `style="fill: ${ Color.Nippon.Aisumitya }; font-size: 9px; pointer-events: none;" >`
+                    + (successRate * 100).toFixed(1) + "%"
+                + `</text>`
+            ).documentElement);
+            $(this.refs['svg']).append(labelSuccessRate);
+        }
+
+        return { columns: columns };
     }
 
     // private random(): number {
@@ -430,7 +599,10 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
         $(this.refs['layer']).html("");
         // $('.nodebox').css("rx", 2).css("ry", 2);
         setTimeout(() => {
-            this.relink(this.state);
+            this.rewalk(this.state);
+            setTimeout(() => {
+                this.relink(this.state);
+            }, 200);
             $('.lastlevel').css('stroke', Color.Nippon.Rokusyou);
         }, 800);
         // const path: JQuery<HTMLElement> = $($.parseXML(
@@ -495,8 +667,8 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
     private moveBars(act: "search" | "move", parent: TreeBarNode<T>, id: number, level: number): TreeBarNode<T> | null {
         if (act === "move") {
             if (parent.children.length === 0) {
-                const height: number = this.props.height / this.layers.length;
-                const value: number = 0.08 + 0.92 * this.countRate(parent);
+                const height: number = this.props.height / this.layers.length - 3;
+                const value: number = this.countRate(parent);
                 const y: number = parseFloat($(`#smpBar_id${ parent.id }`).css("y"));
                 // $(`#smpBar_id${ parent.id }`)
                 //     .css("height", height * value + 3)
@@ -510,8 +682,8 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                             level * this.props.height / this.layers.length * t / 950
                         }px)`);
                         $(`#smpBar_id${ parent.id }`)
-                            .css("height", height * (1 - t / 950 + value * t / 950) * 0.84 - 3)
-                            .css("y", y + height * (1 - value) * t / 950 * 0.84 + "px");
+                            .css("height", height * (1 - t / 950 + value * t / 950) * 0.84)
+                            .css("y", y + height * (1 - value) * t / 950 * 0.84);
                     }, 800 + t * 0.8);
                 }
                 // $(`#coreBar_id${ parent.id }`).animate({

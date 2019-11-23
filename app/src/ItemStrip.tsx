@@ -135,7 +135,6 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             src = {
                 origin: './data/93_new.json',
                 tree: './data/visualization_tree_dict_0.1_0.3_0.002.json',
-                cloud: './data/93-wordcount.json',
                 gathering: './data/new_93.json'
             };
             this.props.importSource(src);

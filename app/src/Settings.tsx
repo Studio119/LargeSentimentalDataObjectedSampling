@@ -109,11 +109,11 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                         colors: this.color,
                         enableTooltip: true,
                         deterministic: false,
-                        fontFamily: 'impact',
-                        fontSizes: [14, 28],
+                        fontFamily: 'mono',
+                        fontSizes: [12, 36],
                         fontStyle: 'normal',
                         fontWeight: 'normal',
-                        padding: 1.6,
+                        padding: 1.2,
                         rotations: 3,
                         rotationAngles: [0, 0],//[0, 90],
                         scale: Scale.Sqrt,
@@ -147,7 +147,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
     public import(topics: Array<{ text: string, count: number }>): void {
         let box: Array<{ text: string, count: number }>
             = topics.sort((a: { text: string; count: number; }, b: { text: string; count: number; }) => {
-                return a.count - b.count;
+                return b.count - a.count;
             });
         let data: Array<{ text: string, value: number }> = [];
         box.forEach((d: { text: string, count: number }, index: number) => {
@@ -157,9 +157,10 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             data.push({ text: d.text, value: d.count });
         });
         this.setState({
-            data: data.sort(() => {
-                return Math.random() - 0.5;
-            })
+            // data: data.sort(() => {
+            //     return Math.random() - 0.5;
+            // })
+            data: data
         });
     }
 }
