@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-23 22:11:27
+ * @Last Modified time: 2019-11-24 19:29:20
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -22,6 +22,7 @@ import { FileSet, DataForm } from './DataLib';
 
 // import axios, { AxiosResponse } from 'axios';
 import axios from 'axios';
+import ResultView from './ResultView';
 
 
 class App extends Component<{}, {}, {}> {
@@ -211,12 +212,13 @@ class App extends Component<{}, {}, {}> {
           }} />
         </div> */}
         <TreeBar<Array<number>> id="TreeBar" ref="TreeBar"
-          width={1157} height={242.2}
-          style={{
-            background: 'white',
-            position: 'relative',
-            top: '539.6px'
-          }} />
+        width={1157} height={242.2}
+        style={{
+          background: 'white',
+          position: 'relative',
+          top: '539.6px'
+        }} />
+        <ResultView ref="ResultView" />
       </div>
     );
   }
@@ -391,6 +393,7 @@ class App extends Component<{}, {}, {}> {
           nodes.push(parseInt(str));
         });
         Globe.moveBars(nodes);
+        (this.refs["ResultView"] as ResultView).import("all");
         $("#run").attr("src", "./images/run.png").removeClass("rotating");
       });
     };
@@ -481,6 +484,8 @@ class App extends Component<{}, {}, {}> {
           list.length, active, positive, neutre, A_active / active, A_positive / positive, 0
         );
       }
+      console.log(list);
+      (this.refs["ResultView"] as ResultView).import(list);
       (this.refs["bbs"] as BBS).import(box);
       Globe.countWords(texts);
     };

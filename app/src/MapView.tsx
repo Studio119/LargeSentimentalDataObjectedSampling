@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-21 21:46:50
+ * @Last Modified time: 2019-11-24 19:32:13
  */
 import React from 'react';
 import $ from 'jquery';
@@ -1021,12 +1021,12 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             ready.forEach((d: [number, number, string]) => {
                 this.highLightPoint(d[0], d[1], d[2]);
             });
-            Globe.update(set);
         }
     }
 
     private highlight(points: Array<number> | 'all'): void {
         this.ctx_2!.clearRect(-2, -2, 869, 510.64);
+        Globe.update(points);
         if (points === 'all') {
             $("#map_layer_canvas").css('opacity', 1);
             return;
