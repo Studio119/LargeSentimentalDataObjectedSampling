@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-24 17:47:11 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-12 20:37:15
+ * @Last Modified time: 2019-11-27 19:05:54
  */
 
 
@@ -37,7 +37,7 @@ const linearGradient: (colorset: Array< string | number >, direction?: 'bottom' 
                     return ' ' + value[0];
                 }
                 else {
-                    return ' ' + value[0] + ' ' + value[1] + '%';
+                    return ' ' + value[0] + ' ' + value[1] * 100 + '%';
                 }
             })
         })`;
@@ -353,8 +353,8 @@ const Color = {
          */
         /**
          */
-        /**
-         */
+        /**籐黄 rgb(255,196,8)*/
+        Touou: '#FFC408',
         /**鬱金 rgb(239,187,36)*/
         Ukonn: '#EFBB24',
         /**
@@ -366,7 +366,17 @@ const Color = {
         /**
          */
         /**常盤 rgb(27,129,62)*/
+        /**
+         */
+        /**
+         */
+        /**
+         */
         Tokiwa: '#1B813E',
+        /**緑 rgb(34,125,81)*/
+        Midori: '#227D51',
+        /**
+         */
         /**
          */
         /**
@@ -407,10 +417,10 @@ const Color = {
         Kati: '#08192D',
         /**瑠璃 rgb(0,92,175)*/
         Ruri: '#005CAF',
-        /**
-         */
-        /**
-         */
+        /**瑠璃紺 rgb(11,52,110)*/
+        Rurikonn: '#0B346E',
+        /**红碧 rgb(123,144,210)*/
+        Berimidori: '#7B90D2',
         /**
          */
         /**
@@ -433,8 +443,24 @@ const Color = {
          */
         /**
          */
-        /**半 rgb()*/
+        /**半 rgb(152,109,78)*/
         Hasita: '#986DB2',
+        /**
+         */
+        /**
+         */
+        /**
+         */
+        /**
+         */
+        /**
+         */
+        /**
+         */
+        /**
+         */
+        /**躑躅 rgb(224,60,138)*/
+        Tutuzi: '#E03C8A',
         /**胡粉 rgb(189,192,186)*/
         Gohunn: '#FFFFFB',
         /**

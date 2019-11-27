@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-23 22:11:25
+ * @Last Modified time: 2019-11-27 20:23:52
  */
 
 import React, { Component } from 'react';
@@ -62,7 +62,14 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                     height: '24px',
                     width: `${ this.props.width - 16 }px`,
                     borderBottom: '1px solid rgb(149,188,239)',
-                    background: 'rgb(120,151,213)',
+                    background: Color.linearGradient([
+                        Color.setLightness(Color.Nippon.Berimidori, 0.56),
+                        0,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.47),
+                        0.15,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.65),
+                        1
+                    ], 'right'),//Color.Nippon.Berimidori, // Color.Nippon.Tutuzi, //'rgb(120,151,213)',
                     color: 'white',
                     textAlign: 'left',
                     paddingLeft: '16px',
@@ -96,6 +103,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             : (Math.abs(value) * 0.8 + 0.2) * height - 3;
                                         return [(
                                             <rect id={ `Bar_id${ node.id }` }
+                                            className="Bar"
                                             key={ node.id }
                                             xmlns={`http://www.w3.org/2000/svg`}
                                             x={ offsetX * this.props.width / this.layers[this.layers.length - 1].length + 1 }
@@ -114,13 +122,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    Globe.highlightClass(-1);
+                                                    Globe.highlightClass(-1, false);
                                                     Globe.highlight((node.data as any) as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    Globe.highlightClass(-1);
+                                                    Globe.highlightClass(-1, false);
                                                 }
                                             } />
                                         ), (
@@ -144,7 +152,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    Globe.highlightClass(-1);
+                                                    Globe.highlightClass(-1, false);
                                                     let set: Array<number> = [];
                                                     (node.data as any as Array<number>).forEach((id: number) => {
                                                         if (Globe.checkIfPointIsSampled(id)) {
@@ -156,7 +164,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    Globe.highlightClass(-1);
+                                                    Globe.highlightClass(-1, false);
                                                 }
                                             } />
                                         ), (
@@ -181,13 +189,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    Globe.highlightClass(-1);
+                                                    Globe.highlightClass(-1, false);
                                                     Globe.highlight(node.data as any as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    Globe.highlightClass(-1);
+                                                    Globe.highlightClass(-1, false);
                                                 }
                                             } />
                                         )];
@@ -214,13 +222,13 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             }}
                                             onClick={
                                                 () => {
-                                                    Globe.highlightClass(-1);
+                                                    Globe.highlightClass(-1, false);
                                                     Globe.highlight(node.data as any as Array<number>);
                                                 }
                                             }
                                             onDoubleClick={
                                                 () => {
-                                                    Globe.highlightClass(-1);
+                                                    Globe.highlightClass(-1, false);
                                                 }
                                             } />
                                         );
@@ -306,6 +314,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
     }
 
     public componentDidUpdate(): void {
+        $(".offDisplay").remove();
         $(this.refs['layer']).html("");
         $('.node').each((index: number, e: HTMLElement) => {
             const element: JQuery<HTMLElement> = $(e);
@@ -547,7 +556,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
 
             const successRate: number = 1 - mistake / total;
             const labelSuccessRate: JQuery<HTMLElement> = $($.parseXML(
-                `<text xmlns="http://www.w3.org/2000/svg" `
+                `<text xmlns="http://www.w3.org/2000/svg" class="offDisplay" `
                 + `x="${ x - height / 3.2 + height / 10 }" y="${ y - height / 3.2 + height * 3 / 5 }" `
                 + `dy="-4.3" `
                 + `style="fill: ${ Color.Nippon.Aisumitya }; font-size: 9px; pointer-events: none;" >`

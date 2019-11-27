@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-24 19:29:20
+ * @Last Modified time: 2019-11-27 20:23:01
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -23,6 +23,7 @@ import { FileSet, DataForm } from './DataLib';
 // import axios, { AxiosResponse } from 'axios';
 import axios from 'axios';
 import ResultView from './ResultView';
+import Color from './preference/Color';
 
 
 class App extends Component<{}, {}, {}> {
@@ -39,7 +40,10 @@ class App extends Component<{}, {}, {}> {
 
   public render(): JSX.Element {
     return (
-      <div className="App">
+      <div className="App"
+      style={{
+        background: Color.Nippon.Rurikonn
+      }} >
         <TaskQueue<Global> ref="DataCenter" control={ Globe } />
         <ItemStrip id="ItemStrip" importSource={ this.loadSource } />
         <DataView id="MapSettings" ref="DataView" />
@@ -216,7 +220,7 @@ class App extends Component<{}, {}, {}> {
         style={{
           background: 'white',
           position: 'relative',
-          top: '539.6px'
+          top: '540.4px'
         }} />
         <ResultView ref="ResultView" />
       </div>
@@ -225,6 +229,39 @@ class App extends Component<{}, {}, {}> {
 
   public componentDidMount(): void {
     this.loadSource = (paths: FileSet) => {
+      // reset
+      (this.refs["DataView"] as DataView).setState({
+        total: 0,
+        active: 0,
+        positive: 0,
+        neutre: 0,
+        Aver_active: 0,
+        Aver_positive: 0,
+        Aver_neutre: 0
+      });
+      (this.refs["bbs"] as BBS).setState({
+        list: []
+      });
+      (this.refs["map"] as MapView).setState({
+        data: [],
+        sampled: []
+      });
+      (this.refs["topics"] as Settings).setState({
+        data: []
+      });
+      (this.refs["TreeBar"] as TreeBar<Array<number>>).setState({
+        id: -1,
+        name: 'root',
+        path: [ 'root' ],
+        parent: null,
+        children: [],
+        ref: $("NULL"),
+        data: []
+      });
+      (this.refs["ResultView"] as ResultView).setState({
+        classes: []
+      });
+
       (this.refs["DataCenter"] as TaskQueue).open(paths.origin, (data: DataForm.Origin) => {
         let dataset: Array<{
           id: string, lng: number, lat: number, words: string,
@@ -310,7 +347,26 @@ class App extends Component<{}, {}, {}> {
           for (const word in dict) {
             if (dict.hasOwnProperty(word)) {
               const count: number = dict[word];
-              if (count < dataset.length / 1e5) {
+              if (topics.length === 160) {
+                if (topics[159].count <= count) {
+                  topics[159] = {
+                    text: word,
+                    count: count
+                  };
+                  for (let a: number = 159; a >= 1; a--) {
+                    if (topics[a].count < topics[a - 1].count) {
+                      const temp: {
+                        text: string;
+                        count: number;
+                      } = topics[a];
+                      topics[a] = topics[a - 1];
+                      topics[a - 1] = temp;
+                    }
+                    else {
+                      break;
+                    }
+                  }
+                }
                 continue;
               }
               topics.push({
@@ -321,12 +377,17 @@ class App extends Component<{}, {}, {}> {
           }
           (this.refs["topics"] as Settings).import(topics);
         });
-      });
-      (this.refs["DataCenter"] as TaskQueue).open(paths.tree, (data: DataForm.Tree) => {
-        let dataset: TreeBarNode<Array<number>> = this.loadTree(data, null, 'root');
-        // (this.refs["RectTree"] as ContrastView).import(dataset);
-        // (this.refs["TreeMap"] as TreeMap).import(dataset);
-        (this.refs["TreeBar"] as TreeBar<Array<number>>).import(dataset);
+        
+        (this.refs["DataCenter"] as TaskQueue).open(paths.tree, (data: DataForm.Tree) => {
+          let dataset: TreeBarNode<Array<number>> = this.loadTree(data, null, 'root');
+          // (this.refs["RectTree"] as ContrastView).import(dataset);
+          // (this.refs["TreeMap"] as TreeMap).import(dataset);
+          (this.refs["TreeBar"] as TreeBar<Array<number>>).import(dataset);
+        });
+
+        $("#run")
+          .attr("src", "./images/run.png")
+          .removeClass("rotating");
       });
 
       // setTimeout(() => {
@@ -394,7 +455,9 @@ class App extends Component<{}, {}, {}> {
         });
         Globe.moveBars(nodes);
         (this.refs["ResultView"] as ResultView).import("all");
-        $("#run").attr("src", "./images/run.png").removeClass("rotating");
+        $("#run")
+          .attr("src", "./images/run.png")
+          .removeClass("rotating");
       });
     };
     Globe.update = (list: Array<number> | "all") => {
@@ -484,7 +547,6 @@ class App extends Component<{}, {}, {}> {
           list.length, active, positive, neutre, A_active / active, A_positive / positive, 0
         );
       }
-      console.log(list);
       (this.refs["ResultView"] as ResultView).import(list);
       (this.refs["bbs"] as BBS).import(box);
       Globe.countWords(texts);
@@ -517,7 +579,26 @@ class App extends Component<{}, {}, {}> {
         for (const word in dict) {
           if (dict.hasOwnProperty(word)) {
             const count: number = dict[word];
-            if (count < list.length / 1e5) {
+            if (topics.length === 160) {
+              if (topics[159].count <= count) {
+                topics[159] = {
+                  text: word,
+                  count: count
+                };
+                for (let a: number = 159; a >= 1; a--) {
+                  if (topics[a].count < topics[a - 1].count) {
+                    const temp: {
+                      text: string;
+                      count: number;
+                    } = topics[a];
+                    topics[a] = topics[a - 1];
+                    topics[a - 1] = temp;
+                  }
+                  else {
+                    break;
+                  }
+                }
+              }
               continue;
             }
             topics.push({
@@ -572,8 +653,10 @@ interface Global {
     class: number;
   };
   highlight: (points: Array<number> | "all") => void;
-  highlightClass: (index: number) => void;
+  highlightClass: (index: number, useSampled: boolean) => void;
+  loadData: () => void;
   moveBars: (nodes: Array<number>) => void;
+  random: (rate: number) => void;
   sample: () => void;
   update: (list: Array<number> | "all") => void;
   run: () => void;
@@ -587,7 +670,9 @@ export var Globe: Global = {
   },
   highlight: () => {},
   highlightClass: () => {},
+  loadData: () => {},
   moveBars: () => {},
+  random: () => {},
   sample: () => {},
   update: () => {},
   run: () => {}
@@ -633,6 +718,14 @@ var checkIfBackEndServerAvailable: () => void = () => {
 };
 
 setTimeout(checkIfBackEndServerAvailable, 2000);
+
+(window as any)["title"] = (color: string) => {
+  $("div").each((i: number, e: HTMLElement) => {
+    if (parseInt($(e).css("height")) === 24) {
+      $(e).css("background", color);
+    }
+  });
+};
 
 
 export default App;

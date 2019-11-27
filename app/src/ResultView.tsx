@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-11-24 14:10:09 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-24 19:40:50
+ * @Last Modified time: 2019-11-27 20:13:38
  */
 
 import React, { Component } from 'react';
@@ -38,7 +38,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                 background: 'white none repeat scroll 0% 0%',
                 position: 'absolute',
                 left: '1163px',
-                top: '595.4px',
+                top: '596.2px',
                 width: '373px',
                 height: '266.2px'
             }} >
@@ -47,7 +47,14 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                     height: '24px',
                     width: `358px`,
                     borderBottom: '1px solid rgb(149,188,239)',
-                    background: 'rgb(120,151,213)',
+                    background: Color.linearGradient([
+                        Color.setLightness(Color.Nippon.Berimidori, 0.54),
+                        0,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.45),
+                        0.15,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.63),
+                        1
+                    ], 'right'),//Color.Nippon.Berimidori, // Color.Nippon.Tutuzi, //'rgb(120,151,213)',
                     color: 'white',
                     textAlign: 'left',
                     paddingLeft: '16px',
@@ -124,7 +131,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                                         style={{
                                             textAlign: 'right'
                                         }} >
-                                            { leaf.id }
+                                            { index + 1 }
                                         </text>
                                         <rect id={ `prevRes${ leaf.id }` }
                                         key={ `prevRes${ leaf.id }` }
@@ -140,7 +147,12 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                                                     ? Color.Nippon.Syozyohi
                                                     : Color.Nippon.Ruri,
                                             stroke: Color.setLightness(Color.Nippon.Aisumitya, 0.7)
-                                        }} />
+                                        }}
+                                        onClick={
+                                            () => {
+                                                Globe.highlightClass(leaf.id, false);
+                                            }
+                                        } />
                                     </g>);
                             })
                         }
@@ -173,7 +185,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                                         style={{
                                             textAlign: 'left'
                                         }} >
-                                            { leaf.id }
+                                            { index + 1 }
                                         </text>
                                         <rect id={ `nextRes${ leaf.id }` }
                                         key={ `nextRes${ leaf.id }` }
@@ -189,7 +201,12 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                                                     ? Color.Nippon.Syozyohi
                                                     : Color.Nippon.Ruri,
                                             stroke: Color.setLightness(Color.Nippon.Aisumitya, 0.7)
-                                        }} />
+                                        }}
+                                        onClick={
+                                            () => {
+                                                Globe.highlightClass(leaf.id, true);
+                                            }
+                                        } />
                                     </g>);
                             })
                         }

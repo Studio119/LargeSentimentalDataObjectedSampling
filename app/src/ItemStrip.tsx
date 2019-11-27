@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-24 19:29:19
+ * @Last Modified time: 2019-11-27 20:55:13
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -19,27 +19,52 @@ export interface ItemStripProps {
     importSource: (paths: FileSet) => void;
 }
 
-export interface ItemStripState {}
+export interface ItemStripState {
+    sampled: boolean;
+}
 
 class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
     public constructor(props: ItemStripProps) {
         super(props);
-        this.state = {};
+        this.state = {
+            sampled: false
+        };
     }
 
     public render(): JSX.Element {
         return (
             <>
                 <div id={ this.props.id } key="container"
-                    style={{
-                        height: '40px',
-                        padding: '5px 40px 8px 40px',
-                        background: 'rgb(224, 232, 240)',
-                        border: '1px solid rgb(149,188,239)',
-                        textAlign: 'left'
+                style={{
+                    height: '40px',
+                    padding: '5px 22px 8px 22px',
+                    background: Color.Nippon.Touou,
+                    border: `1px solid ${ Color.Nippon.Tokiwa }`,
+                    textAlign: 'left'
+                }} >
+                    <div style={{
+                        display: 'inline-block',
+                        height: '41.8px',
+                        border: `1px solid ${ Color.Nippon.Mizu }`,
+                        background: Color.setLightness(Color.Nippon.Mizu, 0.94),
+                        marginRight: '10.2px'
                     }} >
-                    <label style={{ position: 'relative', top: 8, fontSize: '18px' }}>dataset</label>
-                    <Dropdown<string> width={ 80 } height={ 30 } optionList={ ['Tweet', 'yelp'] } onChange={ (option: string) => { this.load(option); } } />
+                        <label style={{
+                            position: 'relative',
+                            top: 6.5,
+                            fontSize: '17px',
+                            paddingLeft: '10px'
+                        }} >
+                            dataset
+                        </label>
+                        <Dropdown<string> width={ 80 } height={ 30 } optionList={ ['Tweet', 'yelp'] }
+                        onChange={
+                            (option: string) => {
+                                this.load(option);
+                                Globe.loadData = this.load.bind(this, option);
+                            }
+                        } />
+                    </div>
 
                     <div style={{
                         display: 'inline-block',
@@ -55,7 +80,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                             transform: 'translateY(5.4px)',
                             marginRight: '18px',
                             background: Color.Nippon.Gohunn + 'A0',
-                            color: Color.Nippon.Tokiwa
+                            color: Color.Nippon.Midori // Color.Nippon.Tokiwa
                         }} >
                             + New Sample
                         </div>
@@ -81,32 +106,52 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
 
                         <button id="goRun"
                         style={{
-                            fontSize: '15px',
+                            fontSize: this.state.sampled ? '13px' : '15px',
+                            width: '73.2px',
                             transform: 'translateY(5.8px)',
-                            marginLeft: '40px',
+                            marginLeft: '32px',
                             marginRight: '9px',
                             background: Color.Nippon.Aisumitya,
                             color: Color.setLightness(Color.Nippon.Aisumitya, 0.9),
                             padding: '2px 9px'
                         }}
                         onClick={
-                            () => {
-                                if ($("#run").attr("src") === "./images/loading.png") {
-                                    return;
+                            this.state.sampled
+                                ? () => {
+                                    if ($("#run").attr("src") === "./images/loading.png") {
+                                        return;
+                                    }
+                                    $("#run").attr("src", "./images/loading.png").addClass("rotating");
+                                    setTimeout(() => {
+                                        this.setState({
+                                            sampled: false
+                                        });
+                                        Globe.loadData();
+                                    }, 200);
                                 }
-                                $("#run").attr("src", "./images/loading.png").addClass("rotating");
-                                setTimeout(() => {
-                                    Globe.run();
-                                }, 200);
-                            }
+                                :  () => {
+                                    if ($("#run").attr("src") === "./images/loading.png") {
+                                        return;
+                                    }
+                                    $("#run").attr("src", "./images/loading.png").addClass("rotating");
+                                    setTimeout(() => {
+                                        this.setState({
+                                            sampled: true
+                                        });
+                                        Globe.run();
+                                    }, 200);
+                                }
                         } >
                             <img src={ `./images/run.png` } id="run"
                             alt={ ">>" }
                             width="14px" height="14px"
                             style={{
-                                margin: '0px 7px 0px -2px'
+                                margin: this.state.sampled ? '0px 2px 0px -2px' : '0px 7px 0px -2px'
                             }} />
-                            Run
+                            {
+                                this.state.sampled
+                                    ? "Cancel" : "Run"
+                            }
                         </button>
                     </div>
 
@@ -114,6 +159,50 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                     <ColorPicker ref={ "cp0" } x={ 1360 } y={ 6 } r={0} g={92} b={175} opacity={1} />
                     <ColorPicker ref={ "cp1" } x={ 1410 } y={ 6 } r={232} g={48} b={21} opacity={1} />
                     <ColorPicker ref={ "cp2" } x={ 1460 } y={ 6 } r={239} g={187} b={36} opacity={1} />
+                </div>
+                <div style={{
+                    display: 'inline-block',
+                    height: '41.8px',
+                    padding: '0 12px',
+                    border: `1px solid ${ Color.Nippon.Mizu }`,
+                    background: Color.setLightness(Color.Nippon.Mizu, 0.94)
+                }} >
+                    <button id="goRandom"
+                    style={{
+                        fontSize: '14px',
+                        width: '73px',
+                        transform: 'translateY(5.8px)',
+                        marginLeft: '32px',
+                        marginRight: '9px',
+                        background: Color.Nippon.Aisumitya,
+                        color: Color.setLightness(Color.Nippon.Aisumitya, 0.9),
+                        padding: '2px 9px'
+                    }}
+                    onClick={
+                        this.state.sampled
+                            ? () => {}
+                            :  () => {
+                                return; // TODO: Random Sampling
+                                // if ($("#run").attr("src") === "./images/loading.png") {
+                                //     return;
+                                // }
+                                // $("#run").attr("src", "./images/loading.png").addClass("rotating");
+                                // setTimeout(() => {
+                                //     this.setState({
+                                //         sampled: true
+                                //     });
+                                //     Globe.run();
+                                // }, 200);
+                            }
+                    } >
+                        <img src={ `./images/run.png` } id="run"
+                        alt={ ">>" }
+                        width="14px" height="14px"
+                        style={{
+                            margin: this.state.sampled ? '0px 2px 0px -2px' : '0px 7px 0px -2px'
+                        }} />
+                        Random
+                    </button>
                 </div>
             </>
         );
@@ -127,6 +216,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             (this.refs[`cp${index}`] as ColorPicker).bind(element, ...attrName);
         };
         this.load('Tweet');
+        Globe.loadData = this.load.bind(this, 'Tweet');
     }
 
     private load(source: string): void {

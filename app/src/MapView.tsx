@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-24 19:32:13
+ * @Last Modified time: 2019-11-27 20:27:27
  */
 import React from 'react';
 import $ from 'jquery';
@@ -104,14 +104,20 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             }} >
                 <div
                 style={{
-                    height: '22px',
+                    height: '24px',
                     width: '848px',
                     borderBottom: '1px solid rgb(149,188,239)',
-                    background: 'rgb(120,151,213)',
+                    background: Color.linearGradient([
+                        Color.setLightness(Color.Nippon.Berimidori, 0.56),
+                        0,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.47),
+                        0.15,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.65),
+                        1
+                    ], 'right'),//Color.Nippon.Berimidori, // Color.Nippon.Tutuzi, //'rgb(120,151,213)',
                     color: 'white',
                     textAlign: 'left',
                     paddingLeft: '16px',
-                    paddingTop: '2px',
                     letterSpacing: '2px',
                     fontSize: 'larger'
                 }} >
@@ -380,7 +386,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             () => {
                                 $(this.refs["area"]).hide();
                                 this.highLighted = [];
-                                this.highLightClass(-1);
+                                this.highLightClass(-1, false);
                                 $(this.refs['svg']).html("");
                                 this.rounds = [];
                                 Globe.update("all");
@@ -430,7 +436,19 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             this.hightLightArea('rect');
         }
         else {
+            this.highLighted = [];
             this.redraw();
+            this.highLighted = [];
+            $("#map_layer_canvas").css('opacity', 1);
+            $(this.refs['svg']).html("");
+            this.rounds = [];
+            try {
+                setTimeout(() => {
+                    Globe.update("all");
+                }, 2000);
+            } catch (error) {
+                console.error(error);
+            }
         }
         // this.bounds = [[ 50.55349948549696, 22.86881607932105 ], [ -128.14621384226703, -67.85378615773539 ]];
     }
@@ -996,14 +1014,16 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         });
     }
 
-    private highLightClass(index: number): void {
+    private highLightClass(index: number, useSampled: boolean): void {
         this.ctx_2!.clearRect(-2, -2, 869, 510.64);
+        $(".Bar").css("stroke-width", 1).css("stroke", Color.setLightness(Color.Nippon.Aisumitya, 0.7));
         if (index === -1) {
             $("#map_layer_canvas").css('opacity', 1);
             return;
         }
         else {
             $("#map_layer_canvas").css('opacity', 0.2);
+            $(`#Bar_id${ index }`).css("stroke-width", 4).css("stroke", Color.Nippon.Kinntya);
             let ready: Array<[number, number, string]> = [];
             let set: Array<number> = [];
             this.state.data.forEach((d: {
@@ -1015,7 +1035,14 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                                         : parseFloat(d.sentiment) > 0
                                                             ? Color.Nippon.Ruri // Tokiwa
                                                             : Color.Nippon.Ukonn]);
-                    set.push(idx);
+                    if (this.state.sampled.length) {
+                        if (!useSampled || Globe.checkIfPointIsSampled(idx)) {
+                            set.push(idx);
+                        }
+                    }
+                    else {
+                        set.push(idx);
+                    }
                 }
             });
             ready.forEach((d: [number, number, string]) => {

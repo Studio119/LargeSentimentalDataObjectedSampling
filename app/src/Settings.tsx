@@ -2,11 +2,12 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-21 21:34:23
+ * @Last Modified time: 2019-11-27 19:48:28
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
 import ReactWordCloud, { Scale, Spiral } from 'react-wordcloud';
+import Color from './preference/Color';
 
 export interface SettingsProps {
     id: string;
@@ -37,20 +38,27 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             <div id={ this.props.id }
             style={{
                 display: 'inline-block',
-                height: '308.8px',
-                width: '288px',
+                height: '307.1px',
+                width: '289px',
                 background: 'white',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
-                top: '281.5px',
+                top: '282.9px',
                 left: '0px'
             }}>
                 <div
                 style={{
                     height: '24px',
-                    width: '272px',
+                    width: '273px',
                     borderBottom: '1px solid rgb(149,188,239)',
-                    background: 'rgb(120,151,213)',
+                    background: Color.linearGradient([
+                        Color.setLightness(Color.Nippon.Berimidori, 0.6),
+                        0,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.5),
+                        0.15,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.7),
+                        1
+                    ], 'right'),//Color.Nippon.Berimidori, // Color.Nippon.Tutuzi, //'rgb(120,151,213)',
                     color: 'white',
                     textAlign: 'left',
                     paddingLeft: '16px',
@@ -109,13 +117,13 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                         colors: this.color,
                         enableTooltip: true,
                         deterministic: false,
-                        fontFamily: 'mono',
-                        fontSizes: [12, 36],
+                        fontFamily: 'impact',
+                        fontSizes: [12, 60],
                         fontStyle: 'normal',
                         fontWeight: 'normal',
-                        padding: 1.2,
+                        padding: 1,
                         rotations: 3,
-                        rotationAngles: [0, 0],//[0, 90],
+                        rotationAngles: [0, 90],
                         scale: Scale.Sqrt,
                         spiral: Spiral.Archimedean,
                         transitionDuration: 100
@@ -151,10 +159,10 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             });
         let data: Array<{ text: string, value: number }> = [];
         box.forEach((d: { text: string, count: number }, index: number) => {
-            if (index >=  30) {
+            if (index >= 160) {
                 return;
             }
-            data.push({ text: d.text, value: d.count });
+            data.push({ text: d.text.toUpperCase(), value: d.count });
         });
         this.setState({
             // data: data.sort(() => {

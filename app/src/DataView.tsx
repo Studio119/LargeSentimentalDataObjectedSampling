@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-15 23:19:54
+ * @Last Modified time: 2019-11-27 19:30:45
  */
 import React, { Component } from 'react';
 import Color from './preference/Color';
@@ -41,7 +41,7 @@ class DataView extends Component<DataViewProps, DataViewState, {}> {
             style={{
                 display: 'inline-block',
                 height: '218.8px',
-                width: '288px',
+                width: '289px',
                 background: 'rgb(246, 249, 253)',
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
@@ -51,9 +51,16 @@ class DataView extends Component<DataViewProps, DataViewState, {}> {
                 <div
                 style={{
                     height: '24px',
-                    width: '272px',
+                    width: '273px',
                     borderBottom: '1px solid rgb(149,188,239)',
-                    background: 'rgb(120,151,213)',
+                    background: Color.linearGradient([
+                        Color.setLightness(Color.Nippon.Berimidori, 0.6),
+                        0,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.5),
+                        0.15,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.7),
+                        1
+                    ], 'right'),//Color.Nippon.Berimidori, // Color.Nippon.Tutuzi, //'rgb(120,151,213)',
                     color: Color.Nippon.Gohunn,
                     textAlign: 'left',
                     paddingLeft: '16px',

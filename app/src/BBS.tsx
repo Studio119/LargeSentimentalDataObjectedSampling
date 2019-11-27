@@ -2,10 +2,11 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-10 13:26:24 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-21 21:49:48
+ * @Last Modified time: 2019-11-27 19:53:26
  */
 import React, { Component } from "react";
 import $ from "jquery";
+import Color from "./preference/Color";
 
 export interface BBSprops {
     width: number;
@@ -102,7 +103,14 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                     height: '24px',
                     width: this.props.width - 16,
                     borderBottom: '1px solid rgb(149,188,239)',
-                    background: 'rgb(120,151,213)',
+                    background: Color.linearGradient([
+                        Color.setLightness(Color.Nippon.Berimidori, 0.54),
+                        0,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.45),
+                        0.15,
+                        Color.setLightness(Color.Nippon.Berimidori, 0.63),
+                        1
+                    ], 'right'),//Color.Nippon.Berimidori, // Color.Nippon.Tutuzi, //'rgb(120,151,213)',
                     color: 'white',
                     textAlign: 'left',
                     paddingLeft: '16px',
@@ -124,7 +132,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                         <p style={{
                             color: "#888",
                             margin: "6px -29px 22px",
-                            fontSize: '12px'
+                            fontSize: '12.4px'
                         }} >
                             Too many to display, showing 20 results only.
                         </p>
@@ -153,7 +161,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                                                 color: '#668',
                                                 marginRight: '8px',
                                                 textAlign: 'right',
-                                                fontSize: '12.6px'
+                                                fontSize: '13px'
                                             }}>
                                                 { b.city }
                                             </span>
@@ -192,7 +200,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                                             marginBottom: '-6px',
                                             marginTop: '2px',
                                             marginLeft: '10px',
-                                            fontSize: '13px'
+                                            fontSize: '13.4px'
                                         }} >
                                             <span ref={ `bbs_text${ index }`} >
                                                 { b.text }
