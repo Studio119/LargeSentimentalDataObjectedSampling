@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-27 20:23:01
+ * @Last Modified time: 2019-11-28 21:01:49
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -45,7 +45,7 @@ class App extends Component<{}, {}, {}> {
         background: Color.Nippon.Rurikonn
       }} >
         <TaskQueue<Global> ref="DataCenter" control={ Globe } />
-        <ItemStrip id="ItemStrip" importSource={ this.loadSource } />
+        <ItemStrip id="ItemStrip" ref="ItemStrip" importSource={ this.loadSource } />
         <DataView id="MapSettings" ref="DataView" />
         {/* <div className="Chart"
         style={{
@@ -347,13 +347,13 @@ class App extends Component<{}, {}, {}> {
           for (const word in dict) {
             if (dict.hasOwnProperty(word)) {
               const count: number = dict[word];
-              if (topics.length === 160) {
-                if (topics[159].count <= count) {
-                  topics[159] = {
+              if (topics.length === 80) {
+                if (topics[79].count <= count) {
+                  topics[79] = {
                     text: word,
                     count: count
                   };
-                  for (let a: number = 159; a >= 1; a--) {
+                  for (let a: number = 79; a >= 1; a--) {
                     if (topics[a].count < topics[a - 1].count) {
                       const temp: {
                         text: string;
@@ -388,6 +388,8 @@ class App extends Component<{}, {}, {}> {
         $("#run")
           .attr("src", "./images/run.png")
           .removeClass("rotating");
+          
+        (this.refs["ItemStrip"] as ItemStrip).end(false);
       });
 
       // setTimeout(() => {
@@ -407,8 +409,26 @@ class App extends Component<{}, {}, {}> {
       // (this.refs["DataCenter"] as TaskQueue).open(prun, (data: Array<number>) => {
       //   (this.refs["TreeMap"] as TreeMap).importPruning(data);
       // });
-    }
+    };
     Globe.sample = () => {
+      let c: number = 0;
+      let process: NodeJS.Timeout = setInterval(() => {
+        $("#goRun").css("background", Color.linearGradient([
+          Color.setLightness(Color.Nippon.Nae, 0.6),
+          0,
+          Color.Nippon.Nae,
+          c <= 0.5 ? c : c - 0.041,
+          Color.setLightness(Color.Nippon.Midori, 0.7),
+          c <= 0.5 ? c + 0.001 : c - 0.04,
+          Color.setLightness(Color.Nippon.Midori, 0.9),
+          c <= 0.5 ? c + 0.04 : c - 0.001,
+          Color.setLightness(Color.Nippon.Aisumitya, 0.3),
+          c <= 0.5 ? c + 0.041 : c,
+          Color.setLightness(Color.Nippon.Aisumitya, 0.3),
+          1
+        ], 'right'));
+        c += (1 - c) / 10;
+      }, 50);
       (this.refs["DataCenter"] as TaskQueue).open("./data/huisu_sampled_9.17_29_0.3_0.1_0.002.json", (data: DataForm.Sampled) => {
         let set: Array<number> = [];
         Object.values(data).forEach((innode: Array<number>) => {
@@ -446,19 +466,106 @@ class App extends Component<{}, {}, {}> {
         //   }
         // }
         // console.log(over);
-        (this.refs["map"] as MapView).setState({
-          sampled: set
-        });
-        let nodes: Array<number> = [];
-        Object.keys(data).forEach((str: string) => {
-          nodes.push(parseInt(str));
-        });
-        Globe.moveBars(nodes);
-        (this.refs["ResultView"] as ResultView).import("all");
-        $("#run")
-          .attr("src", "./images/run.png")
-          .removeClass("rotating");
+        setTimeout(() => {
+          (this.refs["map"] as MapView).setState({
+            sampled: set
+          });
+          let nodes: Array<number> = [];
+          setTimeout(() => {
+            Object.keys(data).forEach((str: string) => {
+              nodes.push(parseInt(str));
+            });
+            setTimeout(() => {
+              Globe.moveBars(nodes);
+              setTimeout(() => {
+                (this.refs["ItemStrip"] as ItemStrip).end(true);
+                clearInterval(process);
+                $("#run")
+                  .attr("src", "./images/run.png")
+                  .removeClass("rotating");
+                (this.refs["ItemStrip"] as ItemStrip).setSampleRate(set.length / (this.refs["map"] as MapView).state.data.length);
+              }, 1000);
+            }, 300);
+            (this.refs["ResultView"] as ResultView).import("all");
+          }, 40);
+        }, 40);
       });
+    };
+    Globe.random = () => {
+      let total: Array<number> = [];
+      let set: Array<number> = [];
+      let length: number = (this.refs["map"] as MapView).state.data.length;
+      for (let i: number = 0; i < length; i++) {
+        total.push(i);
+      }
+      let k: number = 0;
+      let max: number = 4e2;
+      const target: number = Math.round(length * (this.refs["ItemStrip"] as ItemStrip).getSampleRate());
+      const fun: () => void = () => {
+        while (k < target && k < max) {
+          const idx: number = Math.floor(Math.random() * total.length);
+          set.push(total[idx]);
+          let left: Array<number> = [];
+          total.forEach((i: number) => {
+            if (i !== idx) {
+              left.push(i);
+            }
+          });
+          total = left;
+          k++;
+        }
+        if (k === target) {
+          (this.refs["map"] as MapView).setState({
+            sampled: set
+          });
+          Globe.moveBars([]);
+          (this.refs["ResultView"] as ResultView).import("all");
+          (this.refs["ItemStrip"] as ItemStrip).end(true);
+          $("#runr")
+            .attr("src", "./images/run.png")
+            .removeClass("rotating");
+          return;
+        }
+        else {
+          $("#goRandom").css("background", Color.linearGradient([
+            Color.setLightness(Color.Nippon.Nae, 0.6),
+            0,
+            Color.Nippon.Nae,
+            (k / target) <= 0.5 ? k / target : k / target - 0.041,
+            Color.setLightness(Color.Nippon.Midori, 0.7),
+            (k / target) <= 0.5 ? k / target + 0.001 : k / target - 0.04,
+            Color.setLightness(Color.Nippon.Midori, 0.9),
+            (k / target) <= 0.5 ? k / target + 0.04 : k / target - 0.001,
+            Color.setLightness(Color.Nippon.Aisumitya, 0.3),
+            (k / target) <= 0.5 ? k / target + 0.041 : k / target,
+            Color.setLightness(Color.Nippon.Aisumitya, 0.3),
+            1
+          ], 'right'));
+          max += 4e2;
+          setTimeout(fun, 10);
+        }
+      };
+      fun();
+      // for (; k < target; k++) {
+      //   const idx: number = Math.floor(Math.random() * total.length);
+      //   set.push(total[idx]);
+      //   let left: Array<number> = [];
+      //   total.forEach((i: number) => {
+      //     if (i !== idx) {
+      //       left.push(i);
+      //     }
+      //   });
+      //   total = left;
+      // }
+      
+      // (this.refs["map"] as MapView).setState({
+      //   sampled: set
+      // });
+      // Globe.moveBars([]);
+      // (this.refs["ResultView"] as ResultView).import("all");
+      // $("#runr")
+      //   .attr("src", "./images/run.png")
+      //   .removeClass("rotating");
     };
     Globe.update = (list: Array<number> | "all") => {
       let box: Array<{ text: string; city: string; sentiment: number; }> = [];
@@ -552,7 +659,7 @@ class App extends Component<{}, {}, {}> {
       Globe.countWords(texts);
     };
     Globe.countWords = (list: Array<{ text: string; }>) => {
-      (this.refs["topics"] as Settings).import([]);
+      (this.refs["topics"] as Settings).import([], []);
       setTimeout(() => {
         let topics: Array<{ text: string; count: number; }> = [];
         let dict: {[word: string]: number} = {};
@@ -579,13 +686,13 @@ class App extends Component<{}, {}, {}> {
         for (const word in dict) {
           if (dict.hasOwnProperty(word)) {
             const count: number = dict[word];
-            if (topics.length === 160) {
-              if (topics[159].count <= count) {
-                topics[159] = {
+            if (topics.length === 80) {
+              if (topics[79].count <= count) {
+                topics[79] = {
                   text: word,
                   count: count
                 };
-                for (let a: number = 159; a >= 1; a--) {
+                for (let a: number = 79; a >= 1; a--) {
                   if (topics[a].count < topics[a - 1].count) {
                     const temp: {
                       text: string;
@@ -656,7 +763,7 @@ interface Global {
   highlightClass: (index: number, useSampled: boolean) => void;
   loadData: () => void;
   moveBars: (nodes: Array<number>) => void;
-  random: (rate: number) => void;
+  random: () => void;
   sample: () => void;
   update: (list: Array<number> | "all") => void;
   run: () => void;

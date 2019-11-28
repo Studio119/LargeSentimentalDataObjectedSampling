@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-27 20:55:13
+ * @Last Modified time: 2019-11-28 18:39:14
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -37,7 +37,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                 <div id={ this.props.id } key="container"
                 style={{
                     height: '40px',
-                    padding: '5px 22px 8px 22px',
+                    padding: '5px 18px 8px 18px',
                     background: Color.Nippon.Touou,
                     border: `1px solid ${ Color.Nippon.Tokiwa }`,
                     textAlign: 'left'
@@ -71,7 +71,8 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                         height: '41.8px',
                         padding: '0 12px',
                         border: `1px solid ${ Color.Nippon.Mizu }`,
-                        background: Color.setLightness(Color.Nippon.Mizu, 0.94)
+                        background: Color.setLightness(Color.Nippon.Mizu, 0.94),
+                        width: '938px'
                     }} >
                         <div style={{
                             fontSize: '14px',
@@ -85,69 +86,80 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                             + New Sample
                         </div>
 
-                        <ValueBar label={ "Sampling Rate" } width={ 100 } height={ 18 } min={ 0 } max={ 1 } defaultValue={ 0.4 } />
+                        <ValueBar label={ "Sampling Rate" } ref="SamplingRate"
+                        width={ 90 } height={ 18 } min={ 0 } max={ 1 } step={ 0.0001 } defaultValue={ 0.4 }
+                        valueFormatter={
+                            (num: number) => {
+                                return num.toFixed(4);
+                            }
+                        } />
                         
                         <div style={{ display: 'inline-block', width: '6px' }}/>
 
-                        <ValueBar label={ "r =" } width={ 80 } height={ 18 }
+                        <ValueBar label={ "r =" } width={ 80 } height={ 18 } ref="radius"
                             min={ 0 } max={ 0.001 } step={ 0.0001 } defaultValue={ 0.0002 }
                             valueFormatter={
                                 (num: number) => {
-                                    return num.toPrecision(1);
+                                    return num.toFixed(4);
                                 }
                             }
                         />
-                        <ValueBar label={ "β =" } width={ 80 } height={ 18 }
+                        <ValueBar label={ "β =" } width={ 80 } height={ 18 } ref="beta"
                             min={ 0 } max={ 1 } step={ 0.01 } defaultValue={ 0.3 }
                         />
-                        <ValueBar label={ "γ =" } width={ 80 } height={ 18 }
+                        <ValueBar label={ "γ =" } width={ 80 } height={ 18 } ref="gamma"
                             min={ 0 } max={ 1 } step={ 0.01 } defaultValue={ 0.2 }
                         />
 
                         <button id="goRun"
                         style={{
-                            fontSize: this.state.sampled ? '13px' : '15px',
+                            fontSize: '15px',
                             width: '73.2px',
                             transform: 'translateY(5.8px)',
                             marginLeft: '32px',
-                            marginRight: '9px',
-                            background: Color.Nippon.Aisumitya,
+                            background: this.state.sampled
+                                ? Color.Nippon.Akabeni
+                                : Color.Nippon.Aisumitya,
                             color: Color.setLightness(Color.Nippon.Aisumitya, 0.9),
-                            padding: '2px 9px'
+                            padding: '2px 9px',
+                            height: '25.6px'
                         }}
                         onClick={
                             this.state.sampled
                                 ? () => {
-                                    if ($("#run").attr("src") === "./images/loading.png") {
+                                    if ($("#run").attr("src") === "./images/loading.png"
+                                    || $("#runr").attr("src") === "./images/loading.png") {
                                         return;
                                     }
                                     $("#run").attr("src", "./images/loading.png").addClass("rotating");
                                     setTimeout(() => {
-                                        this.setState({
-                                            sampled: false
-                                        });
+                                        (this.refs["SamplingRate"] as ValueBar).val(
+                                            (this.refs["SamplingRate"] as ValueBar).val()
+                                        );
                                         Globe.loadData();
                                     }, 200);
                                 }
                                 :  () => {
-                                    if ($("#run").attr("src") === "./images/loading.png") {
+                                    if ($("#run").attr("src") === "./images/loading.png"
+                                    || $("#runr").attr("src") === "./images/loading.png") {
                                         return;
                                     }
                                     $("#run").attr("src", "./images/loading.png").addClass("rotating");
                                     setTimeout(() => {
-                                        this.setState({
-                                            sampled: true
-                                        });
                                         Globe.run();
                                     }, 200);
                                 }
                         } >
-                            <img src={ `./images/run.png` } id="run"
-                            alt={ ">>" }
-                            width="14px" height="14px"
-                            style={{
-                                margin: this.state.sampled ? '0px 2px 0px -2px' : '0px 7px 0px -2px'
-                            }} />
+                            {
+                                this.state.sampled
+                                    ? null
+                                    : <img src={ `./images/run.png` } id="run"
+                                    alt={ ">>" }
+                                    width="14px" height="14px"
+                                    style={{
+                                        margin: this.state.sampled ? '0px 2px 0px -2px' : '0px 7px 0px -2px'
+                                    }} />
+                            }
                             {
                                 this.state.sampled
                                     ? "Cancel" : "Run"
@@ -159,50 +171,57 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                     <ColorPicker ref={ "cp0" } x={ 1360 } y={ 6 } r={0} g={92} b={175} opacity={1} />
                     <ColorPicker ref={ "cp1" } x={ 1410 } y={ 6 } r={232} g={48} b={21} opacity={1} />
                     <ColorPicker ref={ "cp2" } x={ 1460 } y={ 6 } r={239} g={187} b={36} opacity={1} />
-                </div>
-                <div style={{
-                    display: 'inline-block',
-                    height: '41.8px',
-                    padding: '0 12px',
-                    border: `1px solid ${ Color.Nippon.Mizu }`,
-                    background: Color.setLightness(Color.Nippon.Mizu, 0.94)
-                }} >
-                    <button id="goRandom"
-                    style={{
-                        fontSize: '14px',
-                        width: '73px',
-                        transform: 'translateY(5.8px)',
-                        marginLeft: '32px',
-                        marginRight: '9px',
-                        background: Color.Nippon.Aisumitya,
-                        color: Color.setLightness(Color.Nippon.Aisumitya, 0.9),
-                        padding: '2px 9px'
-                    }}
-                    onClick={
-                        this.state.sampled
-                            ? () => {}
-                            :  () => {
-                                return; // TODO: Random Sampling
-                                // if ($("#run").attr("src") === "./images/loading.png") {
-                                //     return;
-                                // }
-                                // $("#run").attr("src", "./images/loading.png").addClass("rotating");
-                                // setTimeout(() => {
-                                //     this.setState({
-                                //         sampled: true
-                                //     });
-                                //     Globe.run();
-                                // }, 200);
-                            }
-                    } >
-                        <img src={ `./images/run.png` } id="run"
-                        alt={ ">>" }
-                        width="14px" height="14px"
+                
+                    <div style={{
+                        position: 'relative',
+                        height: '42px',
+                        padding: '0px 12px',
+                        border: `1px solid ${ Color.Nippon.Mizu }`,
+                        background: Color.setLightness(Color.Nippon.Mizu, 0.94),
+                        top: '-3px',
+                        width: '104px',
+                        left: '0px',
+                        display: 'inline-block'
+                    }} >
+                        <button id="goRandom"
                         style={{
-                            margin: this.state.sampled ? '0px 2px 0px -2px' : '0px 7px 0px -2px'
-                        }} />
-                        Random
-                    </button>
+                            fontSize: '14px',
+                            width: '92px',
+                            transform: 'translateY(8px)',
+                            marginLeft: '5px',
+                            marginRight: '9px',
+                            background: this.state.sampled
+                                ? Color.setLightness(Color.Nippon.Aisumitya, 0.6)
+                                : Color.Nippon.Aisumitya,
+                            color: Color.setLightness(Color.Nippon.Aisumitya, 0.9),
+                            padding: '2px 9px',
+                            height: '25.6px'
+                        }}
+                        onClick={
+                            this.state.sampled
+                                ? () => {
+                                    return;
+                                }
+                                : () => {
+                                    if ($("#run").attr("src") === "./images/loading.png"
+                                    || $("#runr").attr("src") === "./images/loading.png") {
+                                        return;
+                                    }
+                                    $("#runr").attr("src", "./images/loading.png").addClass("rotating");
+                                    setTimeout(() => {
+                                        Globe.random();
+                                    }, 200);
+                                }
+                        } >
+                            <img src={ `./images/run.png` } id="runr"
+                            alt={ ">>" }
+                            width="14px" height="14px"
+                            style={{
+                                margin: this.state.sampled ? '0px 2px 0px -2px' : '0px 7px 0px -2px'
+                            }} />
+                            Random
+                        </button>
+                    </div>
                 </div>
             </>
         );
@@ -217,6 +236,39 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
         };
         this.load('Tweet');
         Globe.loadData = this.load.bind(this, 'Tweet');
+    }
+
+    public getSnapshotBeforeUpdate(): {
+        rate: number;
+        radius: number;
+        beta: number;
+        gamma: number;
+    } {
+        return {
+            rate: (this.refs["SamplingRate"] as ValueBar).val(),
+            radius: (this.refs["radius"] as ValueBar).val(),
+            beta: (this.refs["beta"] as ValueBar).val(),
+            gamma: (this.refs["gamma"] as ValueBar).val()
+        };
+    }
+
+    public componentDidUpdate(prevProps: Readonly<ItemStripProps>, prevState: Readonly<ItemStripState>,
+    snapshot: {
+        rate: number;
+        radius: number;
+        beta: number;
+        gamma: number;
+    }): void {
+        (this.refs["SamplingRate"] as ValueBar).val(snapshot.rate);
+        (this.refs["radius"] as ValueBar).val(snapshot.radius);
+        (this.refs["beta"] as ValueBar).val(snapshot.beta);
+        (this.refs["gamma"] as ValueBar).val(snapshot.gamma);
+    }
+
+    public end(b: boolean): void {
+        this.setState({
+            sampled: b
+        });
     }
 
     private load(source: string): void {
@@ -236,6 +288,14 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             return;
             // this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');
         }
+    }
+
+    public setSampleRate(rate: number): void {
+        (this.refs["SamplingRate"] as ValueBar).val(rate);
+    }
+
+    public getSampleRate(): number {
+        return (this.refs["SamplingRate"] as ValueBar).val();
     }
 }
 

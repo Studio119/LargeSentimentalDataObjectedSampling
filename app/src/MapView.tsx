@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-27 20:27:27
+ * @Last Modified time: 2019-11-28 21:37:02
  */
 import React from 'react';
 import $ from 'jquery';
@@ -59,8 +59,6 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         data_sp: Array<number>;
         count_sp: number;
     }> = [];
-    private ticking: number = 0;
-    private timer: NodeJS.Timeout;
 
     public constructor(props: MapViewProps) {
         super(props);
@@ -75,17 +73,6 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         this.timers = [];
         this.behaviour = 'zoom';
         this.active = false;
-        this.timer = setInterval(() => {
-            this.ticking += 5;
-            if (this.ticking >= 1000) {
-                this.ticking = 0;
-            }
-            $('.chosen').css('fill-opacity', 0.1 + (Math.abs(this.ticking - 500) / 2400));
-        }, 10);
-    }
-
-    public componentWillUnmount(): void {
-        clearInterval(this.timer);
     }
 
     public render(): JSX.Element {
@@ -618,7 +605,9 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                                                 : Color.Nippon.Ukonn]);
                         this.highLighted.push(index);
                         heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
+                        heap_origin[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
                         set.push(index);
+                        count_origin++;
                         count++;
                     }
                 });
@@ -677,10 +666,10 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             + `color="${ color }" `
             + `cx="${ this.area[0][1] + 1 }px" cy="${ this.area[0][0] - 22 }px" r="${ r + 2.5 }px" `
             + `style="`
-                // + `fill: none; `
-                + `fill: ${ color }; `
-                + `stroke: ${ Color.Nippon.Hasita + "C0" }; `
-                + `stroke-width: 2px; `
+                + `fill: none; `
+                // + `fill: ${ color }; `
+                + `stroke: ${ color + "C0" }; `
+                + `stroke-width: 4px; `
                 + `pointer-Events: none; `
             + `" `
             + `/>`
@@ -693,65 +682,71 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             data_sp: heap_sp,
             count_sp: count_sp
         });
-        for (let i: number = 0; i < 20; i++) {
-            const r2: number = r + Math.sqrt(r * 2 + 36) * (0.2 + heap[i] / count);
-            let arc: JQuery<HTMLElement> = $($.parseXML(
-                `<path xmlns="http://www.w3.org/2000/svg" `
-                + `class="arc" `
-                + `d="M${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r + 3) },`
-                    + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r + 3) }`
-                    + ` A${ r + 3 },${ r + 3 },0,0,1,`
-                    + `${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r + 3) },`
-                    + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r + 3) }`
-                    + ` L${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) },`
-                    + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) }`
-                    + ` A${ r + 3 },${ r + 3 },0,0,0,`
-                    + `${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r2 + 3) },`
-                    + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r2 + 3) }`
-                    + ` Z" `
-                + `style="`
-                    // + `fill: ${ Color.interpolate(
-                    //     Color.Nippon.Syozyohi + "C0",
-                    //     Color.Nippon.Ruri + "C0",
-                    //     i / 19
-                    // ) }; `
-                    + `fill: ${ this.getColor(i) }; `
-                    + `stroke: none; `
-                    + `pointer-Events: none; `
-                + `" `
-                + `/>`
-            ).documentElement);
-            $(this.refs['svg']).append(arc);
-            if (count_sp > 0) {
-                // const color: string = Color.interpolate(
-                //     Color.Nippon.Syozyohi + "C0",
-                //     Color.Nippon.Ruri + "C0",
-                //     i / 19
-                // );
+        $(".arc").remove();
+        if (this.rounds.length === 1)  {
+            for (let i: number = 0; i < 20; i++) {
+                const r2: number = r + Math.sqrt(r * 2 + 36) * (0.1 + 8 * heap[i] / count);
                 const color: string = this.getColor(i);
                 const lightness: number = Color.toHsl(color).l;
-                let arc_sp: JQuery<HTMLElement> = $($.parseXML(
+                let arc: JQuery<HTMLElement> = $($.parseXML(
                     `<path xmlns="http://www.w3.org/2000/svg" `
                     + `class="arc" `
-                    + `d="M${ this.area[0][1] + 1 + Math.sin((i + 0.35) / 20 * 2 * Math.PI) * (r + 3) },`
-                        + `${ this.area[0][0] - 22 - Math.cos((i + 0.35) / 20 * 2 * Math.PI) * (r + 3) }`
+                    + `d="M${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r + 3) },`
+                        + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r + 3) }`
                         + ` A${ r + 3 },${ r + 3 },0,0,1,`
-                        + `${ this.area[0][1] + 1 + Math.sin((i + 0.65) / 20 * 2 * Math.PI) * (r + 3) },`
-                        + `${ this.area[0][0] - 22 - Math.cos((i + 0.65) / 20 * 2 * Math.PI) * (r + 3) }`
-                        + ` L${ this.area[0][1] + 1 + Math.sin((i + 0.65) / 20 * 2 * Math.PI) * (r2 + 3) },`
-                        + `${ this.area[0][0] - 22 - Math.cos((i + 0.65) / 20 * 2 * Math.PI) * (r2 + 3) }`
+                        + `${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r + 3) },`
+                        + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r + 3) }`
+                        + ` L${ this.area[0][1] + 1 + Math.sin((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) },`
+                        + `${ this.area[0][0] - 22 - Math.cos((i + 1) / 20 * 2 * Math.PI) * (r2 + 3) }`
                         + ` A${ r + 3 },${ r + 3 },0,0,0,`
-                        + `${ this.area[0][1] + 1 + Math.sin((i + 0.35) / 20 * 2 * Math.PI) * (r2 + 3) },`
-                        + `${ this.area[0][0] - 22 - Math.cos((i + 0.35) / 20 * 2 * Math.PI) * (r2 + 3) }`
+                        + `${ this.area[0][1] + 1 + Math.sin(i / 20 * 2 * Math.PI) * (r2 + 3) },`
+                        + `${ this.area[0][0] - 22 - Math.cos(i / 20 * 2 * Math.PI) * (r2 + 3) }`
                         + ` Z" `
                     + `style="`
-                        + `fill: ${ Color.setLightness(color, 0.75 + lightness * 0.25) }; `
-                        + `stroke: none; `
+                        // + `fill: ${ Color.interpolate(
+                        //     Color.Nippon.Syozyohi + "C0",
+                        //     Color.Nippon.Ruri + "C0",
+                        //     i / 19
+                        // ) }; `
+                        + `fill: ${ color }; `
+                        + `stroke: ${ Color.setLightness(color, lightness * 0.7) }; `
+                        + `stroke-width: 0.6px; `
                         + `pointer-Events: none; `
                     + `" `
                     + `/>`
                 ).documentElement);
-                $(this.refs['svg']).append(arc_sp);
+                $(this.refs['svg']).append(arc);
+                if (count_sp > 0) {
+                    const r3: number = r + Math.sqrt(r * 2 + 36) * (0.1 + 8 * heap_sp[i] / count_sp);
+                    // const color: string = Color.interpolate(
+                    //     Color.Nippon.Syozyohi + "C0",
+                    //     Color.Nippon.Ruri + "C0",
+                    //     i / 19
+                    // );
+                    let arc_sp: JQuery<HTMLElement> = $($.parseXML(
+                        `<path xmlns="http://www.w3.org/2000/svg" `
+                        + `class="arc" `
+                        + `d="M${ this.area[0][1] + 1 + Math.sin((i + 0.35) / 20 * 2 * Math.PI) * (r + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((i + 0.35) / 20 * 2 * Math.PI) * (r + 3) }`
+                            + ` A${ r + 3 },${ r + 3 },0,0,1,`
+                            + `${ this.area[0][1] + 1 + Math.sin((i + 0.65) / 20 * 2 * Math.PI) * (r + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((i + 0.65) / 20 * 2 * Math.PI) * (r + 3) }`
+                            + ` L${ this.area[0][1] + 1 + Math.sin((i + 0.65) / 20 * 2 * Math.PI) * (r3 + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((i + 0.65) / 20 * 2 * Math.PI) * (r3 + 3) }`
+                            + ` A${ r + 3 },${ r + 3 },0,0,0,`
+                            + `${ this.area[0][1] + 1 + Math.sin((i + 0.35) / 20 * 2 * Math.PI) * (r3 + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((i + 0.35) / 20 * 2 * Math.PI) * (r3 + 3) }`
+                            + ` Z" `
+                        + `style="`
+                            + `fill: ${ Color.setLightness(color, 0.3 + lightness * 0.7) }; `
+                            + `stroke: ${ Color.setLightness(color, lightness * 0.5) }; `
+                            + `stroke-width: 0.6px; `
+                            + `pointer-Events: none; `
+                        + `" `
+                        + `/>`
+                    ).documentElement);
+                    $(this.refs['svg']).append(arc_sp);
+                }
             }
         }
         this.rounds.forEach((e: {

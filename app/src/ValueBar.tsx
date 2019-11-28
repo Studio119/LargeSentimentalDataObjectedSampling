@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-26 18:44:41 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-09-27 19:11:20
+ * @Last Modified time: 2019-11-28 15:25:40
  */
 
 import React, { Component } from 'react';
@@ -314,7 +314,7 @@ class ValueBar extends Component<ValueBarProps, ValueBarState, {}> {
             }
             this.debounceHandler = 2;
         });
-        $('*').on('mouseup', () => {
+        $(this.refs["flag"]).on('mouseup', () => {
             $(this.refs["flag"]).css("fill", "url(#grad)").css("stroke", "rgb(135, 137, 142)");
             $(this.refs["value"]).css("color", "black");
             this.dragging = false;
@@ -327,12 +327,16 @@ class ValueBar extends Component<ValueBarProps, ValueBarState, {}> {
         if (this.props.onValueChange) {
             this.props.onValueChange(this.state.value);
         }
+        this.valueAfterDragging = this.state.value;
     }
 
-    public val(value?: number): number | void {
+    public val(value?: number): number {
         if (value) {
             this.callbackHandler.update({ value: value });
-            return;
+            this.setState({
+                value: value
+            });
+            return value;
         }
         return this.state.value;
     }

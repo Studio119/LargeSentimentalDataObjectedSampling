@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-27 20:23:52
+ * @Last Modified time: 2019-11-28 18:10:51
  */
 
 import React, { Component } from 'react';
@@ -75,7 +75,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                     paddingLeft: '16px',
                     letterSpacing: '2px'
                 }} >
-                    Tree Chart
+                    Sentiment Tree
                 </div>
                 <svg width={`${ this.props.width }px`} height={`${ this.props.height }px`}
                 id={ this.props.id + '_svg' } xmlns={`http://www.w3.org/2000/svg`}
@@ -104,7 +104,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                         return [(
                                             <rect id={ `Bar_id${ node.id }` }
                                             className="Bar"
-                                            key={ node.id }
+                                            key={ node.id + "_" + Math.floor(Math.random() * 1e8) }
                                             xmlns={`http://www.w3.org/2000/svg`}
                                             x={ offsetX * this.props.width / this.layers[this.layers.length - 1].length + 1 }
                                             y={ (level + 0.08) * height + 1 }
@@ -133,7 +133,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             } />
                                         ), (
                                             <rect id={ `smpBar_id${ node.id }` }
-                                            key={ "S_" + node.id }
+                                            key={ "S_" + node.id + "_" + Math.floor(Math.random() * 1e8) }
                                             xmlns={`http://www.w3.org/2000/svg`}
                                             x={ offsetX * this.props.width / this.layers[this.layers.length - 1].length + 1.5 }
                                             // y={ (level + 1) * this.props.height / this.layers.length }
@@ -169,7 +169,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             } />
                                         ), (
                                             <rect id={ `coreBar_id${ node.id }` }
-                                            key={ "C_" + node.id }
+                                            key={ "C_" + node.id + "_" + Math.floor(Math.random() * 1e8) }
                                             xmlns={`http://www.w3.org/2000/svg`}
                                             x={ offsetX * this.props.width / this.layers[this.layers.length - 1].length + 1.5 }
                                             // y={ (level + 1) * this.props.height / this.layers.length }
@@ -203,7 +203,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                     else {
                                         return (
                                             <rect id={ `Bar_id${ node.id }` }
-                                            key={ node.id }
+                                            key={ node.id + "_" + Math.floor(Math.random() * 1e8) }
                                             className="node"
                                             xmlns={`http://www.w3.org/2000/svg`}
                                             x={ offsetX * this.props.width / this.layers[this.layers.length - 1].length + 1 }
@@ -247,7 +247,7 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                     if (level === this.layers.length - 2) {
                                         return (
                                             <rect id={ `Rect_id${ node.id }` }
-                                            key={ "rect" + node.id }
+                                            key={ "rect" + node.id + "_" + Math.floor(Math.random() * 1e8) }
                                             className="lastlevel"
                                             xmlns={`http://www.w3.org/2000/svg`}
                                             x={ offsetX * this.props.width / this.layers[this.layers.length - 1].length + 1 }
@@ -513,11 +513,11 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
             //         countAfter++;
             //     }
             // }
-            if (countBefore !== 0 && isNaN(Math.abs(valueAfter / countAfter))) {
-                console.log($(`#Bar_id${ node.id }`), node.id, valueBefore, countBefore, valueAfter, countAfter);
-            }
+            // if (countBefore !== 0 && isNaN(Math.abs(valueAfter / countAfter))) {
+            //     console.log($(`#Bar_id${ node.id }`), node.id, valueBefore, countBefore, valueAfter, countAfter);
+            // }
             return { columns:
-                countBefore === 0
+                countBefore === 0 || countAfter === 0
                     ? []
                     : [{
                         averBefore: Math.abs(valueBefore / countBefore),

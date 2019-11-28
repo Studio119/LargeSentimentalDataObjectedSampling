@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-11-24 14:10:09 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-27 20:13:38
+ * @Last Modified time: 2019-11-28 18:10:12
  */
 
 import React, { Component } from 'react';
@@ -60,7 +60,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                     paddingLeft: '16px',
                     letterSpacing: '2px'
                 }} >
-                    Average Sentiment Value
+                    Ranking Value
                 </div>
                 <div key="header"
                 style={{
@@ -221,6 +221,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                                 return (
                                     <path id={ `link${ leaf.id }` }
                                     key={ `link${ leaf.id }` }
+                                    className="ctrst"
                                     xmlns={`http://www.w3.org/2000/svg`}
                                     d={
                                         `M148,${ prevY + 3 } `
@@ -309,19 +310,27 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                     }
                 });
             }
-            this.setState({
-                classes: Object.entries(classes).map((value: [string, {
-                    valueBefore: number;
-                    valueAfter: number;
-                    countBefore: number;
-                    countAfter: number;
-                }]) => {
-                    return {
+            let box: Array<{
+                id: number;
+                valueBefore: number;
+                valueAfter: number;
+            }> = [];
+            Object.entries(classes).forEach((value: [string, {
+                valueBefore: number;
+                valueAfter: number;
+                countBefore: number;
+                countAfter: number;
+            }]) => {
+                if (value[1].countBefore !== 0 && value[1].countAfter !== 0) {
+                    box.push({
                         id: parseInt(value[0]),
                         valueBefore: value[1].valueBefore / value[1].countBefore,
                         valueAfter: value[1].valueAfter / value[1].countAfter
-                    };
-                })
+                    });
+                }
+            })
+            this.setState({
+                classes: box
             });
         }, 400);
     }

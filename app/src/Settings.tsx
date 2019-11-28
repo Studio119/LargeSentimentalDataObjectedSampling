@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-27 19:48:28
+ * @Last Modified time: 2019-11-28 21:56:18
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -44,7 +44,8 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                 border: '1px solid rgb(149,188,239)',
                 position: 'absolute',
                 top: '282.9px',
-                left: '0px'
+                left: '0px',
+                overflow: 'hidden'
             }}>
                 <div
                 style={{
@@ -112,7 +113,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                 {/* <WordCloud width={ 318 } height={ 291 } ref="WordCloud" /> */}
                 <div id="cloud">
                     <ReactWordCloud
-                    size={[300, 300]}
+                    size={[360, 360]}
                     options={{
                         colors: this.color,
                         enableTooltip: true,
@@ -152,7 +153,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
         }, 100);
     }
 
-    public import(topics: Array<{ text: string, count: number }>): void {
+    public import(topics: Array<{ text: string, count: number }>, after: Array<{ text: string, count: number }>): void {
         let box: Array<{ text: string, count: number }>
             = topics.sort((a: { text: string; count: number; }, b: { text: string; count: number; }) => {
                 return b.count - a.count;
