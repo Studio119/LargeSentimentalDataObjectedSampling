@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-28 21:01:49
+ * @Last Modified time: 2019-11-28 22:09:08
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -659,7 +659,7 @@ class App extends Component<{}, {}, {}> {
       Globe.countWords(texts);
     };
     Globe.countWords = (list: Array<{ text: string; }>) => {
-      (this.refs["topics"] as Settings).import([], []);
+      (this.refs["topics"] as Settings).import([]);
       setTimeout(() => {
         let topics: Array<{ text: string; count: number; }> = [];
         let dict: {[word: string]: number} = {};

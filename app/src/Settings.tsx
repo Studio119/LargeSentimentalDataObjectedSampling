@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-28 21:56:18
+ * @Last Modified time: 2019-11-28 22:09:06
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -153,7 +153,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
         }, 100);
     }
 
-    public import(topics: Array<{ text: string, count: number }>, after: Array<{ text: string, count: number }>): void {
+    public import(topics: Array<{ text: string, count: number }>): void {
         let box: Array<{ text: string, count: number }>
             = topics.sort((a: { text: string; count: number; }, b: { text: string; count: number; }) => {
                 return b.count - a.count;
