@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-28 22:09:08
+ * @Last Modified time: 2019-11-29 20:54:35
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -30,12 +30,13 @@ class App extends Component<{}, {}, {}> {
   private view: [number, number, number, number, number, number, number] = [0, 0, 0, 0, 0, 0, 0];
   private stopWords: Array<string> = [
     "don't", "wh", "this", "tha", "not", "for", "this", "her", "his", "the", "you", "our", "not", "watch",
-    "but", "will", "today", "about", "much", "call", "won't", "well", "just", "can", "get", "i'm", "tonight",
+    "but", "will", "today", "about", "much", "call", "won't", "well", "just", "can", "get", "i'", "tonight",
     "too", "all", "tak", "go", "man", "also", "eve", "did", "over", "other", "was", "are", "like", "way",
     "and", "false", "true", "now", "year", "day", "want", "you", "feel", "she", "tell", "one", "it's", "said",
     "out", "should", "would", "see", "hav", "has", "time", "know", "people", "look", "him", "person", "told",
     "from", "think", "via", "because", "with", "any", "let", "need", "show", "only", "big", "wld", "more",
-    "more", "he's", "after", "must", "how", "wow", "keep", "say", "does"
+    "more", "he's", "after", "must", "how", "wow", "keep", "say", "does", "isn", "very", "come", "came", "coming",
+    "been", "using"
   ];
 
   public render(): JSX.Element {
@@ -741,12 +742,27 @@ class App extends Component<{}, {}, {}> {
   private loadSource: (paths: FileSet) => void
     = (paths: FileSet) => {
       setTimeout(() => this.loadSource(paths), 1000);
+
+      // Globe.mapThis = (data: Array<{user_id: string; text: string; lat: number; lng: number;}>) => {
+      //   let dataset: Array<{
+      //     id: string, lng: number, lat: number, words: string,
+      //     day: string, city: string, sentiment: string, class: number}> = [];
+      //   data.forEach((d: {user_id: string; text: string; lat: number; lng: number;}) => {
+      //     dataset.push({ ...d, id: d.user_id, words: d.text, sentiment: (
+      //       Math.random() * 110000 > 45000 ? 0 : Math.random() >= 0.58 ? -1 : 1
+      //     ).toString(), class: 1, city: "", day: "0" });
+      //   });
+      //   (this.refs["map"] as MapView).setState({
+      //     data: dataset
+      //   });
+      // }
       return;
     };
 }
 
 
 interface Global {
+  mapThis: (data: Array<{user_id: string; text: string; lat: number; lng: number;}>) => void;
   checkIfPointIsSampled: (index: number) => boolean;
   countWords: (list: Array<{ text: string; }>) => void;
   getPoint: (index: number) => {
@@ -770,6 +786,7 @@ interface Global {
 }
 
 export var Globe: Global = {
+  mapThis: () => {},
   checkIfPointIsSampled: () => false,
   countWords: () => {},
   getPoint: () => {

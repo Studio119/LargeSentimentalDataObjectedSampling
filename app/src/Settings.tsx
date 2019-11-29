@@ -2,12 +2,13 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-28 22:09:06
+ * @Last Modified time: 2019-11-29 20:49:37
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
 import ReactWordCloud, { Scale, Spiral } from 'react-wordcloud';
 import Color from './preference/Color';
+import Dict from './dict';
 
 export interface SettingsProps {
     id: string;
@@ -25,12 +26,14 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
         'rgb(66,96,45)', 'rgb(27,129,62)', 'rgb(32,96,79)', 'rgb(12,72,66)',
         'rgb(8,25,45)', 'rgb(33,30,85)', 'rgb(102,50,124)', 'rgb(98,41,84)'
     ];
+    private timeout: NodeJS.Timeout | null;
 
     public constructor(props: SettingsProps) {
         super(props);
         this.state = {
             data: []
         };
+        this.timeout = null;
     }
 
     public render(): JSX.Element {
@@ -151,6 +154,20 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
             $('#cloud svg').attr('width', '288px').attr('height', '285px');
             $('#cloud g:first').attr('transform', 'translate(144,142.5)');
         }, 100);
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+        }
+        this.timeout = setTimeout(() => {
+            $("#cloud text").each((index: number, element: HTMLElement) => {
+                const res: boolean | undefined = Dict[$(element).text().toLowerCase()];
+                if (res === undefined) {
+                    $(element).attr("fill", Color.setLightness(Color.Nippon.Kinntya, 0.7));
+                }
+                else {
+                    $(element).css("fill", res ? Color.Nippon.Ruri : Color.Nippon.Syozyohi);
+                }
+            });
+        }, 1000);
     }
 
     public import(topics: Array<{ text: string, count: number }>): void {
