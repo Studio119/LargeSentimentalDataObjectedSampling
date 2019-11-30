@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-28 18:10:51
+ * @Last Modified time: 2019-11-30 16:34:11
  */
 
 import React, { Component } from 'react';
@@ -160,6 +160,8 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                                         }
                                                     });
                                                     Globe.highlight(set);
+                                                    $(".Bar").css("stroke-width", 1).css("stroke", Color.setLightness(Color.Nippon.Aisumitya, 0.7));
+                                                    $(`#Bar_id${ node.id }`).css("stroke-width", 4).css("stroke", Color.Nippon.Kinntya);
                                                 }
                                             }
                                             onDoubleClick={
@@ -190,6 +192,8 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             onClick={
                                                 () => {
                                                     Globe.highlightClass(-1, false);
+                                                    $(".Bar").css("stroke-width", 1).css("stroke", Color.setLightness(Color.Nippon.Aisumitya, 0.7));
+                                                    $(`#Bar_id${ node.id }`).css("stroke-width", 4).css("stroke", Color.Nippon.Kinntya);
                                                     Globe.highlight(node.data as any as Array<number>);
                                                 }
                                             }

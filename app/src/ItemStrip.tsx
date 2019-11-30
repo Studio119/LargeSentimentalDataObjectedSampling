@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-28 18:39:14
+ * @Last Modified time: 2019-11-30 16:49:56
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -24,11 +24,14 @@ export interface ItemStripState {
 }
 
 class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
+    private source: 'Tweet' | 'yelp';
+
     public constructor(props: ItemStripProps) {
         super(props);
         this.state = {
             sampled: false
         };
+        this.source = 'Tweet';
     }
 
     public render(): JSX.Element {
@@ -38,7 +41,16 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                 style={{
                     height: '40px',
                     padding: '5px 18px 8px 18px',
-                    background: Color.Nippon.Touou,
+                    background: Color.linearGradient([
+                        Color.Nippon.Touou, 0,
+                        Color.Nippon.Touou, 0.87,
+                        Color.setLightness(Color.Nippon.Touou, 0.86), 0.88,
+                        Color.setLightness(Color.Nippon.Touou, 0.97), 0.90,
+                        Color.setLightness(Color.Nippon.Touou, 0.97), 0.966,
+                        Color.setLightness(Color.Nippon.Touou, 0.86), 0.986,
+                        Color.Nippon.Touou, 0.996,
+                        Color.Nippon.Touou, 1
+                    ], 'right'),
                     border: `1px solid ${ Color.Nippon.Tokiwa }`,
                     textAlign: 'left'
                 }} >
@@ -234,8 +246,8 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             }
             (this.refs[`cp${index}`] as ColorPicker).bind(element, ...attrName);
         };
-        this.load('Tweet');
-        Globe.loadData = this.load.bind(this, 'Tweet');
+        this.load('yelp');
+        Globe.loadData = this.load.bind(this, 'yelp');
     }
 
     public getSnapshotBeforeUpdate(): {
@@ -271,9 +283,14 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
         });
     }
 
+    public getSource(): 'Tweet' | 'yelp' {
+        return this.source;
+    }
+
     private load(source: string): void {
         let src: FileSet;
         if (source === 'Tweet') {
+            this.source = 'Tweet';
             src = {
                 origin: './data/93_new.json',
                 tree: './data/visualization_tree_dict_0.1_0.3_0.002.json',
@@ -285,7 +302,13 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             // this.props.importSource('/data/917-51K.json', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
         }
         else if (source === 'yelp') {
-            return;
+            this.source = 'yelp';
+            src = {
+                origin: './data/97_new.json',
+                tree: './data/new_visualization_tree_dict_0.1_0.3_0.2.json',
+                gathering: './data/new_97.json'
+            };
+            this.props.importSource(src);
             // this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');
         }
     }

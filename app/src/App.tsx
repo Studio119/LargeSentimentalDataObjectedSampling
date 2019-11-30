@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-29 20:54:35
+ * @Last Modified time: 2019-11-30 16:45:19
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -36,7 +36,7 @@ class App extends Component<{}, {}, {}> {
     "out", "should", "would", "see", "hav", "has", "time", "know", "people", "look", "him", "person", "told",
     "from", "think", "via", "because", "with", "any", "let", "need", "show", "only", "big", "wld", "more",
     "more", "he's", "after", "must", "how", "wow", "keep", "say", "does", "isn", "very", "come", "came", "coming",
-    "been", "using"
+    "been", "using", "twitter"
   ];
 
   public render(): JSX.Element {
@@ -430,7 +430,10 @@ class App extends Component<{}, {}, {}> {
         ], 'right'));
         c += (1 - c) / 10;
       }, 50);
-      (this.refs["DataCenter"] as TaskQueue).open("./data/huisu_sampled_9.17_29_0.3_0.1_0.002.json", (data: DataForm.Sampled) => {
+      (this.refs["DataCenter"] as TaskQueue).open(
+        (this.refs["ItemStrip"] as ItemStrip).getSource() === 'Tweet'
+          ? "./data/huisu_sampled_9.17_29_0.3_0.1_0.002.json"
+          : "./data/new_huisu_sampled_9.17_15_0.3_0.1_0.2.json", (data: DataForm.Sampled) => {
         let set: Array<number> = [];
         Object.values(data).forEach((innode: Array<number>) => {
           innode.forEach((id: number) => {

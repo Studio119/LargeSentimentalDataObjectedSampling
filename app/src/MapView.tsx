@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-29 22:16:48
+ * @Last Modified time: 2019-11-30 14:33:31
  */
 import React from 'react';
 import $ from 'jquery';
@@ -720,14 +720,14 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             for (const leafId in nodeset) {
                 if (nodeset.hasOwnProperty(leafId)) {
                     const element: [Array<number>, Array<number>] = nodeset[leafId];
+                    if (element[0].length === 0) {
+                        continue;
+                    }
                     let value: number = 0;
                     element[0].forEach((v: number) => {
                         value += v;
                     });
                     value /= element[0].length;
-                    if (Math.abs(value) < 5e-4) {
-                        return;
-                    }
                     const r2: number = r + Math.sqrt(r * 2 + 36) * (0.1 + 4 * Math.abs(value));
                     const color: string = Color.setLightness(value < -5e-4
                         ?   Color.Nippon.Syozyohi
@@ -745,7 +745,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             + `${ this.area[0][0] - 22 - Math.cos((idx + 1) / leafCount * 2 * Math.PI) * (r + 3) }`
                             + ` L${ this.area[0][1] + 1 + Math.sin((idx + 1) / leafCount * 2 * Math.PI) * (r2 + 3) },`
                             + `${ this.area[0][0] - 22 - Math.cos((idx + 1) / leafCount * 2 * Math.PI) * (r2 + 3) }`
-                            + ` A${ r + 3 },${ r + 3 },0,0,0,`
+                            + ` A${ r2 + 3 },${ r2 + 3 },0,0,0,`
                             + `${ this.area[0][1] + 1 + Math.sin(idx / leafCount * 2 * Math.PI) * (r2 + 3) },`
                             + `${ this.area[0][0] - 22 - Math.cos(idx / leafCount * 2 * Math.PI) * (r2 + 3) }`
                             + ` Z" `
@@ -763,7 +763,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         + `/>`
                     ).documentElement);
                     $(this.refs['svg']).append(arc);
-                    if (count_sp > 0) {
+                    if (element[1].length > 0) {
                         let value: number = 0;
                         element[1].forEach((v: number) => {
                             value += v;
@@ -780,7 +780,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                 + `${ this.area[0][0] - 22 - Math.cos((idx + 0.65) / leafCount * 2 * Math.PI) * (r + 3) }`
                                 + ` L${ this.area[0][1] + 1 + Math.sin((idx + 0.65) / leafCount * 2 * Math.PI) * (r3 + 3) },`
                                 + `${ this.area[0][0] - 22 - Math.cos((idx + 0.65) / leafCount * 2 * Math.PI) * (r3 + 3) }`
-                                + ` A${ r + 3 },${ r + 3 },0,0,0,`
+                                + ` A${ r3 + 3 },${ r3 + 3 },0,0,0,`
                                 + `${ this.area[0][1] + 1 + Math.sin((idx + 0.35) / leafCount * 2 * Math.PI) * (r3 + 3) },`
                                 + `${ this.area[0][0] - 22 - Math.cos((idx + 0.35) / leafCount * 2 * Math.PI) * (r3 + 3) }`
                                 + ` Z" `
@@ -794,8 +794,8 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         ).documentElement);
                         $(this.refs['svg']).append(arc_sp);
                     }
+                    idx++;
                 }
-                idx++;
             }
             
             // for (let i: number = 0; i < 20; i++) {
