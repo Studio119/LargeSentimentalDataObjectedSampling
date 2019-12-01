@@ -93,14 +93,19 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                         offsetX += layer[index - 1].width!;
                                     }
                                     const res: [number, number] = this.tot(node);
-                                    const value: number = ((res[0] / 2 + 0.5) / res[1]);// / 2 + 0.5;
+                                    // const value: number = ((res[0] / 2 + 0.5) / res[1]);// / 2 + 0.5;
+                                    const value: number = res[0] / res[1];// / 2 + 0.5;
                                     if (level === this.layers.length - 1) {
                                         const y: number = value > -5e-4 && value < 5e-4
-                                            ? (level + 0.72) * height + 3
-                                            : (level + 0.72 - Math.abs(value) * 0.8 * 0.84) * height + 3;
+                                            ? (level + 0.62) * height + 3
+                                            : (level + 0.62 - Math.abs(value) * 0.7 * 0.84) * height + 3;
                                         const top: number = value > -5e-4 && value < 5e-4
-                                            ? 0.2 * height - 3
-                                            : (Math.abs(value) * 0.8 + 0.2) * height - 3;
+                                            ? 0.3 * height - 3
+                                            : (Math.abs(value) * 0.7 + 0.3) * height - 3;
+                                        if (isNaN(y)) {
+                                            // this ocasion happens only when no data is loaded
+                                            return null;
+                                        }
                                         return [(
                                             <rect id={ `Bar_id${ node.id }` }
                                             className="Bar"
@@ -347,9 +352,9 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
     }
 
     private tot(node: TreeBarNode<T>): [number, number] {
-        if (typeof node.data !== 'object' || typeof (node.data as any)[0] !== 'number') {
-            return [-1, -1];
-        }
+        // if (typeof node.data !== 'object' || typeof (node.data as any)[0] !== 'number') {
+        //     return [-1, -1];
+        // }
         let value: number = 0;
         let count: number = 0;
         if (node.children.length === 0) {
@@ -564,7 +569,9 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                 + `x="${ x - height / 3.2 + height / 10 }" y="${ y - height / 3.2 + height * 3 / 5 }" `
                 + `dy="-4.3" `
                 + `style="fill: ${ Color.Nippon.Aisumitya }; font-size: 9px; pointer-events: none;" >`
-                    + (successRate * 100).toFixed(1) + "%"
+                    + (
+                        isNaN(successRate) ? '100%' : ((successRate * 100).toFixed(1) + "%")
+                    )
                 + `</text>`
             ).documentElement);
             $(this.refs['svg']).append(labelSuccessRate);

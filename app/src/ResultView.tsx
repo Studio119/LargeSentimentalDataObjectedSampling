@@ -60,7 +60,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                     paddingLeft: '16px',
                     letterSpacing: '2px'
                 }} >
-                    Ranking Value
+                    Ranking View
                 </div>
                 <div key="header"
                 style={{

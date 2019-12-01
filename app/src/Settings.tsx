@@ -10,6 +10,7 @@ import ReactWordCloud, { Scale, Spiral } from 'react-wordcloud';
 import Color from './preference/Color';
 import Dict from './dict';
 import { Word } from 'd3-cloud';
+import { Globe } from './App';
 
 export interface SettingsProps {
     id: string;
@@ -67,7 +68,7 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                     paddingLeft: '16px',
                     letterSpacing: '2px'
                 }} >
-                    Hotspots
+                    Word Cloud
                 </div>
                 {/* <div key="head">
                     <table
@@ -126,6 +127,9 @@ class Settings extends Component<SettingsProps, SettingsState, {}> {
                             else {
                                 return res > 0 ? Color.Nippon.Ruri : Color.Nippon.Syozyohi;
                             }
+                        },
+                        onWordClick: (word: Word) => {
+                            Globe.appendWord(word.text!);
                         }
                     }}
                     options={{

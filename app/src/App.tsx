@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-30 16:45:19
+ * @Last Modified time: 2019-12-01 15:35:07
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -38,6 +38,7 @@ class App extends Component<{}, {}, {}> {
     "more", "he's", "after", "must", "how", "wow", "keep", "say", "does", "isn", "very", "come", "came", "coming",
     "been", "using", "twitter"
   ];
+  private play: () => void = () => {};
 
   public render(): JSX.Element {
     return (
@@ -295,12 +296,12 @@ class App extends Component<{}, {}, {}> {
           ...this.view
         );
         let list: Array<{ text: string; city: string; sentiment: number; }> = [];
-        let start: number = 985;    //parseInt((Math.random() * (data.length - 50)).toString());
-        for (let i: number = 0; i < 20; i++) {
+        let start: number = 0; //985;    //parseInt((Math.random() * (data.length - 50)).toString());
+        for (let i: number = start; i < dataset.length; i++) {
           list.push({
-            text: data[start + i].words,
-            city: data[start + i].city,
-            sentiment: parseFloat(data[start + i].sentiment)
+            text: data[i].words,
+            city: data[i].city,
+            sentiment: parseFloat(data[i].sentiment)
           });
         }
         (this.refs["bbs"] as BBS).import(list);
@@ -379,12 +380,15 @@ class App extends Component<{}, {}, {}> {
           (this.refs["topics"] as Settings).import(topics);
         });
         
-        (this.refs["DataCenter"] as TaskQueue).open(paths.tree, (data: DataForm.Tree) => {
-          let dataset: TreeBarNode<Array<number>> = this.loadTree(data, null, 'root');
-          // (this.refs["RectTree"] as ContrastView).import(dataset);
-          // (this.refs["TreeMap"] as TreeMap).import(dataset);
-          (this.refs["TreeBar"] as TreeBar<Array<number>>).import(dataset);
-        });
+        this.play = () => {
+          (this.refs["DataCenter"] as TaskQueue).open(paths.tree, (data: DataForm.Tree) => {
+            let dataset: TreeBarNode<Array<number>> = this.loadTree(data, null, 'root');
+            // (this.refs["RectTree"] as ContrastView).import(dataset);
+            // (this.refs["TreeMap"] as TreeMap).import(dataset);
+            (this.refs["TreeBar"] as TreeBar<Array<number>>).import(dataset);
+          });
+          this.play = () => {};
+        };
 
         $("#run")
           .attr("src", "./images/run.png")
@@ -412,88 +416,91 @@ class App extends Component<{}, {}, {}> {
       // });
     };
     Globe.sample = () => {
-      let c: number = 0;
-      let process: NodeJS.Timeout = setInterval(() => {
-        $("#goRun").css("background", Color.linearGradient([
-          Color.setLightness(Color.Nippon.Nae, 0.6),
-          0,
-          Color.Nippon.Nae,
-          c <= 0.5 ? c : c - 0.041,
-          Color.setLightness(Color.Nippon.Midori, 0.7),
-          c <= 0.5 ? c + 0.001 : c - 0.04,
-          Color.setLightness(Color.Nippon.Midori, 0.9),
-          c <= 0.5 ? c + 0.04 : c - 0.001,
-          Color.setLightness(Color.Nippon.Aisumitya, 0.3),
-          c <= 0.5 ? c + 0.041 : c,
-          Color.setLightness(Color.Nippon.Aisumitya, 0.3),
-          1
-        ], 'right'));
-        c += (1 - c) / 10;
-      }, 50);
-      (this.refs["DataCenter"] as TaskQueue).open(
-        (this.refs["ItemStrip"] as ItemStrip).getSource() === 'Tweet'
-          ? "./data/huisu_sampled_9.17_29_0.3_0.1_0.002.json"
-          : "./data/new_huisu_sampled_9.17_15_0.3_0.1_0.2.json", (data: DataForm.Sampled) => {
-        let set: Array<number> = [];
-        Object.values(data).forEach((innode: Array<number>) => {
-          innode.forEach((id: number) => {
-            for (let i: number = 0; i < set.length; i++) {
-              if (id === set[i]) {
-                return;
+      this.play();
+      setTimeout(() => {
+        let c: number = 0;
+        let process: NodeJS.Timeout = setInterval(() => {
+          $("#goRun").css("background", Color.linearGradient([
+            Color.setLightness(Color.Nippon.Nae, 0.6),
+            0,
+            Color.Nippon.Nae,
+            c <= 0.5 ? c : c - 0.041,
+            Color.setLightness(Color.Nippon.Midori, 0.7),
+            c <= 0.5 ? c + 0.001 : c - 0.04,
+            Color.setLightness(Color.Nippon.Midori, 0.9),
+            c <= 0.5 ? c + 0.04 : c - 0.001,
+            Color.setLightness(Color.Nippon.Aisumitya, 0.3),
+            c <= 0.5 ? c + 0.041 : c,
+            Color.setLightness(Color.Nippon.Aisumitya, 0.3),
+            1
+          ], 'right'));
+          c += (1 - c) / 10;
+        }, 50);
+        (this.refs["DataCenter"] as TaskQueue).open(
+          (this.refs["ItemStrip"] as ItemStrip).getSource() === 'Tweet'
+            ? "./data/huisu_sampled_9.17_10_0.3_0.1_0.001.json"
+            : "./data/new_huisu_sampled_9.17_24_0.3_0.1_0.2.json", (data: DataForm.Sampled) => {
+          let set: Array<number> = [];
+          Object.values(data).forEach((innode: Array<number>) => {
+            innode.forEach((id: number) => {
+              for (let i: number = 0; i < set.length; i++) {
+                if (id === set[i]) {
+                  return;
+                }
               }
-            }
-            set.push(id);
-          });
-          // set.push(...innode);
-        });
-        console.log(set.length);
-        // var dict: {[key: string]: number} = {};
-        // var over: Array<[number, number]> = [];
-        // for (let s: number = 0; s < set.length; s++) {
-        //   dict["id" + s] = 0;
-        // }
-        // for (let s: number = 0; s < set.length; s++) {
-        //   dict["id" + set[s]]++;
-        // }
-        // set = [];
-        // for (const key in dict) {
-        //   if (dict.hasOwnProperty(key)) {
-        //     const element = dict[key];
-        //     const id: number = parseInt((key as string).replace("id", ""));
-        //     if (element === 1) {
-        //       set.push(id);
-        //     }
-        //     else if (element > 1) {
-        //       set.push(id);
-        //       over.push([id, element]);
-        //     }
-        //   }
-        // }
-        // console.log(over);
-        setTimeout(() => {
-          (this.refs["map"] as MapView).setState({
-            sampled: set
-          });
-          let nodes: Array<number> = [];
-          setTimeout(() => {
-            Object.keys(data).forEach((str: string) => {
-              nodes.push(parseInt(str));
+              set.push(id);
             });
+            // set.push(...innode);
+          });
+          console.log(set.length);
+          // var dict: {[key: string]: number} = {};
+          // var over: Array<[number, number]> = [];
+          // for (let s: number = 0; s < set.length; s++) {
+          //   dict["id" + s] = 0;
+          // }
+          // for (let s: number = 0; s < set.length; s++) {
+          //   dict["id" + set[s]]++;
+          // }
+          // set = [];
+          // for (const key in dict) {
+          //   if (dict.hasOwnProperty(key)) {
+          //     const element = dict[key];
+          //     const id: number = parseInt((key as string).replace("id", ""));
+          //     if (element === 1) {
+          //       set.push(id);
+          //     }
+          //     else if (element > 1) {
+          //       set.push(id);
+          //       over.push([id, element]);
+          //     }
+          //   }
+          // }
+          // console.log(over);
+          setTimeout(() => {
+            (this.refs["map"] as MapView).setState({
+              sampled: set
+            });
+            let nodes: Array<number> = [];
             setTimeout(() => {
-              Globe.moveBars(nodes);
+              Object.keys(data).forEach((str: string) => {
+                nodes.push(parseInt(str));
+              });
               setTimeout(() => {
-                (this.refs["ItemStrip"] as ItemStrip).end(true);
-                clearInterval(process);
-                $("#run")
-                  .attr("src", "./images/run.png")
-                  .removeClass("rotating");
-                (this.refs["ItemStrip"] as ItemStrip).setSampleRate(set.length / (this.refs["map"] as MapView).state.data.length);
-              }, 1000);
-            }, 300);
-            (this.refs["ResultView"] as ResultView).import("all");
+                Globe.moveBars(nodes);
+                setTimeout(() => {
+                  (this.refs["ItemStrip"] as ItemStrip).end(true);
+                  clearInterval(process);
+                  $("#run")
+                    .attr("src", "./images/run.png")
+                    .removeClass("rotating");
+                  (this.refs["ItemStrip"] as ItemStrip).setSampleRate(set.length / (this.refs["map"] as MapView).state.data.length);
+                }, 1000);
+              }, 300);
+              (this.refs["ResultView"] as ResultView).import("all");
+            }, 40);
           }, 40);
-        }, 40);
-      });
+        });
+      }, 1000);
     };
     Globe.random = () => {
       let total: Array<number> = [];
@@ -592,18 +599,6 @@ class App extends Component<{}, {}, {}> {
           texts.push({
             text: data.words
           });
-        }
-        for (let i: number = 0; i < 20; i++) {
-          const data: {
-            id: string;
-            lng: number;
-            lat: number;
-            words: string;
-            day: string;
-            city: string;
-            sentiment: string;
-            class: number;
-          } = Globe.getPoint(i);
           box.push({
             text: data.words,
             city: data.city,
@@ -632,13 +627,11 @@ class App extends Component<{}, {}, {}> {
             class: number;
           } = Globe.getPoint(list[i]);
           const s: number = parseFloat(data.sentiment);
-          if (i < 20) {
-            box.push({
-              text: data.words,
-              city: data.city,
-              sentiment: s
-            });
-          }
+          box.push({
+            text: data.words,
+            city: data.city,
+            sentiment: s
+          });
           texts.push({
             text: data.words
           });
@@ -765,7 +758,7 @@ class App extends Component<{}, {}, {}> {
 
 
 interface Global {
-  mapThis: (data: Array<{user_id: string; text: string; lat: number; lng: number;}>) => void;
+  appendWord: (word: string) => void;
   checkIfPointIsSampled: (index: number) => boolean;
   countWords: (list: Array<{ text: string; }>) => void;
   getPoint: (index: number) => {
@@ -788,8 +781,8 @@ interface Global {
   run: () => void;
 }
 
-export var Globe: Global = {
-  mapThis: () => {},
+export const Globe: Global = {
+  appendWord: () => {},
   checkIfPointIsSampled: () => false,
   countWords: () => {},
   getPoint: () => {

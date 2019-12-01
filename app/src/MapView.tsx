@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-30 14:33:31
+ * @Last Modified time: 2019-12-01 18:20:31
  */
 import React from 'react';
 import $ from 'jquery';
@@ -408,9 +408,30 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             }
             return false;
         };
+        
+        const attemp = () => {
+            if (this.refs["map"]) {
+                (this.refs["map"] as MapBox).callHeatMap();
+                (this.refs["map"] as MapBox).updateHeatMap([]);
+            }
+            else {
+                setTimeout(() => {
+                    attemp();
+                }, 800);
+            }
+        };
+        attemp();
     }
 
     public componentDidUpdate(): void {
+        let cors: Array<[number, number]> = [];
+        this.state.data.forEach((d: {lng: number, lat: number}) => {
+            cors.push([d.lng, d.lat]);
+        });
+        
+        (this.refs["map"] as MapBox).callHeatMap();
+        (this.refs["map"] as MapBox).updateHeatMap(cors);
+
         $(this.refs['svg']).html("");
         this.rounds = [];
         // this.behaviour = 'zoom';
@@ -1070,7 +1091,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     private fx(d: number): number {
-        return (d - this.bounds[1][0]) / (this.bounds[1][1] - this.bounds[1][0]) * 867;
+        return (d - this.bounds[1][0]) / (this.bounds[1][1] - this.bounds[1][0]) * (867 - 2);
     }
 
     private fy(d: number): number {

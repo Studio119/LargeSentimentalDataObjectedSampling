@@ -70,6 +70,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                             dataset
                         </label>
                         <Dropdown<string> width={ 80 } height={ 30 } optionList={ ['Tweet', 'yelp'] }
+                        defaultIndex={ 0 }
                         onChange={
                             (option: string) => {
                                 this.load(option);
@@ -246,8 +247,8 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             }
             (this.refs[`cp${index}`] as ColorPicker).bind(element, ...attrName);
         };
-        this.load('yelp');
-        Globe.loadData = this.load.bind(this, 'yelp');
+        this.load('Tweet');
+        Globe.loadData = this.load.bind(this, 'Tweet');
     }
 
     public getSnapshotBeforeUpdate(): {
@@ -293,7 +294,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
             this.source = 'Tweet';
             src = {
                 origin: './data/93_new.json',
-                tree: './data/visualization_tree_dict_0.1_0.3_0.002.json',
+                tree: './data/visualization_tree_dict_0.1_0.3_0.001.json',
                 gathering: './data/new_93.json'
             };
             this.props.importSource(src);
@@ -307,6 +308,10 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                 origin: './data/97_new.json',
                 tree: './data/new_visualization_tree_dict_0.1_0.3_0.2.json',
                 gathering: './data/new_97.json'
+                
+                // origin: './data/97_new.json',
+                // tree: './data/new_visualization_tree_dict_0.1_0.3_0.07.json',
+                // gathering: './data/new_97.json'
             };
             this.props.importSource(src);
             // this.props.importSource('/data/NOSUCHFILE.csv', '/data/Tree.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json', '/data/NOSUCHFILE.json');

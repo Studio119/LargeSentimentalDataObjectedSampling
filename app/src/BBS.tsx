@@ -2,11 +2,12 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-10 13:26:24 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-27 19:53:26
+ * @Last Modified time: 2019-12-01 17:35:16
  */
 import React, { Component } from "react";
 import $ from "jquery";
 import Color from "./preference/Color";
+import { Globe } from "./App";
 
 export interface BBSprops {
     width: number;
@@ -15,6 +16,7 @@ export interface BBSprops {
 
 export interface BBSstate {
     list: Array<{ text: string; city: string; sentiment: number; }>;
+    filter: string;
 }
 
 class BBS extends Component<BBSprops, BBSstate, {}> {
@@ -56,10 +58,28 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
         "Mimmo Sambuco"
     ];
 
+    private displayList: Array<{ text: string; city: string; sentiment: number; }>;
+
     public constructor(props: BBSprops) {
         super(props);
         this.state = {
-            list: []
+            list: [],
+            filter: '*'
+        };
+        this.displayList = [];
+    }
+
+    public componentDidMount(): void {
+        Globe.appendWord = (word: string) => {
+            if ($("#wordSearch").val() === "*") {
+                $("#wordSearch").val(word);
+            }
+            else {
+                $("#wordSearch").val($("#wordSearch").val() + ',' + word);
+            }
+            this.setState({
+                filter: $("#wordSearch").val() as string
+            });
         };
     }
 
@@ -90,6 +110,50 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                 }
             }
         }
+
+        this.displayList = [];
+
+        let words: Array<string> = [];
+        if (this.state.filter !== '*') {
+            this.state.filter.split(/ |,/).forEach((str: string) => {
+                if (str.length && (str[str.length - 1] !== "-" || str.length > 1)) {
+                    words.push(str.toLowerCase());
+                }
+            });
+        }
+        
+        this.state.list.forEach((d: { text: string; city: string; sentiment: number; }, index: number) => {
+            let flag: boolean = words.length ? false : true;
+            const tb: Array<string> = d.text.split(/[ |,|.|;|:|(|)|[|\]|?|!|“]/);
+            if (flag) {
+                this.displayList.push(d);
+                return;
+            }
+            for (let m: number = 0; m < tb.length; m++) {
+                const t: string = tb[m];
+                for (let i: number = 0; i < words.length; i++) {
+                    if (words[i][words[i].length - 1] === '-') {
+                        if (t.toLowerCase().startsWith(words[i][words[i].length].substring(0, words[i].length - 1))) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    else {
+                        if (t.toLowerCase() === words[i]) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                }
+                if (flag) {
+                    break;
+                }
+            }
+            if (flag) {
+                this.displayList.push(d);
+            }
+        });
+        
         return (
             <div
             style={{
@@ -116,29 +180,77 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                     paddingLeft: '16px',
                     letterSpacing: '2px'
                 }}>
-                    Tweets List
+                    Text Information
                 </div>
-                <ul
+                <input
+                name="wordSearch"
+                id="wordSearch"
+                placeholder="*"
+                style={{
+                    margin: '6px 10px 4px 0px',
+                    fontSize: '14px',
+                    width: '188px',
+                    padding: '2px 6px'
+                }} />
+                <button
+                style={{
+                    margin: '6px 41px 4px 4px',
+                    fontSize: '14px',
+                    padding: '1px 10px',
+                    letterSpacing: '1.2px',
+                    transform: 'translateY(-2px)',
+                    background: Color.setLightness(Color.Nippon.Kesizumi, 0.98),
+                    borderTop: '1px solid ' + Color.setLightness(Color.Nippon.Kesizumi, 0.9),
+                    borderLeft: '1px solid ' + Color.setLightness(Color.Nippon.Kesizumi, 0.9),
+                    borderBottom: '3px solid ' + Color.setLightness(Color.Nippon.Kesizumi, 0.6),
+                    borderRight: '2px solid ' + Color.setLightness(Color.Nippon.Kesizumi, 0.42)
+                }}
+                onClick={
+                    () => {
+                        if (!$("#wordSearch").val()) {
+                            return;
+                        }
+                        const val: string = $("#wordSearch").val()! as string;
+                        if (val.length || val !== '*') {
+                            this.setState({
+                                filter: val
+                            });
+                        }
+                        else {
+                            $("#wordSearch").val("*");
+                            this.setState({
+                                filter: '*'
+                            });
+                        }
+                    }
+                } >
+                    filter
+                </button>
+                <ul ref="container"
                 style={{
                     margin: '0px',
-                    height: this.props.height - 24.8,
+                    height: this.props.height - 24.8 - 33.2,
                     listStyle: 'none',
                     overflowX: 'hidden',
                     overflowY: 'scroll',
                     textAlign: 'left'
                 }}>
                     {
-                        this.state.list.length < 20 ||
+                        this.displayList.length <= 20 ||
                         <p style={{
                             color: "#888",
                             margin: "6px -29px 22px",
                             fontSize: '12.4px'
                         }} >
-                            Too many to display, showing 20 results only.
+                            Too many to display ({ this.displayList.length }), showing 20 results only.
                         </p>
                     }
                     {
-                        this.state.list.map((b: { text: string; city: string; sentiment: number; }, index: number) => {
+                        this.displayList.map((b: { text: string; city: string; sentiment: number; }, index: number) => {
+                            if (index >= 20) {
+                                return null;
+                            }
+
                             return (
                                 <li key={ `row${ index }` }
                                 style={{
@@ -153,7 +265,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                                             <span style={{
                                                 fontSize: '13px'
                                             }} >
-                                                { this.hide(idset[index]) }
+                                                { this.hide(idset[index % 20]) }
                                             </span>
                                             <span key={ `city${ index }` }
                                             style={{
@@ -175,8 +287,8 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                                         verticalAlign: 'top',
                                         margin: '-12px 18px 0px -18px'
                                     }} >
-                                        <img src={ `./images/icon${ iconset[index] }.jpg` }
-                                        alt={ idset[index].split(' ').map((p: string) => {
+                                        <img src={ `./images/icon${ iconset[index % 20] }.jpg` }
+                                        alt={ idset[index % 20].split(' ').map((p: string) => {
                                             return p[0] + ".";
                                         }).join('') }
                                         width="32px" height="32px"
@@ -218,7 +330,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                                         </p>
                                     </div>
                                 </li>
-                            )
+                            );
                         })
                     }
                 </ul>
@@ -227,10 +339,63 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
     }
 
     public componentDidUpdate(): void {
-        for (let i: number = 0; i < this.state.list.length; i++) {
+        let words: Array<string> = [];
+        if (this.state.filter !== '*') {
+            this.state.filter.split(/ |,/).forEach((str: string) => {
+                if (str.length && (str[str.length - 1] !== "-" || str.length > 1)) {
+                    words.push(str.toLowerCase());
+                }
+            });
+        }
+        this.displayList.forEach((d: { text: string; city: string; sentiment: number; }, i: number) => {
             let origin: string = $(this.refs[`bbs_text${ i }`] as any).html();
+            if (!origin) {
+                return;
+            }
+
+            if (this.state.filter !== '*') {
+                let box: Array<string> = [];
+                const tb: Array<string> = origin.split(/[ |,|.|;|:|(|)|[|\]|?|!|“]/);
+                for (let m: number = 0; m < tb.length; m++) {
+                    const t: string = tb[m];
+                    for (let i: number = 0; i < words.length; i++) {
+                        if (words[i][words[i].length - 1] === '-') {
+                            if (t.toLowerCase().startsWith(words[i][words[i].length].substring(0, words[i].length - 1))) {
+                                let flag: boolean = false;
+                                for (let s: number = 0; s < box.length; s++) {
+                                    if (box[s] === t) {
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                if (!flag) {
+                                    box.push(t);
+                                }
+                            }
+                        }
+                        else {
+                            if (t.toLowerCase() === words[i]) {
+                                let flag: boolean = false;
+                                for (let s: number = 0; s < box.length; s++) {
+                                    if (box[s] === t) {
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                if (!flag) {
+                                    box.push(t);
+                                }
+                            }
+                        }
+                    }
+                }
+                for (let j: number = 0; j < box.length; j++) {
+                    origin = origin.replace(box[j], "?" + box[j]);
+                }
+            }
+
             let rich: string = "";
-            let space: 'none' | 'at' | 'sharp' = 'none';
+            let space: 'none' | 'at' | 'sharp' | 'found' = 'none';
             let tab: number = 0;
             for (let j: number = 0; j < origin.length; j++) {
                 if (space === 'none') {
@@ -244,13 +409,19 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                         rich += "<span style='color: rgb(255,145,0);'>";
                         tab++;
                     }
+                    else if (origin[j] === "?") {
+                        space = 'found';
+                        rich += `<span style='color: ${ Color.Nippon.Karakurenai };`
+                                + `background: ${ Color.Nippon.Touou }80;'>`;
+                        tab++;
+                    }
                 }
                 else if (origin[j] === " ") {
                     if (space === 'at') {
                         rich += "</u></span>";
                         tab--;
                     }
-                    else if (space === 'sharp') {
+                    else if (space === 'sharp' || space === 'found') {
                         rich += "</span>";
                         tab--;
                     }
@@ -262,7 +433,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                         rich += "</{></span>";
                         tab--;
                     }
-                    else if (space === 'sharp') {
+                    else if (space === 'sharp' || space === 'found') {
                         rich += "</span>";
                         tab--;
                     }
@@ -270,9 +441,12 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                 }
             }
             if (tab === 0) {
-                $(this.refs[`bbs_text${ i }`] as any).html(rich);
+                $(this.refs[`bbs_text${ i }`] as any).html(rich.replace("?", ""));
             }
-        }
+        });
+        $(this.refs["container"]).animate({
+            scrollTop: 0
+        }, 800);
     }
 
     public import(list: Array<{ text: string; city: string; sentiment: number; }>): void {
