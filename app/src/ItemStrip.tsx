@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-30 16:49:56
+ * @Last Modified time: 2019-12-02 19:43:19
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -110,17 +110,17 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                         <div style={{ display: 'inline-block', width: '6px' }}/>
 
                         <ValueBar label={ "r =" } width={ 80 } height={ 18 } ref="radius"
-                            min={ 0 } max={ 0.001 } step={ 0.0001 } defaultValue={ 0.0002 }
+                            min={ 0.001 } max={ 0.2 } defaultValue={ 0.001 }
                             valueFormatter={
                                 (num: number) => {
                                     return num.toFixed(4);
                                 }
                             }
                         />
-                        <ValueBar label={ "β =" } width={ 80 } height={ 18 } ref="beta"
+                        <ValueBar label={ "\u03BB =" } width={ 80 } height={ 18 } ref="beta"
                             min={ 0 } max={ 1 } step={ 0.01 } defaultValue={ 0.3 }
                         />
-                        <ValueBar label={ "γ =" } width={ 80 } height={ 18 } ref="gamma"
+                        <ValueBar label={ "\u03B3 =" } width={ 80 } height={ 18 } ref="gamma"
                             min={ 0 } max={ 1 } step={ 0.01 } defaultValue={ 0.2 }
                         />
 
@@ -286,6 +286,18 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
 
     public getSource(): 'Tweet' | 'yelp' {
         return this.source;
+    }
+
+    public getLambda(): number {
+        return parseFloat(((this.refs["beta"] as ValueBar).val()!).toFixed(1));
+    }
+    
+    public getGamma(): number {
+        return parseFloat(((this.refs["gamma"] as ValueBar).val()!).toFixed(1));
+    }
+    
+    public getRadius(): number {
+        return (this.refs["radius"] as ValueBar).val()! < 0.1 ? 0.001 : 0.2;
     }
 
     private load(source: string): void {

@@ -133,7 +133,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                 const t: string = tb[m];
                 for (let i: number = 0; i < words.length; i++) {
                     if (words[i][words[i].length - 1] === '-') {
-                        if (t.toLowerCase().startsWith(words[i][words[i].length].substring(0, words[i].length - 1))) {
+                        if (t.toLowerCase().startsWith(words[i].substring(0, words[i].length - 1))) {
                             flag = true;
                             break;
                         }
@@ -360,7 +360,7 @@ class BBS extends Component<BBSprops, BBSstate, {}> {
                     const t: string = tb[m];
                     for (let i: number = 0; i < words.length; i++) {
                         if (words[i][words[i].length - 1] === '-') {
-                            if (t.toLowerCase().startsWith(words[i][words[i].length].substring(0, words[i].length - 1))) {
+                            if (t.toLowerCase().startsWith(words[i].substring(0, words[i].length - 1))) {
                                 let flag: boolean = false;
                                 for (let s: number = 0; s < box.length; s++) {
                                     if (box[s] === t) {

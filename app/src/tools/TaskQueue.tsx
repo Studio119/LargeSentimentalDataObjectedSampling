@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-10-02 15:53:12 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-16 22:02:20
+ * @Last Modified time: 2019-12-02 19:52:08
  */
 
 import React from 'react';
@@ -717,11 +717,12 @@ class TaskQueue<T = {}> extends Dragable<TaskQueueProps<T>, TaskQueueState, {}> 
      * Opens a file.
      * This object will bind an "open" attribute which is a reference of this function on object window.
      * @param {string} url The path of the file.
-     * @param {((jsondata: any) => void | undefined | null)} [success] Callback called when the request success.
+     * @param {((jsondata: any) => void | undefined | null)} [success] Callback called when the request successes.
+     * @param {(() => void | undefined | null)} [fail] Callback called when the request fails.
      * @returns {void}
      * @memberof TaskQueue
      */
-    public open(url: string, success?: (jsondata: any) => void | undefined | null): void {
+    public open(url: string, success?: (jsondata: any) => void | undefined | null, fail?: () => void | undefined | null): void {
         if (TaskQueue.files[url] === "REQUEST_NOW_WAITING_IN_THE_QUEUE") {
             return;
         }
@@ -741,9 +742,78 @@ class TaskQueue<T = {}> extends Dragable<TaskQueueProps<T>, TaskQueueState, {}> 
                 }
             }, (log: string) => {
                 this.print(log);
+                if (fail && log.startsWith('@err')) {
+                    fail();
+                }
             });
             return;
         }
+    }
+
+    /**
+     * Sets the visibility of this DOM element.
+     * @param {('on' | 'off' | number)} args
+     * * on visible
+     * * off hidden
+     * * number shows the DOM element and hides it after certain time
+     * @memberof TaskQueue
+     */
+    public display(args: 'on' | 'off' | number): void {
+        switch (args) {
+            case 'on':
+                $(this.refs["drag:target"])
+                    .css('opacity', 0)
+                    .show()
+                    .animate({
+                        opacity: 1,
+                        width: 601.6,
+                        height: 300.4,
+                        top: $(this.refs["drag:target"]).attr('_y'),
+                        left: $(this.refs["drag:target"]).attr('_x')
+                    }, 200);
+                return;
+            case 'off':
+                $(this.refs["drag:target"])
+                    .css('opacity', 1)
+                    .attr('_x', $(this.refs["drag:target"]).css('left'))
+                    .attr('_y', $(this.refs["drag:target"]).css('top'))
+                    .animate({
+                        opacity: 0,
+                        top: 0,
+                        left: 0,
+                        width: 0,
+                        height: 0
+                    }, 200, () => {
+                        $(this.refs["drag:target"]).hide();
+                    });
+                return;
+        }
+
+        $(this.refs["drag:target"])
+            .css('opacity', 0)
+            .show()
+            .animate({
+                opacity: 1,
+                width: 601.6,
+                height: 300.4,
+                top: $(this.refs["drag:target"]).attr('_y'),
+                left: $(this.refs["drag:target"]).attr('_x')
+            }, 200);
+        setTimeout(() => {
+            $(this.refs["drag:target"])
+                .css('opacity', 1)
+                .attr('_x', $(this.refs["drag:target"]).css('left'))
+                .attr('_y', $(this.refs["drag:target"]).css('top'))
+                .animate({
+                    opacity: 0,
+                    top: 0,
+                    left: 0,
+                    width: 0,
+                    height: 0
+                }, 200, () => {
+                    $(this.refs["drag:target"]).hide();
+                });
+        }, args);
     }
 }
 

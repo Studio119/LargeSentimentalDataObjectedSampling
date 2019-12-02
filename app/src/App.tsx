@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-12-02 11:38:39
+ * @Last Modified time: 2019-12-02 20:36:27
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -438,7 +438,15 @@ class App extends Component<{}, {}, {}> {
         }, 50);
         (this.refs["DataCenter"] as TaskQueue).open(
           (this.refs["ItemStrip"] as ItemStrip).getSource() === 'Tweet'
-            ? "./data/huisu_sampled_9.17_10_0.3_0.1_0.001.json"
+            ? `./data/huisu_sampled_9.17_${
+                Math.round((this.refs["ItemStrip"] as ItemStrip).getSampleRate() * 100)
+              }_${
+                (this.refs["ItemStrip"] as ItemStrip).getLambda()
+              }_${
+                (this.refs["ItemStrip"] as ItemStrip).getGamma()
+              }_${
+                (this.refs["ItemStrip"] as ItemStrip).getRadius()
+              }.json`
             : "./data/new_huisu_sampled_9.17_24_0.3_0.1_0.2.json", (data: DataForm.Sampled) => {
           let set: Array<number> = [];
           Object.values(data).forEach((innode: Array<number>) => {
@@ -499,10 +507,20 @@ class App extends Component<{}, {}, {}> {
               (this.refs["ResultView"] as ResultView).import("all");
             }, 40);
           }, 40);
+        }, () => {
+          clearInterval(process);
+          setTimeout(() => {
+            $("#run")
+              .attr("src", "./images/run.png")
+              .removeClass("rotating");
+            (this.refs["DataCenter"] as TaskQueue<Global>).display('on');
+          }, 1200);
+            // Globe.loadData();
         });
       }, 1000);
     };
     Globe.random = () => {
+      this.play();
       let total: Array<number> = [];
       let set: Array<number> = [];
       let length: number = (this.refs["map"] as MapView).state.data.length;
