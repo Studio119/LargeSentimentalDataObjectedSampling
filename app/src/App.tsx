@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-12-01 15:35:07
+ * @Last Modified time: 2019-12-02 11:38:39
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -185,7 +185,7 @@ class App extends Component<{}, {}, {}> {
         </div> */}
         <Settings id="ActiveSettings" ref="topics" />
         <MapView id="MapView" ref="map" center={ [-98, 38] } zoom={ 3.2 } minZoom={ 3.2 } maxZoom={ 12 }
-        left={ [8, 817] } top={ [32, 372] } />
+        left={ [8, 817] } top={ [32, 336] } />
         <div
         style={{
           position: 'absolute',

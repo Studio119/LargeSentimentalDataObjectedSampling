@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-12-01 18:20:31
+ * @Last Modified time: 2019-12-02 11:45:47
  */
 import React from 'react';
 import $ from 'jquery';
@@ -245,7 +245,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 <div ref="drag:target" key="tooltip"
                 style={{
                     width: '40px',
-                    height: '154px',
+                    height: '190px',
                     background: Color.Nippon.Aonibi,
                     position: 'absolute',
                     top: '32px',
@@ -380,6 +380,43 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             }
                         } />
                     </div>
+                    <div key="button:heatmap" ref="button:heatmap"
+                    style={{
+                        width: '28px',
+                        height: '28px',
+                        margin: '5px',
+                        border: `1px solid ${ Color.Nippon.Kuroturubami }`,
+                        background: Color.Nippon.Kesizumi
+                    }} >
+                        <img src="./images/heatmapOff.png" alt="Heatmap" id="heatmapButton"
+                        style={{
+                            width: '24px',
+                            margin: '2px'
+                        }}
+                        onClick={
+                            () => {
+                                let cors: Array<[number, number]> = [];
+                                switch ($("#heatmapButton").attr("src")) {
+                                    case "./images/heatmapOff.png":
+                                        $("#heatmapButton").attr("src", "./images/heatmapBefore.png");
+                                        this.state.data.forEach((d: {lng: number, lat: number}) => {
+                                            cors.push([d.lng, d.lat]);
+                                        });
+                                        break;
+                                    case "./images/heatmapBefore.png":
+                                        $("#heatmapButton").attr("src", "./images/heatmapAfter.png");
+                                        this.state.sampled.forEach((i: number) => {
+                                            cors.push([this.state.data[i].lng, this.state.data[i].lat]);
+                                        });
+                                        break;
+                                    case "./images/heatmapAfter.png":
+                                        $("#heatmapButton").attr("src", "./images/heatmapOff.png");
+                                        break;
+                                }
+                                (this.refs["map"] as MapBox).updateHeatMap(cors);
+                            }
+                        } />
+                    </div>
                 </div>
             </div>
         )
@@ -424,14 +461,6 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
     }
 
     public componentDidUpdate(): void {
-        let cors: Array<[number, number]> = [];
-        this.state.data.forEach((d: {lng: number, lat: number}) => {
-            cors.push([d.lng, d.lat]);
-        });
-        
-        (this.refs["map"] as MapBox).callHeatMap();
-        (this.refs["map"] as MapBox).updateHeatMap(cors);
-
         $(this.refs['svg']).html("");
         this.rounds = [];
         // this.behaviour = 'zoom';
@@ -450,6 +479,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             $("#map_layer_canvas").css('opacity', 1);
             $(this.refs['svg']).html("");
             this.rounds = [];
+
             try {
                 setTimeout(() => {
                     Globe.update("all");
@@ -459,6 +489,26 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             }
         }
         // this.bounds = [[ 50.55349948549696, 22.86881607932105 ], [ -128.14621384226703, -67.85378615773539 ]];
+
+        let cors: Array<[number, number]> = [];
+        switch ($("#heatmapButton").attr("src")) {
+            case "./images/heatmapOff.png":
+                $("#heatmapButton").attr("src", "./images/heatmapBefore.png");
+                this.state.data.forEach((d: {lng: number, lat: number}) => {
+                    cors.push([d.lng, d.lat]);
+                });
+                break;
+            case "./images/heatmapBefore.png":
+                $("#heatmapButton").attr("src", "./images/heatmapAfter.png");
+                this.state.sampled.forEach((i: number) => {
+                    cors.push([this.state.data[i].lng, this.state.data[i].lat]);
+                });
+                break;
+            case "./images/heatmapAfter.png":
+                $("#heatmapButton").attr("src", "./images/heatmapOff.png");
+                break;
+        }
+        (this.refs["map"] as MapBox).updateHeatMap(cors);
     }
 
     private redraw(): void {

@@ -234,9 +234,9 @@ class MapBox extends Component<MapProps, {}, {}> {
                     ["get", "mag"],
                     0, 0,
                     100, 0.2,
-                    5000, 0.5,
-                    500000, 0.6,
-                    5000000, 1
+                    5000, 0.6,
+                    10000, 0.7,
+                    500000, 1
                   ],
                   // Increase the heatmap color weight weight by zoom level
                   // heatmap-intensity is a multiplier on top of heatmap-weight
@@ -263,10 +263,11 @@ class MapBox extends Component<MapProps, {}, {}> {
                   "heatmap-radius": [
                     "interpolate", ["linear"],
                     ["zoom"],
-                    0, 48,
-                    10, 32,
-                    100, 24,
-                    1000, 16,
+                    0, 39,
+                    100, 28,
+                    5000, 20,
+                    10000, 14,
+                    500000, 10
                   ],
                   // Transition from heatmap to circle layer by zoom level
                   "heatmap-opacity": [
