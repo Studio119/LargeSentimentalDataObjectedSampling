@@ -328,7 +328,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                         valueAfter: value[1].valueAfter / value[1].countAfter
                     });
                 }
-            })
+            });
             this.setState({
                 classes: box
             });

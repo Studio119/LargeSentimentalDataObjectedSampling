@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-12-02 20:36:27
+ * @Last Modified time: 2019-12-03 22:05:43
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -447,6 +447,8 @@ class App extends Component<{}, {}, {}> {
               }_${
                 (this.refs["ItemStrip"] as ItemStrip).getRadius()
               }.json`
+            // ? './data/neu_huisu_sampled_9.17_16_0.2_0.08_0.001.json'
+            // ? './data/neu_huisu_sampled_9.17_6_0.2_0.08_0.001.json'
             : "./data/new_huisu_sampled_9.17_24_0.3_0.1_0.2.json", (data: DataForm.Sampled) => {
           let set: Array<number> = [];
           Object.values(data).forEach((innode: Array<number>) => {
@@ -595,6 +597,52 @@ class App extends Component<{}, {}, {}> {
       // $("#runr")
       //   .attr("src", "./images/run.png")
       //   .removeClass("rotating");
+    };
+    Globe.blueNoise = () => {
+      this.play();
+      setTimeout(() => {
+        let c: number = 0;
+        let process: NodeJS.Timeout = setInterval(() => {
+          $("#goBN").css("background", Color.linearGradient([
+            Color.setLightness(Color.Nippon.Nae, 0.6),
+            0,
+            Color.Nippon.Nae,
+            c <= 0.5 ? c : c - 0.041,
+            Color.setLightness(Color.Nippon.Midori, 0.7),
+            c <= 0.5 ? c + 0.001 : c - 0.04,
+            Color.setLightness(Color.Nippon.Midori, 0.9),
+            c <= 0.5 ? c + 0.04 : c - 0.001,
+            Color.setLightness(Color.Nippon.Aisumitya, 0.3),
+            c <= 0.5 ? c + 0.041 : c,
+            Color.setLightness(Color.Nippon.Aisumitya, 0.3),
+            1
+          ], 'right'));
+          c += (1 - c) / 8;
+        }, 50);
+        (this.refs["DataCenter"] as TaskQueue).open("./data/blue-noisy.json", (data: Array<number>) => {
+          (this.refs["map"] as MapView).setState({
+            sampled: data
+          });
+          Globe.moveBars([]);
+          (this.refs["ResultView"] as ResultView).import("all");
+          (this.refs["ItemStrip"] as ItemStrip).end(true);
+          (this.refs["ItemStrip"] as ItemStrip).setSampleRate(data.length / (this.refs["map"] as MapView).state.data.length);
+          clearInterval(process);
+          setTimeout(() => {
+            $("#runb")
+              .attr("src", "./images/run.png")
+              .removeClass("rotating");
+          }, 300);
+        }, () => {
+          clearInterval(process);
+          setTimeout(() => {
+            $("#runb")
+              .attr("src", "./images/run.png")
+              .removeClass("rotating");
+            (this.refs["DataCenter"] as TaskQueue<Global>).display('on');
+          }, 1200);
+        });
+      }, 1000);
     };
     Globe.update = (list: Array<number> | "all") => {
       let box: Array<{ text: string; city: string; sentiment: number; }> = [];
@@ -777,6 +825,7 @@ class App extends Component<{}, {}, {}> {
 
 interface Global {
   appendWord: (word: string) => void;
+  blueNoise: () => void;
   checkIfPointIsSampled: (index: number) => boolean;
   countWords: (list: Array<{ text: string; }>) => void;
   getPoint: (index: number) => {
@@ -801,6 +850,7 @@ interface Global {
 
 export const Globe: Global = {
   appendWord: () => {},
+  blueNoise: () => {},
   checkIfPointIsSampled: () => false,
   countWords: () => {},
   getPoint: () => {

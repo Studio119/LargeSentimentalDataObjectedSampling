@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-12-02 11:45:47
+ * @Last Modified time: 2019-12-03 21:50:52
  */
 import React from 'react';
 import $ from 'jquery';
@@ -128,29 +128,34 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             : null
                     }
                 </div>
-                {/* 这个画布用于展现全部的点 */}
-                <canvas key="1" id="map_layer_canvas" ref="canvas" width="867px" height="508.64px" style={{
-                    position: 'relative',
-                    top: '-506px',
-                    pointerEvents: 'none'
-                }} />
-                {/* 这个画布用于展现被高亮的点 */}
-                <canvas key="2" id="highlight_canvas" ref="canvas2" width="867px" height="508.64px" style={{
-                    position: 'relative',
-                    top: '-1018.6px',
-                    pointerEvents: 'none'
-                }} />
-                {/* 这个元素用于放置每一个框选的交互组件 */}
-                <svg ref="svg"
-                xmlns={`http://www.w3.org/2000/svg`}
+                <div id="scatter"
                 style={{
-                    width: '867px',
-                    height: '508.64px',
-                    position: 'absolute',
-                    left: '0px',
-                    top: '24px',
-                    pointerEvents: 'none'
-                }} />
+                    display: 'unset'
+                }} >
+                    {/* 这个画布用于展现全部的点 */}
+                    <canvas key="1" id="map_layer_canvas" ref="canvas" width="867px" height="508.64px" style={{
+                        position: 'relative',
+                        top: '-506px',
+                        pointerEvents: 'none'
+                    }} />
+                    {/* 这个画布用于展现被高亮的点 */}
+                    <canvas key="2" id="highlight_canvas" ref="canvas2" width="867px" height="508.64px" style={{
+                        position: 'relative',
+                        top: '-1018.6px',
+                        pointerEvents: 'none'
+                    }} />
+                    {/* 这个元素用于放置每一个框选的交互组件 */}
+                    <svg ref="svg"
+                    xmlns={`http://www.w3.org/2000/svg`}
+                    style={{
+                        width: '867px',
+                        height: '508.64px',
+                        position: 'absolute',
+                        left: '0px',
+                        top: '24px',
+                        pointerEvents: 'none'
+                    }} />
+                </div>
                 {/* 这个画布用于接受框选交互事件 */}
                 <canvas key="A" id="interaction" ref="table" width="867px" height="508.64px" style={{
                     position: 'relative',
@@ -402,15 +407,18 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                                         this.state.data.forEach((d: {lng: number, lat: number}) => {
                                             cors.push([d.lng, d.lat]);
                                         });
+                                        $("#scatter").hide();
                                         break;
                                     case "./images/heatmapBefore.png":
                                         $("#heatmapButton").attr("src", "./images/heatmapAfter.png");
                                         this.state.sampled.forEach((i: number) => {
                                             cors.push([this.state.data[i].lng, this.state.data[i].lat]);
                                         });
+                                        $("#scatter").hide();
                                         break;
                                     case "./images/heatmapAfter.png":
                                         $("#heatmapButton").attr("src", "./images/heatmapOff.png");
+                                        $("#scatter").show();
                                         break;
                                 }
                                 (this.refs["map"] as MapBox).updateHeatMap(cors);
@@ -572,7 +580,6 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         // this.ctx_2!.clearRect(-2, -2, 790, 464.4);
         // this.highLighted = [];
         let heap: Array<number> = [];
-        let count: number = 0;
         for (let i: number = 0; i < 20; i++) {
             heap.push(0);
         }
@@ -616,7 +623,6 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         this.highLighted.push(index);
                         heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
                         set.push(index);
-                        count++;
                     }
                 });
             }
@@ -633,7 +639,6 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         this.highLighted.push(index);
                         heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
                         set.push(index);
-                        count++;
                     }
                 });
             }
@@ -641,10 +646,10 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         }
         else {
             let heap_origin: Array<number> = [];
+            let set_sp: Array<number> = [];
             for (let i: number = 0; i < 20; i++) {
                 heap_origin.push(0);
             }
-            let count_origin: number = 0;
             let r2: number = Math.pow(this.area[0][0] - this.area[1][0], 2)
                 + Math.pow(this.area[0][1] - this.area[1][1], 2);
             let r: number = Math.sqrt(r2);
@@ -678,8 +683,6 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         heap[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
                         heap_origin[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
                         set.push(index);
-                        count_origin++;
-                        count++;
                     }
                 });
             }
@@ -701,11 +704,22 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         this.highLighted.push(index);
                         heap_origin[Math.floor(parseFloat(d.sentiment) * (10 - 1e-6) + 10)]++;
                         set.push(index);
-                        count_origin++;
                     }
                 });
             }
-            this.analyze(heap_origin, count_origin, heap, count, r);
+            this.state.data.forEach((d: {
+                id: string, lng: number, lat: number, words: string,
+            day: string, city: string, sentiment: string, class: number}, index: number) => {
+                if (this.fx(d.lng) < this.area[0][1] - r || this.fx(d.lng) > this.area[0][1] + r
+                    || this.fy(d.lat) < this.area[0][0] - r - 24 || this.fy(d.lat) > this.area[0][0] + r + 24) {
+                    return;
+                }
+                if (Math.pow(this.area[0][0] - this.fy(d.lat) - 24, 2)
+                        + Math.pow(this.area[0][1] - this.fx(d.lng), 2) <= r2) {
+                    set_sp.push(index);
+                }
+            });
+            this.analyze(set_sp, heap_origin, heap, r);
             Globe.update(set);
         }
         ready.forEach((list: Array<[number, number, string]>, index: number) => {
@@ -727,9 +741,13 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         return set[index * 2 % set.length];
     }
 
-    private analyze(heap_ori: Array<number>, count_ori: number, heap_sp: Array<number>, count_sp: number, r: number): void {
-        const heap: Array<number> = count_sp === 0 ? heap_ori : heap_sp;
-        const count: number = count_sp === 0 ? count_ori : count_sp;
+    private analyze(set: Array<number>, heap_origin: Array<number>, heap: Array<number>, r: number): void {
+        let setAft: Array<number> = [];
+        set.forEach((i: number) => {
+            if (Globe.checkIfPointIsSampled(i)) {
+                setAft.push(i);
+            }
+        });
         const color: string = this.paint(this.rounds.length);
         let circle: JQuery<HTMLElement> = $($.parseXML(
             `<circle xmlns="http://www.w3.org/2000/svg" `
@@ -748,16 +766,16 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         $(this.refs['svg']).append(circle);
         this.rounds.push({
             element: circle,
-            data: heap,
-            count: count,
-            data_sp: heap_sp,
-            count_sp: count_sp
+            data: heap_origin,
+            count: set.length,
+            data_sp: heap,
+            count_sp: setAft.length
         });
         $(".arc").remove();
         $(".Bar").css("stroke-width", 1).css("stroke", Color.setLightness(Color.Nippon.Aisumitya, 0.7));
         let nodeset: {[id: number]: [Array<number>, Array<number>]} = {};
         let leafCount: number = 0;
-        heap_ori.forEach((id: number) => {
+        set.forEach((id: number) => {
             const p: {
                 id: string;
                 lng: number;
@@ -773,12 +791,11 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             if (!nodeset.hasOwnProperty(leafId)) {
                 nodeset[leafId] = [[], []];
                 $(`#Bar_id${ leafId }`).css("stroke-width", 4).css("stroke", Color.Nippon.Kinntya);
-                if (Math.abs(value) < 5e-4) {
+                if (value === 0) {
                     return;
                 }
-                leafCount++;
             }
-            if (Math.abs(value) < 5e-4) {
+            if (value === 0) {
                 return;
             }
             nodeset[leafId][0].push(value);
@@ -786,6 +803,14 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 nodeset[leafId][1].push(value);
             }
         });
+        for (const leafId in nodeset) {
+            if (nodeset.hasOwnProperty(leafId)) {
+                const element: [Array<number>, Array<number>] = nodeset[leafId];
+                if (element[0].length > 0) {
+                    leafCount++;
+                }
+            }
+        }
         if (this.rounds.length === 1)  {
             let idx: number = 0;
             for (const leafId in nodeset) {
@@ -980,7 +1005,10 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
             for (let i: number = 0; i < 20; i++) {
                 let x: number = tx + (i + 1) * stepX;
                 let y: number = ty + (i + 1) * stepY;
-                let value1: number = Math.sqrt(2 * heap[i] / count + 1e-6);
+                let value1: number =
+                    setAft.length > 0
+                            ? Math.sqrt(2 * heap[i] / setAft.length + 1e-6)
+                            : Math.sqrt(2 * heap_origin[i] / set.length + 1e-6);
                 let rect1: JQuery<HTMLElement> = $($.parseXML(
                     `<path xmlns="http://www.w3.org/2000/svg" `
                     + `d="M${ x - offsetX },${ y - offsetY } `
@@ -1014,7 +1042,9 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         + `${ y + (height + 3) * value1 * (x2 - tx) / s }`;
                 }
                 else {
-                    let value0: number = Math.sqrt(2 * heap[i - 1] / count + 1e-6);
+                    let value0: number = setAft.length > 0
+                                ? Math.sqrt(2 * heap[i - 1] / setAft.length + 1e-6)
+                                : Math.sqrt(2 * heap_origin[i - 1] / set.length + 1e-6);
                     // d1 += ` L${ x - height * value1 * (y2 - ty) / s },${ y + height * value1 * (x2 - tx) / s }`;
                     d1 += ` C${ x - (height + 3) * value0 * (y2 - ty) / s - stepX * 2 / 3 },`
                         + `${ y + (height + 3) * value0 * (x2 - tx) / s - stepY * 2 / 3 }`

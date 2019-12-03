@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:27 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-12-02 19:43:19
+ * @Last Modified time: 2019-12-03 22:02:42
  */
 import React, { Component } from 'react';
 import $ from 'jquery';
@@ -100,7 +100,7 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                         </div>
 
                         <ValueBar label={ "Sampling Rate" } ref="SamplingRate"
-                        width={ 90 } height={ 18 } min={ 0 } max={ 1 } step={ 0.0001 } defaultValue={ 0.4 }
+                        width={ 90 } height={ 18 } min={ 0 } max={ 0.30 } step={ 0.01 } defaultValue={ 0.20 }
                         valueFormatter={
                             (num: number) => {
                                 return num.toFixed(4);
@@ -192,14 +192,14 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                         border: `1px solid ${ Color.Nippon.Mizu }`,
                         background: Color.setLightness(Color.Nippon.Mizu, 0.94),
                         top: '-3px',
-                        width: '104px',
+                        width: '158px',
                         left: '0px',
                         display: 'inline-block'
                     }} >
                         <button id="goRandom"
                         style={{
                             fontSize: '14px',
-                            width: '92px',
+                            width: '60px',
                             transform: 'translateY(8px)',
                             marginLeft: '5px',
                             marginRight: '9px',
@@ -232,7 +232,45 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                             style={{
                                 margin: this.state.sampled ? '0px 2px 0px -2px' : '0px 7px 0px -2px'
                             }} />
-                            Random
+                            RS
+                        </button>
+                        <button id="goBN"
+                        style={{
+                            fontSize: '14px',
+                            width: '70px',
+                            transform: 'translateY(8px)',
+                            marginLeft: '5px',
+                            marginRight: '9px',
+                            background: this.state.sampled
+                                ? Color.setLightness(Color.Nippon.Aisumitya, 0.6)
+                                : Color.Nippon.Aisumitya,
+                            color: Color.setLightness(Color.Nippon.Aisumitya, 0.9),
+                            padding: '2px 9px',
+                            height: '25.6px'
+                        }}
+                        onClick={
+                            this.state.sampled
+                                ? () => {
+                                    return;
+                                }
+                                : () => {
+                                    if ($("#run").attr("src") === "./images/loading.png"
+                                    || $("#runb").attr("src") === "./images/loading.png") {
+                                        return;
+                                    }
+                                    $("#runb").attr("src", "./images/loading.png").addClass("rotating");
+                                    setTimeout(() => {
+                                        Globe.blueNoise();
+                                    }, 200);
+                                }
+                        } >
+                            <img src={ `./images/run.png` } id="runb"
+                            alt={ ">>" }
+                            width="14px" height="14px"
+                            style={{
+                                margin: this.state.sampled ? '0px 2px 0px -2px' : '0px 7px 0px -2px'
+                            }} />
+                            BNS
                         </button>
                     </div>
                 </div>
@@ -310,6 +348,12 @@ class ItemStrip extends Component<ItemStripProps, ItemStripState, any> {
                 gathering: './data/new_93.json'
             };
             this.props.importSource(src);
+            // src = {
+            //     origin: './data/99_new.json',
+            //     tree: './data/visualization_tree_dict_0.08_0.2_0.001.json',
+            //     gathering: './data/new_99.json'
+            // };
+            // this.props.importSource(src);
             // this.props.importSource('/data/93.csv', '/data/visualization_tree_dict_0.2_0.1_0.02.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
             // this.props.importSource('/data/9-17.json', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
             // this.props.importSource('/data/917-51K.json', '/data/1/visualization_tree_dict_0.15_0.1_0.0007.json', '/data/93-wordcount.json', '/data/00sentiment_dis-0.15-0.01-20.json', '/data/00sentiment_sum-0.15-0.01-20.json', '/data/prun.json');
