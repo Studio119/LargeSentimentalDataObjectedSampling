@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-11-24 14:10:09 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-28 18:10:12
+ * @Last Modified time: 2019-12-04 14:14:26
  */
 
 import React, { Component } from 'react';
@@ -112,7 +112,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                                 valueBefore: number;
                                 valueAfter: number;
                             }) => {
-                                const dif: number = b.valueBefore - a.valueBefore;
+                                const dif: number = Math.abs(b.valueBefore) - Math.abs(a.valueBefore);
                                 return dif === 0 ? b.id - a.id : dif;
                             }).map((leaf: {
                                 id: number;
@@ -166,7 +166,7 @@ class ResultView extends Component<{}, ResultViewState, {}> {
                                 valueBefore: number;
                                 valueAfter: number;
                             }) => {
-                                const dif: number = b.valueAfter - a.valueAfter;
+                                const dif: number = Math.abs(b.valueAfter) - Math.abs(a.valueAfter);
                                 return dif === 0 ? b.id - a.id : dif;
                             }).map((leaf: {
                                 id: number;

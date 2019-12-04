@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 14:07:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-12-03 22:05:43
+ * @Last Modified time: 2019-12-04 15:19:58
  */
 import React, { Component } from 'react';
 import './App.css';
@@ -512,6 +512,7 @@ class App extends Component<{}, {}, {}> {
         }, () => {
           clearInterval(process);
           setTimeout(() => {
+            (this.refs["ItemStrip"] as ItemStrip).end(false);
             $("#run")
               .attr("src", "./images/run.png")
               .removeClass("rotating");
@@ -644,7 +645,7 @@ class App extends Component<{}, {}, {}> {
         });
       }, 1000);
     };
-    Globe.update = (list: Array<number> | "all") => {
+    Globe.update = (list: Array<number> | "all", origin?: Array<number>) => {
       let box: Array<{ text: string; city: string; sentiment: number; }> = [];
       let texts: Array<{ text: string; }> = [];
       if (list === "all") {
@@ -717,7 +718,7 @@ class App extends Component<{}, {}, {}> {
           list.length, active, positive, neutre, A_active / active, A_positive / positive, 0
         );
       }
-      (this.refs["ResultView"] as ResultView).import(list);
+      (this.refs["ResultView"] as ResultView).import(origin ? origin : list);
       (this.refs["bbs"] as BBS).import(box);
       Globe.countWords(texts);
     };
@@ -844,7 +845,7 @@ interface Global {
   moveBars: (nodes: Array<number>) => void;
   random: () => void;
   sample: () => void;
-  update: (list: Array<number> | "all") => void;
+  update: (list: Array<number> | "all", origin?: Array<number>) => void;
   run: () => void;
 }
 

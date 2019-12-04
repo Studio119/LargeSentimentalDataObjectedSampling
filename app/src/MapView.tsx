@@ -720,7 +720,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                 }
             });
             this.analyze(set_sp, heap_origin, heap, r);
-            Globe.update(set);
+            Globe.update(set, set_sp);
         }
         ready.forEach((list: Array<[number, number, string]>, index: number) => {
             this.timers.push(
@@ -824,26 +824,27 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         value += v;
                     });
                     value /= element[0].length;
-                    const r2: number = r + Math.sqrt(r * 2 + 36) * (0.1 + 4 * Math.abs(value));
-                    const color: string = Color.setLightness(value < -5e-4
+                    const r2: number = r + Math.sqrt(r * 2 + 36) * (4 * Math.abs(value));
+                    // const r2: number = r + Math.sqrt(r * 2 + 36) * (0.1 + 4 * Math.abs(value));
+                    const color: string = value < -5e-4
                         ?   Color.Nippon.Syozyohi
                         :   value < 5e-4
                                     ?   Color.Nippon.Ukonn
-                                    :   Color.Nippon.Ruri, 0.8 + 0.16 * Math.abs(value));
+                                    :   Color.Nippon.Ruri;
                     const lightness: number = Color.toHsl(color).l;
                     let arc: JQuery<HTMLElement> = $($.parseXML(
                         `<path xmlns="http://www.w3.org/2000/svg" `
                         + `class="arc" `
-                        + `d="M${ this.area[0][1] + 1 + Math.sin(idx / leafCount * 2 * Math.PI) * (r + 3) },`
-                            + `${ this.area[0][0] - 22 - Math.cos(idx / leafCount * 2 * Math.PI) * (r + 3) }`
+                        + `d="M${ this.area[0][1] + 1 + Math.sin((idx + 0.12) / leafCount * 2 * Math.PI) * (r + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((idx + 0.12) / leafCount * 2 * Math.PI) * (r + 3) }`
                             + ` A${ r + 3 },${ r + 3 },0,0,1,`
-                            + `${ this.area[0][1] + 1 + Math.sin((idx + 1) / leafCount * 2 * Math.PI) * (r + 3) },`
-                            + `${ this.area[0][0] - 22 - Math.cos((idx + 1) / leafCount * 2 * Math.PI) * (r + 3) }`
-                            + ` L${ this.area[0][1] + 1 + Math.sin((idx + 1) / leafCount * 2 * Math.PI) * (r2 + 3) },`
-                            + `${ this.area[0][0] - 22 - Math.cos((idx + 1) / leafCount * 2 * Math.PI) * (r2 + 3) }`
+                            + `${ this.area[0][1] + 1 + Math.sin((idx + 0.88) / leafCount * 2 * Math.PI) * (r + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((idx + 0.88) / leafCount * 2 * Math.PI) * (r + 3) }`
+                            + ` L${ this.area[0][1] + 1 + Math.sin((idx + 0.88) / leafCount * 2 * Math.PI) * (r2 + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((idx + 0.88) / leafCount * 2 * Math.PI) * (r2 + 3) }`
                             + ` A${ r2 + 3 },${ r2 + 3 },0,0,0,`
-                            + `${ this.area[0][1] + 1 + Math.sin(idx / leafCount * 2 * Math.PI) * (r2 + 3) },`
-                            + `${ this.area[0][0] - 22 - Math.cos(idx / leafCount * 2 * Math.PI) * (r2 + 3) }`
+                            + `${ this.area[0][1] + 1 + Math.sin((idx + 0.12) / leafCount * 2 * Math.PI) * (r2 + 3) },`
+                            + `${ this.area[0][0] - 22 - Math.cos((idx + 0.12) / leafCount * 2 * Math.PI) * (r2 + 3) }`
                             + ` Z" `
                         + `style="`
                             // + `fill: ${ Color.interpolate(
@@ -865,20 +866,21 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             value += v;
                         });
                         value /= element[1].length;
-                        const r3: number = r + Math.sqrt(r * 2 + 36) * (0.1 + 4 * Math.abs(value));
+                        // const r3: number = r + Math.sqrt(r * 2 + 36) * (0.1 + 4 * Math.abs(value));
+                        const r3: number = r + Math.sqrt(r * 2 + 36) * (4 * Math.abs(value));
                         let arc_sp: JQuery<HTMLElement> = $($.parseXML(
                             `<path xmlns="http://www.w3.org/2000/svg" `
                             + `class="arc" `
-                            + `d="M${ this.area[0][1] + 1 + Math.sin((idx + 0.35) / leafCount * 2 * Math.PI) * (r + 3) },`
-                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.35) / leafCount * 2 * Math.PI) * (r + 3) }`
+                            + `d="M${ this.area[0][1] + 1 + Math.sin((idx + 0.42) / leafCount * 2 * Math.PI) * (r + 3) },`
+                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.42) / leafCount * 2 * Math.PI) * (r + 3) }`
                                 + ` A${ r + 3 },${ r + 3 },0,0,1,`
-                                + `${ this.area[0][1] + 1 + Math.sin((idx + 0.65) / leafCount * 2 * Math.PI) * (r + 3) },`
-                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.65) / leafCount * 2 * Math.PI) * (r + 3) }`
-                                + ` L${ this.area[0][1] + 1 + Math.sin((idx + 0.65) / leafCount * 2 * Math.PI) * (r3 + 3) },`
-                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.65) / leafCount * 2 * Math.PI) * (r3 + 3) }`
+                                + `${ this.area[0][1] + 1 + Math.sin((idx + 0.58) / leafCount * 2 * Math.PI) * (r + 3) },`
+                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.58) / leafCount * 2 * Math.PI) * (r + 3) }`
+                                + ` L${ this.area[0][1] + 1 + Math.sin((idx + 0.58) / leafCount * 2 * Math.PI) * (r3 + 3) },`
+                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.58) / leafCount * 2 * Math.PI) * (r3 + 3) }`
                                 + ` A${ r3 + 3 },${ r3 + 3 },0,0,0,`
-                                + `${ this.area[0][1] + 1 + Math.sin((idx + 0.35) / leafCount * 2 * Math.PI) * (r3 + 3) },`
-                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.35) / leafCount * 2 * Math.PI) * (r3 + 3) }`
+                                + `${ this.area[0][1] + 1 + Math.sin((idx + 0.42) / leafCount * 2 * Math.PI) * (r3 + 3) },`
+                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.42) / leafCount * 2 * Math.PI) * (r3 + 3) }`
                                 + ` Z" `
                             + `style="`
                                 + `fill: ${ Color.setLightness(color, 0.3 + lightness * 0.7) }; `

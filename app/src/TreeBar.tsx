@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-11-30 16:34:11
+ * @Last Modified time: 2019-12-04 15:41:23
  */
 
 import React, { Component } from 'react';
@@ -222,11 +222,11 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                                             width={ node.width! * this.props.width / this.layers[this.layers.length - 1].length - 2 }
                                             height={ height * 0.84 - 2 }
                                             style={{
-                                                fill: Color.setLightness(value < -5e-4
+                                                fill: value < -5e-4
                                                     ?   Color.Nippon.Syozyohi
                                                     :   value < 5e-4
                                                                 ?   Color.Nippon.Ukonn
-                                                                :   Color.Nippon.Ruri, 0.8 + 0.16 * Math.abs(value)),
+                                                                :   Color.Nippon.Ruri,
                                                 stroke: Color.Nippon.Aisumitya
                                             }}
                                             onClick={
@@ -567,14 +567,70 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
             const labelSuccessRate: JQuery<HTMLElement> = $($.parseXML(
                 `<text xmlns="http://www.w3.org/2000/svg" class="offDisplay" `
                 + `x="${ x - height / 3.2 + height / 10 }" y="${ y - height / 3.2 + height * 3 / 5 }" `
-                + `dy="-4.3" `
-                + `style="fill: ${ Color.Nippon.Aisumitya }; font-size: 9px; pointer-events: none;" >`
+                + `style="fill: ${ Color.Nippon.Gohunn }; font-size: 9px; pointer-events: none; `
+                + `transform-origin: ${ x - height / 3.2 + height / 10 + 16 }px ${ y - height / 3.2 + height * 3 / 5 - 4 }px; `
+                + `transform: rotate(60deg);"> `
+                    + (
+                        (isNaN(successRate) ? '100%' : ((successRate * 100).toFixed(1) + "%"))
+                            === "100.0%" ? "100%" : (isNaN(successRate) ? '100%' : ((successRate * 100).toFixed(1) + "%"))
+                    )
+                + `</text>`
+            ).documentElement);
+            $(this.refs['svg']).append(labelSuccessRate);
+        }
+        else if ($(`#Bar_id${ node.id }`).hasClass("nodebox")) {
+            const element: JQuery<HTMLElement> = $(`#Bar_id${ node.id }`);
+            const width: number = parseFloat(element.attr('__width')!);
+            const height: number = parseFloat(element.attr('__height')!);
+            const x: number = parseFloat(element.css('x'));
+            const y: number = parseFloat(element.css('y'));
+
+            const total: number = columns.length * (columns.length - 1);
+            let mistake: number = 0;
+            for (let a: number = 0; a < columns.length - 1; a++) {
+                for (let b: number = a + 1; b < columns.length; b++) {
+                    if (Math.sign(columns[a].averBefore - columns[b].averBefore)
+                    !== Math.sign(columns[a].averAfter - columns[b].averAfter)) {
+                        mistake++;
+                    }
+                }
+            }
+
+            const labelBackground: JQuery<HTMLElement> = $($.parseXML(
+                `<rect xmlns="http://www.w3.org/2000/svg" class="offDisplay" `
+                + `x="${ x - height / 3.2 + width / 2 - 3 }" y="${ y - height / 3.2 + height * 3 / 5 - 14.2 }" `
+                + `width="36px" height="18px" `
+                + `style="fill: ${ Color.Nippon.Gohunn }C0; pointer-events: none; `
+                + `visibility: hidden; `
+                + `transform-origin: ${ x - height / 3.2 + width / 2 }px ${ y - height / 3.2 + height * 3 / 5 }px; `
+                + `transform: rotate(60deg);" />`
+            ).documentElement);
+            $(this.refs['svg']).append(labelBackground);
+            
+            const successRate: number = 1 - mistake / total;
+            const labelSuccessRate: JQuery<HTMLElement> = $($.parseXML(
+                `<text xmlns="http://www.w3.org/2000/svg" class="offDisplay" `
+                + `x="${ x - height / 3.2 + width / 2 }" y="${ y - height / 3.2 + height * 3 / 5 }" `
+                + `dy="-2.3" `
+                + `style="fill: ${ Color.Nippon.Aisumitya }; font-size: 9px; pointer-events: none; `
+                + `transform-origin: ${ x - height / 3.2 + width / 2 }px ${ y - height / 3.2 + height * 3 / 5 }px; `
+                + `transform: rotate(60deg); visibility: hidden;" >`
                     + (
                         isNaN(successRate) ? '100%' : ((successRate * 100).toFixed(1) + "%")
                     )
                 + `</text>`
             ).documentElement);
             $(this.refs['svg']).append(labelSuccessRate);
+
+            $(`#Bar_id${ node.id }`).on('mouseenter', () => {
+                labelBackground.css("visibility", "visible");
+                labelSuccessRate.css("visibility", "visible");
+            }).on('mouseleave', () => {
+                setTimeout(() => {
+                    labelBackground.css("visibility", "hidden");
+                    labelSuccessRate.css("visibility", "hidden");
+                }, 2000);
+            });
         }
 
         return { columns: columns };
