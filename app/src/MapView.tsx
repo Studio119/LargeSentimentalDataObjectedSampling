@@ -501,19 +501,16 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
         let cors: Array<[number, number]> = [];
         switch ($("#heatmapButton").attr("src")) {
             case "./images/heatmapOff.png":
-                $("#heatmapButton").attr("src", "./images/heatmapBefore.png");
+                break;
+            case "./images/heatmapBefore.png":
                 this.state.data.forEach((d: {lng: number, lat: number}) => {
                     cors.push([d.lng, d.lat]);
                 });
                 break;
-            case "./images/heatmapBefore.png":
-                $("#heatmapButton").attr("src", "./images/heatmapAfter.png");
+            case "./images/heatmapAfter.png":
                 this.state.sampled.forEach((i: number) => {
                     cors.push([this.state.data[i].lng, this.state.data[i].lat]);
                 });
-                break;
-            case "./images/heatmapAfter.png":
-                $("#heatmapButton").attr("src", "./images/heatmapOff.png");
                 break;
         }
         (this.refs["map"] as MapBox).updateHeatMap(cors);
@@ -853,6 +850,7 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                             //     i / 19
                             // ) }; `
                             + `fill: ${ color }; `
+                            + `fill-opacity: ${ element[1].length > 0 ? 0.5 : 0.9 }; `
                             + `stroke: ${ Color.setLightness(color, lightness * 0.7) }; `
                             + `stroke-width: 0.6px; `
                             + `pointer-Events: none; `
@@ -868,19 +866,20 @@ class MapView extends Dragable<MapViewProps, MapViewState, {}> {
                         value /= element[1].length;
                         // const r3: number = r + Math.sqrt(r * 2 + 36) * (0.1 + 4 * Math.abs(value));
                         const r3: number = r + Math.sqrt(r * 2 + 36) * (4 * Math.abs(value));
+                        const width: number = 0.72 * (element[1].length / element[0].length);
                         let arc_sp: JQuery<HTMLElement> = $($.parseXML(
                             `<path xmlns="http://www.w3.org/2000/svg" `
                             + `class="arc" `
-                            + `d="M${ this.area[0][1] + 1 + Math.sin((idx + 0.42) / leafCount * 2 * Math.PI) * (r + 3) },`
-                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.42) / leafCount * 2 * Math.PI) * (r + 3) }`
+                            + `d="M${ this.area[0][1] + 1 + Math.sin((idx + 0.5 - width / 2) / leafCount * 2 * Math.PI) * (r + 3) },`
+                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.5 - width / 2) / leafCount * 2 * Math.PI) * (r + 3) }`
                                 + ` A${ r + 3 },${ r + 3 },0,0,1,`
-                                + `${ this.area[0][1] + 1 + Math.sin((idx + 0.58) / leafCount * 2 * Math.PI) * (r + 3) },`
-                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.58) / leafCount * 2 * Math.PI) * (r + 3) }`
-                                + ` L${ this.area[0][1] + 1 + Math.sin((idx + 0.58) / leafCount * 2 * Math.PI) * (r3 + 3) },`
-                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.58) / leafCount * 2 * Math.PI) * (r3 + 3) }`
+                                + `${ this.area[0][1] + 1 + Math.sin((idx + 0.5 + width / 2) / leafCount * 2 * Math.PI) * (r + 3) },`
+                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.5 + width / 2) / leafCount * 2 * Math.PI) * (r + 3) }`
+                                + ` L${ this.area[0][1] + 1 + Math.sin((idx + 0.5 + width / 2) / leafCount * 2 * Math.PI) * (r3 + 3) },`
+                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.5 + width / 2) / leafCount * 2 * Math.PI) * (r3 + 3) }`
                                 + ` A${ r3 + 3 },${ r3 + 3 },0,0,0,`
-                                + `${ this.area[0][1] + 1 + Math.sin((idx + 0.42) / leafCount * 2 * Math.PI) * (r3 + 3) },`
-                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.42) / leafCount * 2 * Math.PI) * (r3 + 3) }`
+                                + `${ this.area[0][1] + 1 + Math.sin((idx + 0.5 - width / 2) / leafCount * 2 * Math.PI) * (r3 + 3) },`
+                                + `${ this.area[0][0] - 22 - Math.cos((idx + 0.5 - width / 2) / leafCount * 2 * Math.PI) * (r3 + 3) }`
                                 + ` Z" `
                             + `style="`
                                 + `fill: ${ Color.setLightness(color, 0.3 + lightness * 0.7) }; `

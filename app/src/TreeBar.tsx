@@ -2,7 +2,7 @@
  * @Author: Antoine YANG 
  * @Date: 2019-09-23 18:41:23 
  * @Last Modified by: Antoine YANG
- * @Last Modified time: 2019-12-04 15:41:23
+ * @Last Modified time: 2019-12-15 20:19:29
  */
 
 import React, { Component } from 'react';
@@ -338,8 +338,19 @@ class TreeBar<T = any> extends Component<TreeBarProps, TreeBarState<T>, {}> {
                 rx: height / 16,
                 ry: height / 16,
                 x: x + width / 2 - height / 10,
-                y: y + height / 2 - height / 10
+                y: y + height / 2 - height / 10,
+                // opacity: 0.4
             }, 20);
+            // TODO: filling
+            // const rate: number =
+            //     ;
+            // const filling: JQuery<HTMLElement> = $(jQuery.parseXML(
+            //     `<path `
+            //     + `d="`
+            //     + ``
+            //     + `" />`
+            //     ).documentElement);
+            // $(this.refs['layer']).append(filling);
         });
         setTimeout(() => {
             this.relink(this.state);
